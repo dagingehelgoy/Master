@@ -87,6 +87,8 @@ def train(BATCH_SIZE):
 
 		print("Number of batches", total_batches_count)
 
+		should_test_result = True
+
 		for batch_index in range(total_batches_count):
 			for i in range(BATCH_SIZE):
 				uniform_rand = np.random.uniform(-1, 1, 100)
@@ -101,13 +103,14 @@ def train(BATCH_SIZE):
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
 
-			if epoch != 0 and epoch % 25 == 0:
+			if should_test_result and epoch != 0 and epoch % 10 == 0:
 				image_filename = fetch_image_filename(real_image_batch[0])
 
 				print "Fetching fetching most similar caption"
 				caption_string = fetch_text_caption(generated_captions[0])
 
 				print "Best caption for image: %s\n%s" % (image_filename, caption_string)
+				should_test_result = False
 
 			captions = np.concatenate((real_caption_batch, generated_captions))
 			imgs = np.concatenate((real_image_batch, real_image_batch))

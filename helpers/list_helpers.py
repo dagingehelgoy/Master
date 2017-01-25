@@ -22,7 +22,7 @@ from theano import tensor
 import multiprocessing as mp
 import time
 
-from image_database_helper import fetch_all_image_vector_pairs
+from data.database.helpers.image_database_helper import fetch_all_image_vector_pairs
 
 
 def split_list(data, split_ratio=0.8, convert_to_np=True):

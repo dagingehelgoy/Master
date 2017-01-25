@@ -103,14 +103,19 @@ def train(BATCH_SIZE):
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
 
-			if should_test_result and epoch != 0 and epoch % 10 == 0:
+			if should_test_result and epoch != 0 and epoch % 1 == 0:
 				image_filename = fetch_image_filename(real_image_batch[0])
 
 				print "Fetching fetching most similar caption"
 				caption_string = fetch_text_caption(generated_captions[0])
 
-				print "Best caption for image: %s\n%s" % (image_filename, caption_string)
+				result_string = "Best caption for image: %s\n%s" % (image_filename, caption_string)
+				res_file = open("result.txt", 'a')
+				res_file.write(result_string + "\n")
+				res_file.close()
+				print result_string
 				should_test_result = False
+
 
 			captions = np.concatenate((real_caption_batch, generated_captions))
 			imgs = np.concatenate((real_image_batch, real_image_batch))

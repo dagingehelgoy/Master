@@ -80,7 +80,7 @@ def train(BATCH_SIZE):
 
 	noise_and_img = np.zeros((BATCH_SIZE, NOISE_DIM + IMAGE_EMD_DIM))
 
-	for epoch in range(100):
+	for epoch in range(1000):
 		print("Epoch is", epoch)
 		training_data_count = image_vectors.shape[0]
 		total_batches_count = int(training_data_count / BATCH_SIZE)

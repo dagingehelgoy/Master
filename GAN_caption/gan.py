@@ -103,7 +103,7 @@ def train(BATCH_SIZE):
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
 
-			if should_test_result and epoch != 0 and epoch % 1 == 0:
+			if should_test_result and epoch != 0 and epoch % 10 == 0:
 				image_filename = fetch_image_filename(real_image_batch[0])
 
 				print "Fetching fetching most similar caption"

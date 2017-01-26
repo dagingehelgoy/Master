@@ -8,6 +8,7 @@ from keras.optimizers import SGD
 from data.embeddings.helpers.embeddings_helper import fetch_embeddings
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
+from helpers.io_helper import load_pickle_file
 
 NOISE_DIM = 100
 IMAGE_EMD_DIM = 4096
@@ -64,10 +65,10 @@ def train(BATCH_SIZE):
 
 	caption_vectors = np.asarray(caption_vectors)
 	image_vectors = np.asarray(image_vectors)
+	test_data_indices = [0, 10, 20, 30, 40]
 
 	# save_pickle_file(caption_vectors, "test_cap.pickle")
 	# save_pickle_file(image_vectors, "test_img.pickle")
-	test_data_indices = [0, 10, 20, 30, 40]
 
 	# caption_vectors = load_pickle_file("test_cap.pickle")
 	# image_vectors = load_pickle_file("test_img.pickle")
@@ -88,6 +89,7 @@ def train(BATCH_SIZE):
 
 	noise_and_img = np.zeros((BATCH_SIZE, NOISE_DIM + IMAGE_EMD_DIM))
 	noise_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
+	zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
 
 	for epoch in range(1000):
 		print("Epoch is", epoch)
@@ -149,16 +151,23 @@ def train(BATCH_SIZE):
 		# Test model each epoch
 		for test_index in range(len(test_images)):
 			test_image = test_images[test_index]
-
 			uniform_rand = np.random.uniform(-1, 1, 100)
 			noise_and_img_test[test_index, :100] = uniform_rand
 			noise_and_img_test[test_index, 100:] = test_image
 
-		predicted_captions = g_model.predict(noise_and_img_test)
-		for pred_caption_index in range(len(predicted_captions)):
-			pred_caption = predicted_captions[pred_caption_index]
+		for test_index in range(len(test_images)):
+			test_image = test_images[test_index]
+			zero_and_img_test[test_index, 100:] = test_image
+
+		predicted_captions_noise = g_model.predict(noise_and_img_test)
+		predicted_captions_zero = g_model.predict(zero_and_img_test)
+
+		for pred_caption_index in range(len(predicted_captions_noise)):
+			pred_caption_noise = predicted_captions_noise[pred_caption_index]
+			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
-			print "MSE: %s" % compare_vectors(pred_caption, actual_caption)
+			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
+			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
 
 		print "\n"
 
@@ -186,6 +195,7 @@ def get_models():
 
 def gan_main():
 	train(128)
+	# train(5)
 
 
 if __name__ == '__main__':

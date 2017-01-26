@@ -144,7 +144,7 @@ def train(BATCH_SIZE):
 
 			# Train g_model
 			# a_before = d_model.get_weights()
-			for _ in range(1):
+			for _ in range(10):
 				for i in range(BATCH_SIZE):
 					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
 				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
@@ -175,9 +175,6 @@ def train(BATCH_SIZE):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
 			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
-			# print "Actual filename:\t\t %s" % fetch_filenames_from_cation_vector(actual_caption)
-			# print "Predicted filename-noise:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_noise)
-			# print "Predicted filename-zero:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_zero)
 			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
 			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
 

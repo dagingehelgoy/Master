@@ -176,8 +176,8 @@ def train(BATCH_SIZE):
 			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
 			print "Actual filename:\t\t %s" % fetch_filenames_from_cation_vector(actual_caption)
-			print "Predicted filename-noise:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_noise)[0]
-			print "Predicted filename-zero:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_zero)[0]
+			print "Predicted filename-noise:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_noise)
+			print "Predicted filename-zero:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_zero)
 			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
 			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
 

@@ -53,7 +53,7 @@ def generator_containing_discriminator(g_model, d_model, g_input, d_input_img):
 	return gan
 
 
-def fetch_text_caption(cap_emb):
+def fetch_text_captions(cap_emb):
 	return find_n_most_similar_captions(cap_emb, 3)
 
 
@@ -117,15 +117,23 @@ def train(BATCH_SIZE):
 
 			if should_test_result and epoch != 0 and epoch % 10 == 0:
 				image_filename = fetch_image_filename(real_image_batch[0])
-
+				real_captions = fetch_caption_vectors_for_image_name(image_filename)
 				print "Fetching fetching most similar caption"
-				caption_string = fetch_text_caption(generated_captions[0])
+				most_similar_captions = fetch_text_captions(generated_captions[0])
 
-				result_string = "Best caption for image: %s\n%s" % (image_filename, caption_string)
-				res_file = open("result.txt", 'a')
-				res_file.write(result_string + "\n")
-				res_file.close()
-				print result_string
+				print "Best caption for image: %s" % image_filename
+
+				print "\nActual captions:"
+				for cap in real_captions:
+					print cap
+
+				print "\nMost similar captions:\n"
+				for cap in most_similar_captions:
+					print cap
+				# res_file = open("result.txt", 'a')
+				# res_file.write(result_string + "\n")
+				# res_file.close()
+				# print result_string
 				should_test_result = False
 
 			captions = np.concatenate((real_caption_batch, generated_captions))
@@ -139,7 +147,7 @@ def train(BATCH_SIZE):
 
 			# Train g_model
 			# a_before = d_model.get_weights()
-			for _ in range(5):
+			for _ in range(1):
 				for i in range(BATCH_SIZE):
 					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
 				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
@@ -170,6 +178,10 @@ def train(BATCH_SIZE):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
 			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
+			print "Actual filename: %s" % fetch_filenames_from_cation_vector(actual_caption)
+			print "Actual caption: %s" % fetch_text_captions(actual_caption)[0]
+			print "Predicted caption-noise: %s" % fetch_text_captions(pred_caption_noise)[0]
+			print "Predicted caption-zero: %s" % fetch_text_captions(pred_caption_zero)[0]
 			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
 			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
 
@@ -186,13 +198,15 @@ def get_models():
 	d_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
 	g_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
 	g_model, g_input = generator_model()
-	g_model.compile(loss='binary_crossentropy', optimizer="SGD")
+
+	g_model.compile(loss='binary_crossentropy', optimizer="adam")
 	d_model, d_input_img = discriminator_model()
-	d_model.compile(loss='binary_crossentropy', optimizer=d_optim)
+	d_model.compile(loss='binary_crossentropy', optimizer="adam")
+
 	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
 	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model, g_input, d_input_img)
-	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer=g_optim)
+	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer="adam")
 	# plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
 	return d_model, discriminator_on_generator, g_model
 

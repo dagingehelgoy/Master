@@ -22,9 +22,9 @@ def fetch_training_data():
 
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
-	g_tensor = Dense(2048, activation='tanh')(g_input)
+	# g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(1024, activation='tanh')(g_tensor)
-	g_tensor = Dense(512, activation='tanh')(g_tensor)
+	# g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
 	return g_model, g_input
@@ -66,7 +66,7 @@ def train(BATCH_SIZE):
 
 	caption_vectors = np.asarray(caption_vectors)
 	image_vectors = np.asarray(image_vectors)
-	test_data_indices = [0, 10, 20, 30, 40]
+	test_data_indices = [0, 100, 200]
 
 	# save_pickle_file(caption_vectors, "test_cap.pickle")
 	# save_pickle_file(image_vectors, "test_img.pickle")

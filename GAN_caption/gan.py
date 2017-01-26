@@ -93,7 +93,7 @@ def train(BATCH_SIZE):
 	zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
 
 	for epoch in range(1000):
-		print("Epoch is: %s" % epoch)
+		print("Epoch: %s" % epoch)
 		training_data_count = image_vectors.shape[0]
 		total_batches_count = int(training_data_count / BATCH_SIZE)
 
@@ -175,9 +175,9 @@ def train(BATCH_SIZE):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
 			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
-			print "Actual filename:\t\t %s" % fetch_filenames_from_cation_vector(actual_caption)
-			print "Predicted filename-noise:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_noise)
-			print "Predicted filename-zero:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_zero)
+			# print "Actual filename:\t\t %s" % fetch_filenames_from_cation_vector(actual_caption)
+			# print "Predicted filename-noise:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_noise)
+			# print "Predicted filename-zero:\t\t %s" % fetch_filenames_from_cation_vector(pred_caption_zero)
 			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
 			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
 

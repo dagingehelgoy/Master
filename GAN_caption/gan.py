@@ -23,7 +23,7 @@ def fetch_training_data():
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
 	# g_tensor = Dense(2048, activation='tanh')(g_input)
-	g_tensor = Dense(1024, activation='tanh')(g_tensor)
+	g_tensor = Dense(1024, activation='tanh')(g_input)
 	# g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")

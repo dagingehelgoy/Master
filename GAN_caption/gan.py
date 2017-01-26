@@ -116,6 +116,7 @@ def train(BATCH_SIZE):
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
 
 			if should_test_result and epoch != 0 and epoch % 10 == 0:
+				print "\n### CHECKING PERFORMANCE OF GENERATOR ###\n"
 				image_filename = fetch_image_filename(real_image_batch[0])
 				real_captions = fetch_caption_vectors_for_image_name(image_filename)
 				print "Fetching fetching most similar caption"

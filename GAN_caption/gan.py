@@ -2,6 +2,7 @@ from keras.engine import Input
 from keras.layers import Dense, merge
 from keras.models import Model
 from keras.optimizers import SGD
+import datetime
 
 # SETTINGS
 # from keras.utils.visualize_util import plot
@@ -197,6 +198,9 @@ def get_models():
 
 
 def gan_main():
+	res_file = open("result.txt", 'a')
+	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime)
+	res_file.close()
 	train(128)
 	# train(5)
 

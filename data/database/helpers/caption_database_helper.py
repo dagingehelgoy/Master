@@ -76,6 +76,7 @@ def find_n_most_similar_captions(caption_embedding, n=1):
 		counter += 1
 		if counter % 100 == 0 or counter > total_captions - 1:
 			print_progress(counter, total_captions, prefix="Searching for caption")
+	print_progress(total_captions, total_captions, prefix="Searching for caption")
 	return best_caption_text_list
 
 

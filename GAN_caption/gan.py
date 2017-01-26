@@ -93,11 +93,11 @@ def train(BATCH_SIZE):
 	zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
 
 	for epoch in range(1000):
-		print("Epoch is", epoch)
+		print("Epoch is: %s" % epoch)
 		training_data_count = image_vectors.shape[0]
 		total_batches_count = int(training_data_count / BATCH_SIZE)
 
-		print("Number of batches", total_batches_count)
+		# print("Number of batches", total_batches_count)
 
 		should_test_result = True
 
@@ -130,10 +130,6 @@ def train(BATCH_SIZE):
 				print "\nMost similar captions:\n"
 				for cap in most_similar_captions:
 					print cap
-				# res_file = open("result.txt", 'a')
-				# res_file.write(result_string + "\n")
-				# res_file.close()
-				# print result_string
 				should_test_result = False
 
 			captions = np.concatenate((real_caption_batch, generated_captions))

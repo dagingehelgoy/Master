@@ -7,6 +7,7 @@ from keras.optimizers import SGD
 # from keras.utils.visualize_util import plot
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
+from data.embeddings.helpers.embeddings_helper import fetch_embeddings
 from helpers.io_helper import load_pickle_file
 
 NOISE_DIM = 100

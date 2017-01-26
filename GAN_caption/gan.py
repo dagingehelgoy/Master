@@ -5,7 +5,6 @@ from keras.optimizers import SGD
 
 # SETTINGS
 # from keras.utils.visualize_util import plot
-from data.embeddings.helpers.embeddings_helper import fetch_embeddings
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
 from helpers.io_helper import load_pickle_file
@@ -114,18 +113,18 @@ def train(BATCH_SIZE):
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
 
-			# if should_test_result and epoch != 0 and epoch % 10 == 0:
-			# 	image_filename = fetch_image_filename(real_image_batch[0])
-			#
-			# 	print "Fetching fetching most similar caption"
-			# 	caption_string = fetch_text_caption(generated_captions[0])
-			#
-			# 	result_string = "Best caption for image: %s\n%s" % (image_filename, caption_string)
-			# 	res_file = open("result.txt", 'a')
-			# 	res_file.write(result_string + "\n")
-			# 	res_file.close()
-			# 	print result_string
-			# 	should_test_result = False
+			if should_test_result and epoch != 0 and epoch % 10 == 0:
+				image_filename = fetch_image_filename(real_image_batch[0])
+
+				print "Fetching fetching most similar caption"
+				caption_string = fetch_text_caption(generated_captions[0])
+
+				result_string = "Best caption for image: %s\n%s" % (image_filename, caption_string)
+				res_file = open("result.txt", 'a')
+				res_file.write(result_string + "\n")
+				res_file.close()
+				print result_string
+				should_test_result = False
 
 			captions = np.concatenate((real_caption_batch, generated_captions))
 			imgs = np.concatenate((real_image_batch, real_image_batch))
@@ -134,14 +133,17 @@ def train(BATCH_SIZE):
 
 			# Train d_model
 			d_loss = d_model.train_on_batch(X, y)
-
-			for i in range(BATCH_SIZE):
-				noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
+			d_model.trainable = False
 
 			# Train g_model
-			d_model.trainable = False
-			g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
+			# a_before = d_model.get_weights()
+			for _ in range(5):
+				for i in range(BATCH_SIZE):
+					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
+				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
+			# a_after = d_model.get_weights()
 			d_model.trainable = True
+
 		# if batch_index % 100 == 0:
 		# 	print("batch %d d_loss : %f" % (batch_index, d_loss))
 		# 	print("batch %d g_loss : %f" % (batch_index, g_loss))

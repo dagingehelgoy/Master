@@ -194,7 +194,7 @@ def get_models():
 
 	g_model.compile(loss='binary_crossentropy', optimizer="adam")
 	d_model, d_input_img = discriminator_model()
-	d_model.compile(loss='binary_crossentropy', optimizer="adam")
+	d_model.compile(loss='binary_crossentropy', optimizer=d_optim)
 
 	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
 	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)

@@ -199,7 +199,7 @@ def get_models():
 
 def gan_main():
 	res_file = open("result.txt", 'a')
-	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime)
+	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime.now())
 	res_file.close()
 	train(128)
 	# train(5)

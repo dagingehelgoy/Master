@@ -19,6 +19,12 @@ def fetch_caption_vectors_for_image_name(image_name):
 	return vector_list
 
 
+def fetch_caption_texts_for_image_name(image_name):
+	vectors = db_wrapper.db_get_caption_texts(image_name)
+	vector_list = [i[0] for i in vectors]
+	return vector_list
+
+
 def fetch_all_caption_vectors():
 	return db_wrapper.db_fetch_all_caption_vectors()
 

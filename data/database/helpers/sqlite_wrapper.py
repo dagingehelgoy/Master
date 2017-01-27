@@ -1,9 +1,9 @@
 import io
 import sqlite3
-import sys
-import settings
 
 import numpy as np
+
+import settings
 
 
 def adapt_array(arr):
@@ -134,6 +134,12 @@ def db_all_caption_rows():
 def db_get_caption_vectors(filename):
 	cursor = db.cursor()
 	result = cursor.execute("""SELECT caption_vector FROM captions WHERE filename = ?""", (filename,)).fetchall()
+	return result
+
+
+def db_get_caption_texts(filename):
+	cursor = db.cursor()
+	result = cursor.execute("""SELECT caption_text FROM captions WHERE filename = ?""", (filename,)).fetchall()
 	return result
 
 

@@ -23,7 +23,7 @@ def fetch_training_data():
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
 	# g_tensor = Dense(2048, activation='tanh')(g_input)
-	g_tensor = Dense(1024, activation='tanh')(g_input)
+	g_tensor = Dense(2048, activation='tanh')(g_input)
 	# g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
@@ -144,7 +144,7 @@ def train(BATCH_SIZE):
 
 			# Train g_model
 			# a_before = d_model.get_weights()
-			for _ in range(10):
+			for _ in range(5):
 				for i in range(BATCH_SIZE):
 					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
 				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)

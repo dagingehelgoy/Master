@@ -62,19 +62,19 @@ def fetch_image_filename(img_emb):
 
 
 def train(BATCH_SIZE):
-	caption_vectors, image_vectors, _ = fetch_embeddings()
-
-	caption_vectors = np.asarray(caption_vectors)
-	image_vectors = np.asarray(image_vectors)
-	test_data_indices = [0, 100, 200]
+	# caption_vectors, image_vectors, _ = fetch_embeddings()
+	#
+	# caption_vectors = np.asarray(caption_vectors)
+	# image_vectors = np.asarray(image_vectors)
+	# test_data_indices = [0, 100, 200]
 
 	# save_pickle_file(caption_vectors, "test_cap.pickle")
 	# save_pickle_file(image_vectors, "test_img.pickle")
 
-	# caption_vectors = load_pickle_file("test_cap.pickle")
-	# image_vectors = load_pickle_file("test_img.pickle")
-	#
-	# test_data_indices = [0]
+	caption_vectors = load_pickle_file("test_cap.pickle")
+	image_vectors = load_pickle_file("test_img.pickle")
+
+	test_data_indices = [0]
 
 	test_images = []
 	test_captions = []
@@ -117,7 +117,7 @@ def train(BATCH_SIZE):
 
 			if should_test_result and epoch != 0 and epoch % 10 == 0:
 				print "\n### CHECKING PERFORMANCE OF GENERATOR ###\n"
-				image_filename = fetch_image_filename(real_image_batch[0])
+				image_filename = fetch_image_filename(real_image_batch[0])[0]
 				real_captions = fetch_caption_vectors_for_image_name(image_filename)
 				print "Fetching fetching most similar caption"
 				most_similar_captions = fetch_text_captions(generated_captions[0])
@@ -205,11 +205,11 @@ def get_models():
 
 
 def gan_main():
-	res_file = open("result.txt", 'a')
-	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime.now())
-	res_file.close()
-	train(128)
-	# train(5)
+	# res_file = open("result.txt", 'a')
+	# res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime.now())
+	# res_file.close()
+	# train(128)
+	train(5)
 
 
 if __name__ == '__main__':

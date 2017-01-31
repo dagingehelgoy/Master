@@ -175,15 +175,17 @@ def train(BATCH_SIZE, args):
 		# 	zero_and_img_test[test_index, 100:] = test_image
 
 		predicted_captions_noise = g_model.predict(test_images)
+		predicted_captions_class = discriminator_on_generator.predict([test_images, test_images])
 		# predicted_captions_zero = g_model.predict(zero_and_img_test)
 
 		for pred_caption_index in range(len(predicted_captions_noise)):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
+			pred_caption_class = predicted_captions_class[pred_caption_index]
 			# pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
 			mse_noise = compare_vectors(pred_caption_noise, actual_caption)
 			# mse_zero = compare_vectors(pred_caption_zero, actual_caption)
-			print "%s\tMSE-noise:\t%s\t%s...%s" % (pred_caption_index, mse_noise, pred_caption_noise[:5], pred_caption_noise[-5:])
+			print "%s\tMSE-noise:\t%s\tPRED CLASS=%s\t%s...%s" % (pred_caption_index, mse_noise, pred_caption_class[0], pred_caption_noise[:5], pred_caption_noise[-5:])
 			# print "%s\tMSE-zero:\t%s\t%s...%s" % (pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
 
 		print "\n"

@@ -179,8 +179,8 @@ def train(BATCH_SIZE):
 			actual_caption = test_captions[pred_caption_index]
 			mse_noise = compare_vectors(pred_caption_noise, actual_caption)
 			mse_zero = compare_vectors(pred_caption_zero, actual_caption)
-			print "%s\tMSE-noise:\t%s\t%s" % (pred_caption_index, mse_noise, pred_caption_noise)
-			print "%s\tMSE-zero:\t%s\t%s" % (pred_caption_index, mse_zero, pred_caption_zero)
+			print "%s\tMSE-noise:\t%s\t%s...%s" % (pred_caption_index, mse_noise, pred_caption_noise[:5], pred_caption_noise[-5:])
+			print "%s\tMSE-zero:\t%s\t%s...%s" % (pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
 
 		print "\n"
 

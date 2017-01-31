@@ -6,6 +6,8 @@ import datetime
 
 # SETTINGS
 # from keras.utils.visualize_util import plot
+from keras.utils.visualize_util import plot
+
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
 from data.embeddings.helpers.embeddings_helper import fetch_embeddings
@@ -37,7 +39,7 @@ def discriminator_model():
 	d_img_input = Input(shape=(IMAGE_EMD_DIM,), name="d_img_input")
 	d_img_tensor = Dense(2048, activation='tanh')(d_img_input)
 	d_img_tensor = Dense(100, activation='tanh')(d_img_tensor)
-	d_merge = merge([d_caption_tensor, d_img_input], mode='concat')
+	d_merge = merge([d_caption_tensor, d_img_tensor], mode='concat')
 
 	d_output = Dense(1, activation='sigmoid')(d_merge)
 	d_model = Model(input=[d_cap_input, d_img_input], output=d_output, name="discriminator_model")
@@ -197,11 +199,11 @@ def get_models():
 	d_model, d_input_img = discriminator_model()
 	d_model.compile(loss='binary_crossentropy', optimizer=d_optim)
 
-	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
-	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model, g_input, d_input_img)
 	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer="adam")
-	# plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
+	plot(g_model, to_file="generatorCAP.png", show_shapes=True)
+	plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
+	plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
 	return d_model, discriminator_on_generator, g_model
 
 

@@ -5,7 +5,7 @@ from keras.optimizers import SGD
 import datetime
 
 # SETTINGS
-# from keras.utils.visualize_util import plot
+from keras.utils.visualize_util import plot
 
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
@@ -76,7 +76,7 @@ def train(BATCH_SIZE):
 	# caption_vectors = load_pickle_file("test_cap.pickle")
 	# image_vectors = load_pickle_file("test_img.pickle")
 	#
-	# test_data_indices = [0]
+	# test_data_indices = [0, 5]
 
 	test_images = []
 	test_captions = []
@@ -177,8 +177,10 @@ def train(BATCH_SIZE):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
 			pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
-			print "%s\tMSE-noise:\t%s" % (pred_caption_index, compare_vectors(pred_caption_noise, actual_caption))
-			print "%s\tMSE-zero:\t%s" % (pred_caption_index, compare_vectors(pred_caption_zero, actual_caption))
+			mse_noise = compare_vectors(pred_caption_noise, actual_caption)
+			mse_zero = compare_vectors(pred_caption_zero, actual_caption)
+			print "%s\tMSE-noise:\t%s\t%s" % (pred_caption_index, mse_noise, pred_caption_noise)
+			print "%s\tMSE-zero:\t%s\t%s" % (pred_caption_index, mse_zero, pred_caption_zero)
 
 		print "\n"
 
@@ -200,9 +202,9 @@ def get_models():
 
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model, g_input, d_input_img)
 	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer="adam")
-	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
-	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
-	# plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
+	plot(g_model, to_file="generatorCAP.png", show_shapes=True)
+	plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
+	plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
 	return d_model, discriminator_on_generator, g_model
 
 

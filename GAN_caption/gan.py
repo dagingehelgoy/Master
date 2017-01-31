@@ -154,6 +154,10 @@ def train(BATCH_SIZE, args):
 				# for i in range(BATCH_SIZE):
 					# noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
 				g_loss = discriminator_on_generator.train_on_batch([real_image_batch, real_image_batch], [1] * BATCH_SIZE)
+				print "\n\n####### PREDICTING DIS ON GEN #######"
+				print discriminator_on_generator.predict([real_image_batch, real_image_batch])
+				print "#####################################\n\n"
+
 			# a_after = d_model.get_weights()
 			d_model.trainable = True
 

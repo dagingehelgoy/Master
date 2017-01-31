@@ -24,7 +24,7 @@ def fetch_training_data():
 
 
 def generator_model():
-	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
+	g_input = Input(shape=(IMAGE_EMD_DIM,), name='g_input')
 	# g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(512, activation='tanh')(g_tensor)
@@ -94,9 +94,9 @@ def train(BATCH_SIZE, args):
 
 	d_model.trainable = True
 
-	noise_and_img = np.zeros((BATCH_SIZE, NOISE_DIM + IMAGE_EMD_DIM))
-	noise_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
-	zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
+	# noise_and_img = np.zeros((BATCH_SIZE, NOISE_DIM + IMAGE_EMD_DIM))
+	# noise_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
+	# zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
 
 	for epoch in range(1000):
 		print("Epoch: %s" % epoch)
@@ -108,18 +108,18 @@ def train(BATCH_SIZE, args):
 		should_test_result = True
 
 		for batch_index in range(total_batches_count):
-			for i in range(BATCH_SIZE):
-				uniform_rand = np.random.uniform(-1, 1, 100)
-
-				consecutive_img = image_vectors[batch_index * BATCH_SIZE + i]
-
-				noise_and_img[i, :100] = uniform_rand
-				noise_and_img[i, 100:] = consecutive_img
+			# for i in range(BATCH_SIZE):
+			# 	uniform_rand = np.random.uniform(-1, 1, 100)
+			#
+			# 	consecutive_img = image_vectors[batch_index * BATCH_SIZE + i]
+			#
+			# 	noise_and_img[i, :100] = uniform_rand
+			# 	noise_and_img[i, 100:] = consecutive_img
 
 			real_caption_batch = caption_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 			real_image_batch = image_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 
-			generated_captions = g_model.predict(noise_and_img, verbose=0)
+			generated_captions = g_model.predict(real_image_batch, verbose=0)
 
 			if should_test_result and epoch != 0 and epoch % 10 == 0:
 				print "\n### CHECKING PERFORMANCE OF GENERATOR ###\n"
@@ -151,9 +151,9 @@ def train(BATCH_SIZE, args):
 			# Train g_model
 			# a_before = d_model.get_weights()
 			for _ in range(3):
-				for i in range(BATCH_SIZE):
-					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
-				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
+				# for i in range(BATCH_SIZE):
+					# noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
+				g_loss = discriminator_on_generator.train_on_batch([real_image_batch, real_image_batch], [1] * BATCH_SIZE)
 			# a_after = d_model.get_weights()
 			d_model.trainable = True
 
@@ -164,27 +164,27 @@ def train(BATCH_SIZE, args):
 		print("epoch %d d_loss : %f" % (epoch, d_loss))
 		print("epoch %d g_loss : %f" % (epoch, g_loss))
 		# Test model each epoch
-		for test_index in range(len(test_images)):
-			test_image = test_images[test_index]
-			uniform_rand = np.random.uniform(-1, 1, 100)
-			noise_and_img_test[test_index, :100] = uniform_rand
-			noise_and_img_test[test_index, 100:] = test_image
+		# for test_index in range(len(test_images)):
+		# 	test_image = test_images[test_index]
+		# 	uniform_rand = np.random.uniform(-1, 1, 100)
+		# 	noise_and_img_test[test_index, :100] = uniform_rand
+		# 	noise_and_img_test[test_index, 100:] = test_image
 
-		for test_index in range(len(test_images)):
-			test_image = test_images[test_index]
-			zero_and_img_test[test_index, 100:] = test_image
+		# for test_index in range(len(test_images)):
+		# 	test_image = test_images[test_index]
+		# 	zero_and_img_test[test_index, 100:] = test_image
 
-		predicted_captions_noise = g_model.predict(noise_and_img_test)
-		predicted_captions_zero = g_model.predict(zero_and_img_test)
+		predicted_captions_noise = g_model.predict(test_images)
+		# predicted_captions_zero = g_model.predict(zero_and_img_test)
 
 		for pred_caption_index in range(len(predicted_captions_noise)):
 			pred_caption_noise = predicted_captions_noise[pred_caption_index]
-			pred_caption_zero = predicted_captions_zero[pred_caption_index]
+			# pred_caption_zero = predicted_captions_zero[pred_caption_index]
 			actual_caption = test_captions[pred_caption_index]
 			mse_noise = compare_vectors(pred_caption_noise, actual_caption)
-			mse_zero = compare_vectors(pred_caption_zero, actual_caption)
+			# mse_zero = compare_vectors(pred_caption_zero, actual_caption)
 			print "%s\tMSE-noise:\t%s\t%s...%s" % (pred_caption_index, mse_noise, pred_caption_noise[:5], pred_caption_noise[-5:])
-			print "%s\tMSE-zero:\t%s\t%s...%s" % (pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
+			# print "%s\tMSE-zero:\t%s\t%s...%s" % (pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
 
 		print "\n"
 

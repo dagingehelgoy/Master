@@ -24,24 +24,25 @@ def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
 	# g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(2048, activation='tanh')(g_input)
-	# g_tensor = Dense(512, activation='tanh')(g_tensor)
+	g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
 	return g_model, g_input
 
 
 def discriminator_model():
-	d_input_cap = Input(shape=(CAP_EMB_DIM,), name="d_input_cap")
-	d_tensor = Dense(100, activation='tanh')(d_input_cap)
+	d_cap_input = Input(shape=(CAP_EMB_DIM,), name="d_cap_input")
+	d_caption_tensor = Dense(100, activation='tanh')(d_cap_input)
 
-	d_input_img = Input(shape=(IMAGE_EMD_DIM,), name="d_input_img")
-
-	d_merge = merge([d_tensor, d_input_img], mode='concat')
+	d_img_input = Input(shape=(IMAGE_EMD_DIM,), name="d_img_input")
+	d_img_tensor = Dense(2048, activation='tanh')(d_img_input)
+	d_img_tensor = Dense(100, activation='tanh')(d_img_tensor)
+	d_merge = merge([d_caption_tensor, d_img_input], mode='concat')
 
 	d_output = Dense(1, activation='sigmoid')(d_merge)
-	d_model = Model(input=[d_input_cap, d_input_img], output=d_output, name="discriminator_model")
+	d_model = Model(input=[d_cap_input, d_img_input], output=d_output, name="discriminator_model")
 
-	return d_model, d_input_img
+	return d_model, d_img_input
 
 
 def generator_containing_discriminator(g_model, d_model, g_input, d_input_img):

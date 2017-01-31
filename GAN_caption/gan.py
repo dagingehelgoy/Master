@@ -191,17 +191,35 @@ def train(BATCH_SIZE):
 	# d_model.save_weights('d_model', True)
 
 
+def contrastive_loss(_, predict):
+	s, im = tf.split(1, 2, predict)
+	s2 = tf.expand_dims(tf.transpose(s, [0, 1]), 1)
+	im2 = tf.expand_dims(tf.transpose(im, [0, 1]), 0)
+	diff = im2 - s2
+	maximum = tf.maximum(diff, 0.0)
+	tensor_pow = tf.square(maximum)
+	errors = tf.reduce_sum(tensor_pow, 2)
+	diagonal = tf.diag_part(errors)
+	cost_s = tf.maximum(0.05 - errors + diagonal, 0.0)
+	cost_im = tf.maximum(0.05 - errors + tf.reshape(diagonal, (-1, 1)), 0.0)
+	cost_tot = cost_s + cost_im
+	zero_diag = tf.mul(diagonal, 0.0)
+	cost_tot_diag = tf.matrix_set_diag(cost_tot, zero_diag)
+	tot_sum = tf.reduce_sum(cost_tot_diag)
+	return tot_sum
+
+
 def get_models():
 	d_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
 	g_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
 	g_model, g_input = generator_model()
 
-	g_model.compile(loss='binary_crossentropy', optimizer="adam")
+	g_model.compile(loss=contrastive_loss, optimizer='adam')
 	d_model, d_input_img = discriminator_model()
-	d_model.compile(loss='binary_crossentropy', optimizer=d_optim)
+	d_model.compile(loss=contrastive_loss, optimizer='adam')
 
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model, g_input, d_input_img)
-	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer="adam")
+	discriminator_on_generator.compile(loss=contrastive_loss, optimizer='adam')
 	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
 	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
 	# plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)

@@ -5,7 +5,7 @@ from keras.optimizers import SGD
 import datetime
 
 # SETTINGS
-from keras.utils.visualize_util import plot
+# from keras.utils.visualize_util import plot
 
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
@@ -202,9 +202,9 @@ def get_models():
 
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model, g_input, d_input_img)
 	discriminator_on_generator.compile(loss='binary_crossentropy', optimizer="adam")
-	plot(g_model, to_file="generatorCAP.png", show_shapes=True)
-	plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
-	plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
+	# plot(g_model, to_file="generatorCAP.png", show_shapes=True)
+	# plot(d_model, to_file="discriminatorCAP.png", show_shapes=True)
+	# plot(discriminator_on_generator, to_file="discriminator_on_generatorCAP.png", show_shapes=True)
 	return d_model, discriminator_on_generator, g_model
 
 

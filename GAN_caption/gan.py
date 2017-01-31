@@ -1,8 +1,10 @@
+import datetime
+
+import tensorflow as tf
 from keras.engine import Input
 from keras.layers import Dense, merge
 from keras.models import Model
 from keras.optimizers import SGD
-import datetime
 
 # SETTINGS
 # from keras.utils.visualize_util import plot
@@ -10,7 +12,6 @@ import datetime
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.caption_database_helper import *
 from data.embeddings.helpers.embeddings_helper import fetch_embeddings
-from helpers.io_helper import load_pickle_file
 
 NOISE_DIM = 100
 IMAGE_EMD_DIM = 4096

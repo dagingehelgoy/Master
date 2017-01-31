@@ -33,11 +33,11 @@ def generator_model():
 
 def discriminator_model():
 	d_cap_input = Input(shape=(CAP_EMB_DIM,), name="d_cap_input")
-	d_caption_tensor = Dense(100, activation='tanh')(d_cap_input)
+	d_caption_tensor = Dense(300, activation='tanh')(d_cap_input)
 
 	d_img_input = Input(shape=(IMAGE_EMD_DIM,), name="d_img_input")
-	d_img_tensor = Dense(2048, activation='tanh')(d_img_input)
-	d_img_tensor = Dense(100, activation='tanh')(d_img_tensor)
+	d_img_tensor = Dense(300, activation='tanh')(d_img_input)
+	# d_img_tensor = Dense(100, activation='tanh')(d_img_tensor)
 	d_merge = merge([d_caption_tensor, d_img_tensor], mode='concat')
 
 	d_output = Dense(1, activation='sigmoid')(d_merge)
@@ -146,7 +146,7 @@ def train(BATCH_SIZE):
 
 			# Train g_model
 			# a_before = d_model.get_weights()
-			for _ in range(5):
+			for _ in range(3):
 				for i in range(BATCH_SIZE):
 					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
 				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)

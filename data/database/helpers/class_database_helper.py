@@ -1,5 +1,7 @@
+from list_helpers import insert_and_remove_last
+
 import sqlite_wrapper as db_wrapper
-from data.database.helpers.caption_database_helper import fetch_all_caption_text_tuples
+from data.database.helpers.caption_database_helper import fetch_all_caption_text_tuples, compare_vectors
 from data.database.helpers.word_database_helper import fetch_all_word_vectors
 from helpers.io_helper import save_pickle_file, load_pickle_file
 from helpers.list_helpers import print_progress
@@ -76,6 +78,39 @@ def get_classes(caption, common_words):
 		if word not in common_words and len(word) > 2:
 			classes.append(word)
 	return classes
+
+
+def find_n_most_similar_class(class_embedding, n=1):
+	class_vector_pairs = fetch_all_word_vectors()
+
+	first_class_text = class_vector_pairs[0][0]
+	first_class_vector = class_vector_pairs[0][1]
+	first_class_mse = compare_vectors(class_embedding, first_class_vector)
+
+	best_class_vector_mse_list = [0 for i in range(n)]
+	best_class_text_list = ["" for i in range(n)]
+	best_class_vector_list = [[] for i in range(n)]
+
+	best_class_vector_mse_list = insert_and_remove_last(0, best_class_vector_mse_list, first_class_mse)
+	best_class_text_list = insert_and_remove_last(0, best_class_text_list, first_class_text)
+	best_class_vector_list = insert_and_remove_last(0, best_class_vector_list, first_class_vector)
+	total_classs = len(class_vector_pairs)
+	counter = 1
+
+	print_progress(counter, total_classs, prefix="Searching for class")
+	for temp_class_text, temp_class_vector in class_vector_pairs:
+		temp_image_mse = compare_vectors(class_embedding, temp_class_vector)
+		for index in range(len(best_class_vector_list)):
+			if temp_image_mse < best_class_vector_mse_list[index]:
+				best_class_vector_mse_list = insert_and_remove_last(index, best_class_vector_mse_list, temp_image_mse)
+				best_class_text_list = insert_and_remove_last(index, best_class_text_list, temp_class_text)
+				best_class_vector_list = insert_and_remove_last(index, best_class_vector_list, temp_class_vector)
+				break
+		counter += 1
+		if counter % 100 == 0 or counter > total_classs - 1:
+			print_progress(counter, total_classs, prefix="Searching for class")
+	print_progress(total_classs, total_classs, prefix="Searching for class")
+	return best_class_text_list
 
 
 def gen_class_embs():

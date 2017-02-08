@@ -19,6 +19,7 @@ def convert_array(text):
 	out.seek(0)
 	return np.load(out)
 
+
 db = sqlite3.connect(settings.DB_FILE_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
 # TODO str Not working in python 2, unicode does
 # db.text_factory = lambda x: unicode(x, "utf-8", "ignore")
@@ -26,13 +27,13 @@ db = sqlite3.connect(settings.DB_FILE_PATH, detect_types=sqlite3.PARSE_DECLTYPES
 sqlite3.register_adapter(np.ndarray, adapt_array)
 sqlite3.register_converter("array", convert_array)
 
-
 c = db.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS images (filename TEXT UNIQUE, image_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS captions (filename TEXT, caption_text TEXT, caption_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS words (word_text TEXT UNIQUE, word_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS classes (filename TEXT, class_text TEXT, class_vector array)''')
 db.commit()
+
 
 def update_database_connection(word_embedding, image_embedding):
 	global db
@@ -43,6 +44,7 @@ def update_database_connection(word_embedding, image_embedding):
 	settings.IMAGE_EMBEDDING_DIMENSIONS = 4096 if image_embedding == "vgg" else 2048
 	print("Connected to %s" % settings.DB_FILE_PATH)
 
+
 """ TABLE: WORDS """
 
 
@@ -51,10 +53,12 @@ def db_insert_word_vector(word_text, word_vector):
 	cursor.execute("""INSERT INTO words VALUES(?, ?)""", (word_text, word_vector))
 	db.commit()
 
+
 def db_insert_word_vector_list(tuple_list):
 	cursor = db.cursor()
 	cursor.executemany("""INSERT INTO words VALUES (?, ?)""", tuple_list)
 	db.commit()
+
 
 def db_fetch_all_word_vectors():
 	cursor = db.cursor()
@@ -67,6 +71,7 @@ def db_fetch_word_vector(word, default=None):
 	if result is None:
 		return default
 	return result
+
 
 """ TABLE: IMAGES """
 
@@ -95,7 +100,6 @@ def db_update_filename_img_vec_pairs():
 
 
 def db_insert_image_vector(filename, image_vector):
-
 	cursor = db.cursor()
 	cursor.execute("""INSERT INTO images VALUES (?,?)""", (filename, image_vector))
 	db.commit()

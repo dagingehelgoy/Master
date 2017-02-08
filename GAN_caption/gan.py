@@ -2,7 +2,7 @@ import datetime
 
 import tensorflow as tf
 from keras.engine import Input
-from keras.layers import Dense, merge
+from keras.layers import Dense, merge, BatchNormalization
 from keras.models import Model
 from keras.optimizers import SGD
 
@@ -28,8 +28,8 @@ def fetch_training_data():
 
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
-	# g_tensor = Dense(2048, activation='tanh')(g_input)
-	g_tensor = Dense(2048, activation='tanh')(g_input)
+	g_tensor = BatchNormalization()(g_input)
+	g_tensor = Dense(2048, activation='tanh')(g_tensor)
 	g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
@@ -84,6 +84,8 @@ def train(BATCH_SIZE, args):
 	#
 
 	class_vectors, image_vectors = fetch_class_embeddings()
+	print class_vectors[0]
+	print image_vectors[0]
 	test_data_indices = [0, 100, 200]
 	class_vectors = np.asarray(class_vectors)
 	image_vectors = np.asarray(image_vectors)
@@ -162,6 +164,7 @@ def train(BATCH_SIZE, args):
 			# a_after = d_model.get_weights()
 			d_model.trainable = True
 
+		if batch_index % 100 == 0:
 			print("batch %d d_loss : %f" % (batch_index, d_loss))
 			print("batch %d g_loss : %f" % (batch_index, g_loss))
 

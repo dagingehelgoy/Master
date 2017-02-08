@@ -10,9 +10,10 @@ from keras.optimizers import SGD
 # from keras.utils.visualize_util import plot
 
 from data.database.helpers.image_database_helper import *
-from data.database.helpers.caption_database_helper import *
-from data.embeddings.helpers.embeddings_helper import fetch_embeddings
+# from data.database.helpers.caption_database_helper import *
+from data.embeddings.helpers.embeddings_helper import *
 from helpers.io_helper import load_pickle_file
+
 
 NOISE_DIM = 100
 IMAGE_EMD_DIM = 4096
@@ -66,27 +67,30 @@ def fetch_image_filename(img_emb):
 
 
 def train(BATCH_SIZE, args):
-	if args.env == 'local':
-		caption_vectors = load_pickle_file("test_cap.pickle")
-		image_vectors = load_pickle_file("test_img.pickle")
+	# if args.env == 'local':
+	# 	print len(image_vectors), len(class_vectors)
 
-		test_data_indices = [0, 5]
-	else:
-		caption_vectors, image_vectors, _ = fetch_embeddings()
+		# caption_vectors = load_pickle_file("test_cap.pickle")
+		# image_vectors = load_pickle_file("test_img.pickle")
 
-		caption_vectors = np.asarray(caption_vectors)
-		image_vectors = np.asarray(image_vectors)
-		test_data_indices = [0, 100, 200]
+		# test_data_indices = [0, 5]
 
-	# save_pickle_file(caption_vectors, "test_cap.pickle")
-	# save_pickle_file(image_vectors, "test_img.pickle")
+		# save_pickle_file(caption_vectors, "test_cap.pickle")
+		# save_pickle_file(image_vectors, "test_img.pickle")
+	# else:
+	# 	caption_vectors, image_vectors, _ = fetch_class_embeddings()
+	#
 
+	class_vectors, image_vectors = fetch_class_embeddings()
+	test_data_indices = [0, 100, 200]
+	class_vectors = np.asarray(class_vectors)
+	image_vectors = np.asarray(image_vectors)
 
 	test_images = []
 	test_captions = []
 	for index in test_data_indices:
 		test_images.append(image_vectors[index])
-		test_captions.append(caption_vectors[index])
+		test_captions.append(class_vectors[index])
 	test_images = np.asarray(test_images)
 	test_captions = np.asarray(test_captions)
 	print("Building models")
@@ -116,7 +120,7 @@ def train(BATCH_SIZE, args):
 				noise_and_img[i, :100] = uniform_rand
 				noise_and_img[i, 100:] = consecutive_img
 
-			real_caption_batch = caption_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
+			real_caption_batch = class_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 			real_image_batch = image_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)

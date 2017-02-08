@@ -1,6 +1,5 @@
 import argparse
 
-from GAN_caption.gan import gan_main
 
 
 def get_args():
@@ -13,4 +12,8 @@ def get_args():
 if __name__ == "__main__":
 	args = get_args()
 	if args.code == "gan":
+		from GAN_caption.gan import gan_main
 		gan_main(args)
+	if args.code == "genclass":
+		from data.database.helpers.class_database_helper import gen_class_embs
+		gen_class_embs()

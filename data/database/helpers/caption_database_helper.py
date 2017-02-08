@@ -49,6 +49,10 @@ def fetch_filenames_from_cation_vector(caption_vector):
 	return db_wrapper.db_get_filenames_from_caption_vector(caption_vector)
 
 
+def fetch_all_caption_text_tuples():
+	return db_wrapper.db_all_caption_text_tuples()
+
+
 def compare_vectors(v1, v2):
 	return mean_squared_error(v1, v2)
 

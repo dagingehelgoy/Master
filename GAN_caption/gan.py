@@ -192,11 +192,11 @@ def train_gan(BATCH_SIZE, args):
 def train_generator():
 	class_vectors, image_vectors = fetch_class_embeddings()
 
-	# class_vectors = np.asarray(class_vectors)
-	# image_vectors = np.asarray(image_vectors)
+	class_vectors = np.asarray(class_vectors)
+	image_vectors = np.asarray(image_vectors)
 
-	image_vectors = np.asarray(image_vectors[:100])
-	class_vectors = np.asarray(class_vectors[:100])
+	# image_vectors = np.asarray(image_vectors[:100])
+	# class_vectors = np.asarray(class_vectors[:100])
 
 	_, _, g_model = get_models()
 
@@ -204,37 +204,37 @@ def train_generator():
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=5))
+	print(find_n_most_similar_class(pred_class, n=10))
 
 
 

@@ -1,35 +1,21 @@
 import datetime
 
-import tensorflow as tf
 from keras.engine import Input
 from keras.layers import Dense, merge, BatchNormalization
 from keras.models import Model
 from keras.optimizers import SGD
 
-tf.logging.set_verbosity(tf.logging.ERROR)
-
-# SETTINGS
-# from keras.utils.visualize_util import plot
-
-from data.database.helpers.image_database_helper import *
-# from data.database.helpers.caption_database_helper import *
 from data.embeddings.helpers.embeddings_helper import *
-from helpers.io_helper import load_pickle_file
 
-
-NOISE_DIM = 100
+NOISE_DIM = 0
 IMAGE_EMD_DIM = 4096
 CAP_EMB_DIM = 300
-
-
-def fetch_training_data():
-	return [], []
 
 
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
 	g_tensor = BatchNormalization()(g_input)
-	g_tensor = Dense(2048, activation='tanh')(g_tensor)
+	g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
@@ -68,24 +54,22 @@ def fetch_image_filename(img_emb):
 	return fetch_filename_from_image_vector(img_emb)
 
 
-def train(BATCH_SIZE, args):
+def train_gan(BATCH_SIZE, args):
 	# if args.env == 'local':
 	# 	print len(image_vectors), len(class_vectors)
 
-		# caption_vectors = load_pickle_file("test_cap.pickle")
-		# image_vectors = load_pickle_file("test_img.pickle")
+	# caption_vectors = load_pickle_file("test_cap.pickle")
+	# image_vectors = load_pickle_file("test_img.pickle")
 
-		# test_data_indices = [0, 5]
+	# test_data_indices = [0, 5]
 
-		# save_pickle_file(caption_vectors, "test_cap.pickle")
-		# save_pickle_file(image_vectors, "test_img.pickle")
+	# save_pickle_file(caption_vectors, "test_cap.pickle")
+	# save_pickle_file(image_vectors, "test_img.pickle")
 	# else:
 	# 	caption_vectors, image_vectors, _ = fetch_class_embeddings()
 	#
 
 	class_vectors, image_vectors = fetch_class_embeddings()
-	print class_vectors[0]
-	print image_vectors[0]
 	test_data_indices = [0, 100, 200]
 	class_vectors = np.asarray(class_vectors)
 	image_vectors = np.asarray(image_vectors)
@@ -190,8 +174,10 @@ def train(BATCH_SIZE, args):
 			actual_caption = test_captions[pred_caption_index]
 			mse_noise = compare_vectors(pred_caption_noise, actual_caption)
 			mse_zero = compare_vectors(pred_caption_zero, actual_caption)
-			print "%s\tMSE-noise:\t%s\t%s...%s" % (pred_caption_index, mse_noise, pred_caption_noise[:5], pred_caption_noise[-5:])
-			print "%s\tMSE-zero:\t%s\t%s...%s" % (pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
+			print "%s\tMSE-noise:\t%s\t%s...%s" % (
+				pred_caption_index, mse_noise, pred_caption_noise[:5], pred_caption_noise[-5:])
+			print "%s\tMSE-zero:\t%s\t%s...%s" % (
+				pred_caption_index, mse_zero, pred_caption_zero[:5], pred_caption_zero[-5:])
 
 		print "\n"
 
@@ -200,6 +186,22 @@ def train(BATCH_SIZE, args):
 	# d_model.save_weights('d_model-%s' % epoch, True)
 	# g_model.save_weights('g_model', True)
 	# d_model.save_weights('d_model', True)
+
+
+def train_generator():
+	class_vectors, image_vectors = fetch_class_embeddings()
+	class_vectors = np.asarray(class_vectors)
+	image_vectors = np.asarray(image_vectors)
+
+	_, _, g_model = get_models()
+
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	pred_class = g_model.predict(image_vectors[:1])
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
 
 
 def get_models():
@@ -223,11 +225,17 @@ def gan_main(args):
 	res_file = open("result.txt", 'a')
 	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime.now())
 	res_file.close()
-	if args.env == 'local':
-		train(5, args)
-	else:
-		train(128, args)
+
+	# if args.env == 'local':
+	# 	train_gan(5, args)
+	# else:
+	# 	train_gan(128, args)
+
+	train_generator()
+
+
+
 
 
 if __name__ == '__main__':
-	train(1)
+	train_gan(1)

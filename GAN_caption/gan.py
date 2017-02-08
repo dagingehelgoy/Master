@@ -6,6 +6,8 @@ from keras.layers import Dense, merge
 from keras.models import Model
 from keras.optimizers import SGD
 
+tf.logging.set_verbosity(tf.logging.ERROR)
+
 # SETTINGS
 # from keras.utils.visualize_util import plot
 
@@ -112,6 +114,7 @@ def train(BATCH_SIZE, args):
 		should_test_result = True
 
 		for batch_index in range(total_batches_count):
+
 			for i in range(BATCH_SIZE):
 				uniform_rand = np.random.uniform(-1, 1, 100)
 
@@ -119,7 +122,6 @@ def train(BATCH_SIZE, args):
 
 				noise_and_img[i, :100] = uniform_rand
 				noise_and_img[i, 100:] = consecutive_img
-
 			real_caption_batch = class_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 			real_image_batch = image_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 
@@ -142,7 +144,6 @@ def train(BATCH_SIZE, args):
 				for cap in most_similar_captions:
 					print cap
 				should_test_result = False
-
 			captions = np.concatenate((real_caption_batch, generated_captions))
 			imgs = np.concatenate((real_image_batch, real_image_batch))
 			X = [captions, imgs]
@@ -161,9 +162,8 @@ def train(BATCH_SIZE, args):
 			# a_after = d_model.get_weights()
 			d_model.trainable = True
 
-		# if batch_index % 100 == 0:
-		# 	print("batch %d d_loss : %f" % (batch_index, d_loss))
-		# 	print("batch %d g_loss : %f" % (batch_index, g_loss))
+			print("batch %d d_loss : %f" % (batch_index, d_loss))
+			print("batch %d g_loss : %f" % (batch_index, g_loss))
 
 		print("epoch %d d_loss : %f" % (epoch, d_loss))
 		print("epoch %d g_loss : %f" % (epoch, g_loss))

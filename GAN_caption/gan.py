@@ -15,7 +15,7 @@ CAP_EMB_DIM = 300
 
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
-	g_tensor = BatchNormalization()(g_input)
+	# g_tensor = BatchNormalization()(g_input)
 	g_tensor = Dense(2048, activation='tanh')(g_input)
 	g_tensor = Dense(512, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
@@ -192,15 +192,15 @@ def train_gan(BATCH_SIZE, args):
 def train_generator():
 	class_vectors, image_vectors = fetch_class_embeddings()
 
-	class_vectors = np.asarray(class_vectors)
-	image_vectors = np.asarray(image_vectors)
+	# class_vectors = np.asarray(class_vectors)
+	# image_vectors = np.asarray(image_vectors)
 
-	# image_vectors = np.asarray(image_vectors[:100])
-	# class_vectors = np.asarray(class_vectors[:100])
+	image_vectors = np.asarray(image_vectors[:1])
+	class_vectors = np.asarray(class_vectors[:1])
 
 	_, _, g_model = get_models()
 
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	g_model.fit(image_vectors, class_vectors, batch_size=1, nb_epoch=1000)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
@@ -245,6 +245,7 @@ def get_models():
 	g_model, g_input = generator_model()
 
 	g_model.compile(loss='mse', optimizer='adam')
+
 	d_model, d_input_img = discriminator_model()
 	d_model.compile(loss='binary_crossentropy', optimizer='adam')
 

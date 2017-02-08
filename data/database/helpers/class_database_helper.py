@@ -1,9 +1,7 @@
-from io_helper import load_pickle_file
-
 import sqlite_wrapper as db_wrapper
 from data.database.helpers.caption_database_helper import fetch_all_caption_text_tuples
 from data.database.helpers.word_database_helper import fetch_all_word_vectors
-from helpers.io_helper import save_pickle_file
+from helpers.io_helper import save_pickle_file, load_pickle_file
 from helpers.list_helpers import print_progress
 
 

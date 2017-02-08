@@ -5,7 +5,7 @@ from keras.layers import Dense, merge, BatchNormalization
 from keras.models import Model
 from keras.optimizers import SGD
 
-from data.database.helpers.class_database_helper import find_n_most_similar_class
+from data.database.helpers.class_database_helper import *
 from data.embeddings.helpers.embeddings_helper import *
 
 NOISE_DIM = 0
@@ -15,9 +15,10 @@ CAP_EMB_DIM = 300
 
 def generator_model():
 	g_input = Input(shape=(NOISE_DIM + IMAGE_EMD_DIM,), name='g_input')
-	# g_tensor = BatchNormalization()(g_input)
 	g_tensor = Dense(2048, activation='tanh')(g_input)
+	g_tensor = Dense(1024, activation='tanh')(g_tensor)
 	g_tensor = Dense(512, activation='tanh')(g_tensor)
+	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_tensor = Dense(CAP_EMB_DIM, activation='tanh')(g_tensor)
 	g_model = Model(input=g_input, output=g_tensor, name="generator_model")
 	return g_model, g_input
@@ -192,45 +193,49 @@ def train_gan(BATCH_SIZE, args):
 def train_generator():
 	class_vectors, image_vectors = fetch_class_embeddings()
 
-	# class_vectors = np.asarray(class_vectors)
-	# image_vectors = np.asarray(image_vectors)
+	class_vectors = np.asarray(class_vectors)
+	image_vectors = np.asarray(image_vectors)
 
-	image_vectors = np.asarray(image_vectors[:1])
-	class_vectors = np.asarray(class_vectors[:1])
+	# image_vectors = np.asarray(image_vectors[:1])
+	# class_vectors = np.asarray(class_vectors[:1])
+	# image_filename = fetch_filename_from_image_vector(image_vectors[0])
+	# print image_filename
+	# print fetch_caption_texts_for_image_name(image_filename[0])
+	# print fetch_class_texts_for_image_name(image_filename[0])
 
 	_, _, g_model = get_models()
 
-	g_model.fit(image_vectors, class_vectors, batch_size=1, nb_epoch=1000)
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	pred_class = g_model.predict(image_vectors[:1])[0]
+	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
+	print ("Finding most similar class")
+	print(find_n_most_similar_class(pred_class, n=10))
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
-	pred_class = g_model.predict(image_vectors[:1])[0]
-	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
-	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=10))
-
-	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")

@@ -1,4 +1,5 @@
 import argparse
+import keras.backend.tensorflow_backend as ker
 
 
 
@@ -10,6 +11,9 @@ def get_args():
 	return args
 
 if __name__ == "__main__":
+	config1 = ker.tf.ConfigProto()
+	config1.gpu_options.allow_growth = True
+	ker.set_session(ker.tf.Session(config=config1))
 	args = get_args()
 	if args.code == "gan":
 		from GAN_caption.gan import gan_main

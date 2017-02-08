@@ -191,8 +191,12 @@ def train_gan(BATCH_SIZE, args):
 
 def train_generator():
 	class_vectors, image_vectors = fetch_class_embeddings()
-	class_vectors = np.asarray(class_vectors)
-	image_vectors = np.asarray(image_vectors)
+
+	# class_vectors = np.asarray(class_vectors)
+	# image_vectors = np.asarray(image_vectors)
+
+	image_vectors = np.asarray(image_vectors[:100])
+	class_vectors = np.asarray(class_vectors[:100])
 
 	_, _, g_model = get_models()
 

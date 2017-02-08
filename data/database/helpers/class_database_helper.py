@@ -93,10 +93,10 @@ def find_n_most_similar_class(class_embedding, n=1):
 	best_class_vector_mse_list = insert_and_remove_last(0, best_class_vector_mse_list, first_class_mse)
 	best_class_text_list = insert_and_remove_last(0, best_class_text_list, first_class_text)
 	best_class_vector_list = insert_and_remove_last(0, best_class_vector_list, first_class_vector)
-	total_classs = len(class_vector_pairs)
+	total_class = len(class_vector_pairs)
 	counter = 1
 
-	print_progress(counter, total_classs, prefix="Searching for class")
+	print_progress(counter, total_class, prefix="Searching for class")
 	for temp_class_text, temp_class_vector in class_vector_pairs:
 		temp_image_mse = compare_vectors(class_embedding, temp_class_vector)
 		for index in range(len(best_class_vector_list)):
@@ -106,9 +106,8 @@ def find_n_most_similar_class(class_embedding, n=1):
 				best_class_vector_list = insert_and_remove_last(index, best_class_vector_list, temp_class_vector)
 				break
 		counter += 1
-		if counter % 100 == 0 or counter > total_classs - 1:
-			print_progress(counter, total_classs, prefix="Searching for class")
-	print_progress(total_classs, total_classs, prefix="Searching for class")
+		if counter % 100 == 0 or counter > total_class - 2:
+			print_progress(counter, total_class, prefix="Searching for class")
 	return best_class_text_list
 
 

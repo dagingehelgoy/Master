@@ -207,6 +207,18 @@ def train_generator():
 	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
 	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
 
+	pred_class = g_model.predict(image_vectors[:1])
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
+
+	pred_class = g_model.predict(image_vectors[:1])
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
+
+	pred_class = g_model.predict(image_vectors[:1])
+	g_model.fit(image_vectors, class_vectors, batch_size=64, nb_epoch=10)
+	print "MSE: %s" % (compare_vectors(pred_class[0], class_vectors[0]))
+
 
 
 def get_models():

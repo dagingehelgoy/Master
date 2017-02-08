@@ -206,36 +206,42 @@ def train_generator():
 	_, _, g_model = get_models()
 
 	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
-	pred_class = g_model.predict(image_vectors[:1])[0]
-	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
-	print ("Finding most similar class")
-	print(find_n_most_similar_class(pred_class, n=10))
-	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
-
+	g_model.save("g_model-1.hdf5")
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	g_model.save("g_model-2.hdf5")
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	g_model.save("g_model-3.hdf5")
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	g_model.save("g_model-4.hdf5")
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")
 	print(find_n_most_similar_class(pred_class, n=10))
 
 	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	g_model.save("g_model-5.hdf5")
+	pred_class = g_model.predict(image_vectors[:1])[0]
+	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
+	print ("Finding most similar class")
+	print(find_n_most_similar_class(pred_class, n=10))
+
+	g_model.fit(image_vectors, class_vectors, batch_size=128, nb_epoch=1000, validation_split=0.1)
+	g_model.save("g_model-6.hdf5")
 	pred_class = g_model.predict(image_vectors[:1])[0]
 	print "MSE: %s" % (compare_vectors(pred_class, class_vectors[0]))
 	print ("Finding most similar class")

@@ -1,10 +1,9 @@
-from list_helpers import insert_and_remove_last
 
 import sqlite_wrapper as db_wrapper
 from data.database.helpers.caption_database_helper import fetch_all_caption_text_tuples, compare_vectors
 from data.database.helpers.word_database_helper import fetch_all_word_vectors
 from helpers.io_helper import save_pickle_file, load_pickle_file
-from helpers.list_helpers import print_progress
+from helpers.list_helpers import print_progress, insert_and_remove_last
 
 
 def save_class_vector(image_name, class_text, class_vector):

@@ -60,10 +60,10 @@ def train_gan(BATCH_SIZE, args):
 	# if args.env == 'local':
 	# 	print len(image_vectors), len(caption_vectors)
 
-	caption_vectors = load_pickle_file("test_cap.pickle")
-	image_vectors = load_pickle_file("test_img.pickle")
-	#
-	test_data_indices = [0, 5]
+	# caption_vectors = load_pickle_file("test_cap.pickle")
+	# image_vectors = load_pickle_file("test_img.pickle")
+
+	# test_data_indices = [0, 5]
 
 	# save_pickle_file(caption_vectors, "test_cap.pickle")
 	# save_pickle_file(image_vectors, "test_img.pickle")
@@ -71,8 +71,8 @@ def train_gan(BATCH_SIZE, args):
 	# 	caption_vectors, image_vectors, _ = fetch_embeddings()
 	#
 
-	# caption_vectors, image_vectors, _ = fetch_embeddings()
-	# test_data_indices = [0, 100, 200]
+	caption_vectors, image_vectors, _ = fetch_embeddings()
+	test_data_indices = [0, 100, 200]
 	caption_vectors = np.asarray(caption_vectors)
 	image_vectors = np.asarray(image_vectors)
 

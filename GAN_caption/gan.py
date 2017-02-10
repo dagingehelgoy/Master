@@ -1,14 +1,14 @@
 import datetime
 
 from keras.engine import Input
-from keras.layers import Dense, merge, BatchNormalization
+from keras.layers import Dense, merge
 from keras.models import Model
 from keras.optimizers import SGD
 
 from data.database.helpers.class_database_helper import *
 from data.embeddings.helpers.embeddings_helper import *
 
-NOISE_DIM = 0
+NOISE_DIM = 100
 IMAGE_EMD_DIM = 4096
 CAP_EMB_DIM = 300
 
@@ -58,29 +58,29 @@ def fetch_image_filename(img_emb):
 
 def train_gan(BATCH_SIZE, args):
 	# if args.env == 'local':
-	# 	print len(image_vectors), len(class_vectors)
+	# 	print len(image_vectors), len(caption_vectors)
 
-	# caption_vectors = load_pickle_file("test_cap.pickle")
-	# image_vectors = load_pickle_file("test_img.pickle")
-
-	# test_data_indices = [0, 5]
+	caption_vectors = load_pickle_file("test_cap.pickle")
+	image_vectors = load_pickle_file("test_img.pickle")
+	#
+	test_data_indices = [0, 5]
 
 	# save_pickle_file(caption_vectors, "test_cap.pickle")
 	# save_pickle_file(image_vectors, "test_img.pickle")
 	# else:
-	# 	caption_vectors, image_vectors, _ = fetch_class_embeddings()
+	# 	caption_vectors, image_vectors, _ = fetch_embeddings()
 	#
 
-	class_vectors, image_vectors = fetch_class_embeddings()
-	test_data_indices = [0, 100, 200]
-	class_vectors = np.asarray(class_vectors)
+	# caption_vectors, image_vectors, _ = fetch_embeddings()
+	# test_data_indices = [0, 100, 200]
+	caption_vectors = np.asarray(caption_vectors)
 	image_vectors = np.asarray(image_vectors)
 
 	test_images = []
 	test_captions = []
 	for index in test_data_indices:
 		test_images.append(image_vectors[index])
-		test_captions.append(class_vectors[index])
+		test_captions.append(caption_vectors[index])
 	test_images = np.asarray(test_images)
 	test_captions = np.asarray(test_captions)
 	print("Building models")
@@ -91,6 +91,8 @@ def train_gan(BATCH_SIZE, args):
 	noise_and_img = np.zeros((BATCH_SIZE, NOISE_DIM + IMAGE_EMD_DIM))
 	noise_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
 	zero_and_img_test = np.zeros((len(test_captions), NOISE_DIM + IMAGE_EMD_DIM))
+
+	should_train_d = True
 
 	for epoch in range(1000):
 		print("Epoch: %s" % epoch)
@@ -110,7 +112,7 @@ def train_gan(BATCH_SIZE, args):
 
 				noise_and_img[i, :100] = uniform_rand
 				noise_and_img[i, 100:] = consecutive_img
-			real_caption_batch = class_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
+			real_caption_batch = caption_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 			real_image_batch = image_vectors[batch_index * BATCH_SIZE:(batch_index + 1) * BATCH_SIZE]
 
 			generated_captions = g_model.predict(noise_and_img, verbose=0)
@@ -138,15 +140,21 @@ def train_gan(BATCH_SIZE, args):
 			y = [1] * BATCH_SIZE + [0] * BATCH_SIZE
 
 			# Train d_model
-			d_loss = d_model.train_on_batch(X, y)
+			if should_train_d:
+				d_loss = d_model.train_on_batch(X, y)
 			d_model.trainable = False
 
 			# Train g_model
 			# a_before = d_model.get_weights()
-			for _ in range(3):
-				for i in range(BATCH_SIZE):
-					noise_and_img[i, :100] = np.random.uniform(-1, 1, 100)
-				g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
+			for batch_i in range(BATCH_SIZE):
+				noise_and_img[batch_i, :100] = np.random.uniform(-1, 1, 100)
+			g_loss = discriminator_on_generator.train_on_batch([noise_and_img, real_image_batch], [1] * BATCH_SIZE)
+
+			if g_loss > 0.5:
+				should_train_d = False
+			else:
+				should_train_d = True
+
 			# a_after = d_model.get_weights()
 			d_model.trainable = True
 
@@ -248,8 +256,6 @@ def train_generator():
 	print(find_n_most_similar_class(pred_class, n=10))
 
 
-
-
 def get_models():
 	d_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
 	g_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
@@ -273,15 +279,12 @@ def gan_main(args):
 	res_file.write("\n\nNEW RUN: %s\n\n" % datetime.datetime.now())
 	res_file.close()
 
-	# if args.env == 'local':
-	# 	train_gan(5, args)
-	# else:
-	# 	train_gan(128, args)
+	if args.env == 'local':
+		train_gan(5, args)
+	else:
+		train_gan(128, args)
 
-	train_generator()
-
-
-
+	# train_generator()
 
 
 if __name__ == '__main__':

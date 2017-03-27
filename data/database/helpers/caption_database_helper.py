@@ -20,9 +20,9 @@ def fetch_caption_vectors_for_image_name(image_name):
 
 
 def fetch_caption_texts_for_image_name(image_name):
-	vectors = db_wrapper.db_get_caption_texts(image_name)
-	vector_list = [i[0] for i in vectors]
-	return vector_list
+	texts = db_wrapper.db_get_caption_texts(image_name)
+	text_list = [i[0] for i in texts]
+	return text_list
 
 
 def fetch_all_caption_vectors():
@@ -47,6 +47,10 @@ def fetch_all_caption_rows():
 
 def fetch_filenames_from_cation_vector(caption_vector):
 	return db_wrapper.db_get_filenames_from_caption_vector(caption_vector)
+
+
+def fetch_all_caption_text_tuples():
+	return db_wrapper.db_all_caption_text_tuples()
 
 
 def compare_vectors(v1, v2):

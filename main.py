@@ -37,6 +37,11 @@ if __name__ == "__main__":
 	elif args.code == "one_hot_seq2seq":
 		from text_generators.one_hot_seq2seq import seq2seq
 		seq2seq(args.inference)
+
+	elif args.code == "genclass":
+		from data.database.helpers.class_database_helper import gen_class_embs
+		gen_class_embs()
+
 	else:
 		print("### No suitable --code ###")
 

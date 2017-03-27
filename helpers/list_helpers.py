@@ -22,8 +22,6 @@ from theano import tensor
 import multiprocessing as mp
 import time
 
-from data.database.helpers.image_database_helper import fetch_all_image_vector_pairs
-
 
 def split_list(data, split_ratio=0.8, convert_to_np=True):
 	first = data[:int((len(data) * split_ratio))]
@@ -98,50 +96,6 @@ def generate_sorted_similarity(image_vector_tuple):
 				break
 
 	return image_filname, best_image_vector_tuple_list
-
-
-def make_similarity_dict():
-	pool = mp.Pool()
-	print("Getting image-vector pairs...")
-	image_vector_pairs = fetch_all_image_vector_pairs()
-
-	pool_formated_list = [(image_filname, image_vector, image_vector_pairs) for image_filname, image_vector in
-	                      image_vector_pairs]
-
-	print("Starting pool...")
-	result = pool.map_async(generate_sorted_similarity, pool_formated_list)
-	pool.close()
-
-	while not result.ready():
-		new_chunks = result._number_left
-		print("Chunks left %s" % new_chunks)
-		time.sleep(10)
-
-	map_res = result.get()
-	return dict(map_res)
-
-
-if __name__ == "__main__":
-	SAVE_NEW = True
-	name = "similarity-dict.p"
-	if SAVE_NEW:
-		a = make_similarity_dict()
-		try:
-			pickle_file = open(name, 'wb')
-			pickle.dump(a, pickle_file, protocol=2)
-			pickle_file.close()
-			print("Saved dictionary to file.")
-		except Exception as e:
-			print(a)
-			print(e)
-	else:
-		pickle_file = open(name, 'rb')
-		print("loaded", name)
-		dataset = pickle.load(pickle_file)
-		pickle_file.close()
-		key, value = dataset.popitem()
-		print(key)
-		print(value)
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength=30):

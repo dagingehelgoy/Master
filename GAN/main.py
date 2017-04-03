@@ -1,5 +1,4 @@
 from GAN.config import config
-from GAN.config import config
 from GAN.embedding import *
 from GAN.helpers.enums import *
 from GAN.helpers.logger import GANLogger

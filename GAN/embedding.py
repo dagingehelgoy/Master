@@ -1,5 +1,5 @@
 from keras.layers import LSTM, TimeDistributed, Dense
-from keras.models import Sequential
+from keras.models import Sequential, model_from_json
 
 from GAN.helpers.datagen import generate_input_noise, generate_embedding_captions_from_flickr30k
 from GAN.helpers.enums import Conf, PreInit
@@ -68,16 +68,21 @@ def emb_create_discriminator(config):
 	return d_model
 
 
+def load_generator(logger):
+	json_file = open("GAN/GAN_log/%s/model_files/generator.json" % logger.name_prefix, 'r')
+	loaded_model_json = json_file.read()
+	json_file.close()
+	return model_from_json(loaded_model_json)
+
+
 def emb_predict(config, logger):
 	print "Compiling generator..."
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_embedding_captions_from_flickr30k(config)
-	if config[Conf.PREINIT] == PreInit.DECODER:
-		g_model = get_decoder(config)
-	elif config[Conf.PREINIT] == PreInit.NONE:
-		g_model = generator_model(config)
+
+	g_model = load_generator(logger)
 
 	# print "Pretrained"
 	# predictions = g_model.predict(noise_batch)

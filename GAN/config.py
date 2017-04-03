@@ -18,10 +18,7 @@ config = {
 	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
-	# Conf.DATE: "2017-03-31",
 
-	# Conf.NAME_SUFFIX: "sos",
-	# Conf.NAME_SUFFIX: "",
 	# Conf.NAME_SUFFIX: None,
 	Conf.NAME_SUFFIX: "largeG",
 
@@ -42,7 +39,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-04-03_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeG",
+	# Conf.MODELNAME: "2017-03-31_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeDandG",
 	Conf.MODELNAME: None
 
 }

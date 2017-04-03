@@ -27,7 +27,11 @@ def generate_name_prefix(config):
 class GANLogger:
 	def __init__(self, config):
 		self.exists = False
-		self.name_prefix = generate_name_prefix(config)
+		print "config[Conf.MODELNAME]: %s" % config[Conf.MODELNAME]
+		if config[Conf.MODELNAME] is not None:
+			self.name_prefix = config[Conf.MODELNAME]
+		else:
+			self.name_prefix = generate_name_prefix(config)
 
 		print "Initialize logging..."
 

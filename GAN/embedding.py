@@ -2,7 +2,8 @@ from keras.layers import LSTM, TimeDistributed, Dense
 from keras.models import Sequential
 
 from GAN.helpers.datagen import generate_input_noise, generate_embedding_captions_from_flickr30k
-from GAN.helpers.enums import Conf
+from GAN.helpers.enums import Conf, PreInit
+
 # from helpers.list_helpers import *
 from sequence_to_sequence.seq2seq import pairwise_cosine_similarity
 
@@ -31,7 +32,7 @@ def generator_model(config):
 		config[Conf.EMBEDDING_SIZE],
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]),
 		return_sequences=True))
-	# model.add(LSTM(100, return_sequences=True))
+	model.add(LSTM(100, return_sequences=True))
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
 	return model
 
@@ -41,18 +42,20 @@ def discriminator_model(config):
 	model.add(LSTM(
 		50,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=True))
-	model.add(LSTM(50, return_sequences=False))
+		return_sequences=False))
+	# model.add(LSTM(50, return_sequences=False))
 	model.add(Dense(1, activation="sigmoid"))
 	return model
 
 
-def emb_create_generator(config, preinit=False):
-	if preinit:
+def emb_create_generator(config):
+	if config[Conf.PREINIT] == PreInit.DECODER:
 		print "Setting initial generator weights..."
 		g_model = get_decoder(config)
-	else:
+	elif config[Conf.PREINIT] == PreInit.NONE:
 		g_model = generator_model(config)
+	else:
+		g_model = None
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 
 	return g_model
@@ -71,9 +74,9 @@ def emb_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_embedding_captions_from_flickr30k(config)
-	if config[Conf.PREINIT]:
+	if config[Conf.PREINIT] == PreInit.DECODER:
 		g_model = get_decoder(config)
-	else:
+	elif config[Conf.PREINIT] == PreInit.NONE:
 		g_model = generator_model(config)
 
 	# print "Pretrained"
@@ -89,7 +92,7 @@ def emb_predict(config, logger):
 	print "Num weights: %s" % len(weights)
 	for weight in weights:
 		print "\nTesting generator: %s\n" % weight
-		g_model.load_weights("log/%s/model_files/stored_weights/%s" % (logger.name_prefix, weight))
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, weight))
 		predictions = g_model.predict(noise_batch[:10])
 
 		for prediction in predictions:

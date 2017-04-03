@@ -23,7 +23,7 @@ config = {
 	# Conf.NAME_SUFFIX: "sos",
 	# Conf.NAME_SUFFIX: "",
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "largeD",
+	Conf.NAME_SUFFIX: "largeG",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 5,
@@ -38,8 +38,11 @@ config = {
 
 	Conf.EMBEDDING_SIZE: 50,
 	Conf.NOISE_SIZE: 200,
-	Conf.PREINIT: PreInit.ENCODER_DECODER,
+	Conf.PREINIT: PreInit.NONE,
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
+
+	# Conf.MODELNAME: "2017-04-03_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeG",
+	Conf.MODELNAME: None
 
 }

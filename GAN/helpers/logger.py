@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 
 from GAN.helpers.enums import Conf
 
@@ -58,6 +59,7 @@ class GANLogger:
 		self.create_dirs(model_filepath)
 
 	def save_model(self, model, name):
+		self.save_model_summary(model, name)
 		self.save_to_json(model, name)
 
 	def save_to_json(self, model, name):
@@ -91,3 +93,13 @@ class GANLogger:
 				generator_weights.append(weightfile)
 
 		return generator_weights
+
+	def save_model_summary(self, model, name=str()):
+		summary_file = open("GAN/GAN_log/%s/model_summary.txt" % self.name_prefix, "a")
+		orig_stdout = sys.stdout
+		sys.stdout = summary_file
+		print "%s" % name.upper()
+		model.summary()
+		print "\n"
+		sys.stdout = orig_stdout
+		summary_file.close()

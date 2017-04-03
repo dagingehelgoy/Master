@@ -1,14 +1,7 @@
 # encoding=utf8
 
-import os.path
-import pickle
-
-import settings
-
 from data.database.helpers.caption_database_helper import *
-from data.database.helpers.class_database_helper import fetch_all_filename_class_vector_tuples
 from data.database.helpers.image_database_helper import *
-from data.database.helpers.sqlite_wrapper import *
 from helpers.io_helper import *
 
 
@@ -17,38 +10,12 @@ def fetch_embeddings(size=-1):
 		return load_embeddings(size)
 	else:
 		print("Generating compatible dataset...")
-		all_image_names, image_name_caption_vector_dict = create_dictionaries(size)
-		print("Generating positive training data")
-		pos_sorted_caption_vector_data, pos_sorted_image_data, pos_similarity = get_examples(all_image_names, image_name_caption_vector_dict)
-		image_caption = pos_sorted_caption_vector_data
-		image_data = pos_sorted_image_data
-		similarity = pos_similarity
-		if settings.CREATE_NEGATIVE_EXAMPLES:
-			print("\nGenerating negative training data")
-			neg_sorted_caption_vector_data, neg_sorted_image_data, neg_similarity = get_examples(all_image_names, image_name_caption_vector_dict, False)
-			image_caption += neg_sorted_caption_vector_data
-			image_data += neg_sorted_image_data
-			similarity += neg_similarity
+		all_image_names, image_name_caption_dict = create_dictionaries(size)
+		image_names, image_data, image_captions = get_examples(all_image_names, image_name_caption_dict)
 
-		dataset = [image_caption, image_data, similarity]
-		print("Finished generating %s training example" % len(image_caption))
+		dataset = [image_names, image_data, image_captions]
+		print("Finished generating %s training example" % len(image_captions))
 		save_embeddings(dataset, size)
-
-		return dataset
-
-
-def fetch_class_embeddings(size=-1):
-	if class_embedding_exists(size):
-		return load_class_embeddings(size)
-	else:
-		print("Generating compatible dataset...")
-		image_name_class_vector_dict = create_class_dictionaries(size)
-		print("Generating positive training data")
-		sorted_class_vector_data, sorted_image_data = get_class_examples(image_name_class_vector_dict)
-
-		dataset = [sorted_class_vector_data, sorted_image_data]
-		print("Finished generating %s training example" % len(sorted_class_vector_data))
-		save_class_embeddings(dataset, size)
 
 		return dataset
 
@@ -60,25 +27,14 @@ def create_dictionaries(size):
 		all_image_names = fetch_all_image_names()
 	num_images = len(all_image_names)
 	validate_database(num_images)
-	image_name_caption_vector_dict = dict()
-	name_cap_vec_tuples = fetch_all_filename_caption_vector_tuples()
-	for (name, cap_vec) in name_cap_vec_tuples:
-		if name in image_name_caption_vector_dict:
-			image_name_caption_vector_dict[name].append(cap_vec)
+	image_name_caption_dict = dict()
+	name_cap_tuples = fetch_all_caption_text_tuples()
+	for (name, caption) in name_cap_tuples:
+		if name in image_name_caption_dict:
+			image_name_caption_dict[name].append(caption)
 		else:
-			image_name_caption_vector_dict[name] = [cap_vec]
-	return all_image_names, image_name_caption_vector_dict
-
-
-def create_class_dictionaries(size):
-	image_name_caption_vector_dict = dict()
-	name_cap_vec_tuples = fetch_all_filename_class_vector_tuples()
-	for (name, class_vec) in name_cap_vec_tuples:
-		if name in image_name_caption_vector_dict:
-			image_name_caption_vector_dict[name].append(class_vec)
-		else:
-			image_name_caption_vector_dict[name] = [class_vec]
-	return image_name_caption_vector_dict
+			image_name_caption_dict[name] = [caption]
+	return all_image_names, image_name_caption_dict
 
 
 def get_similarity_dictionary():
@@ -88,28 +44,24 @@ def get_similarity_dictionary():
 	return dataset
 
 
-def get_examples(all_image_names, image_name_caption_vector_dict, positive=True):
+def get_examples(all_image_names, image_name_caption_vector_dict):
 	sorted_caption_vector_data = []
 	sorted_image_data = []
-	similiarity_dict = dict()
-	if not positive:
-		similiarity_dict = get_similarity_dictionary()
+	sorted_image_names = []
 	image_name_image_vector_dict = {key: value for (key, value) in fetch_all_image_vector_pairs()}
 	all_image_names_total = len(all_image_names)
 	for i in range(all_image_names_total):
 		image_name = all_image_names[i]
 		image_vector = image_name_image_vector_dict[image_name]
-		if positive:
-			caption_vectors = image_name_caption_vector_dict[image_name]
-		else:
-			dissimilar_image_name = similiarity_dict[image_name][0][0]
-			caption_vectors = image_name_caption_vector_dict[dissimilar_image_name]
+		caption_vectors = image_name_caption_vector_dict[image_name]
+
 		for caption_vector in caption_vectors:
 			sorted_image_data.append(image_vector)
+			sorted_image_names.append(image_name)
 			sorted_caption_vector_data.append(caption_vector)
 		print_progress(i + 1, all_image_names_total, prefix='Generating data:', suffix='Complete', barLength=50)
 
-	return sorted_caption_vector_data, sorted_image_data, [1.0 if positive else -1.0 for x in range(len(sorted_caption_vector_data))]
+	return sorted_image_names, sorted_image_data, sorted_caption_vector_data
 
 
 def get_class_examples(image_name_class_vector_dict):
@@ -141,7 +93,7 @@ def save_class_embeddings(dataset_to_store, size):
 
 
 def load_embeddings(size):
-	print("Loaded compatible dataset from local storage: %s" % get_stored_embeddings_filename(size))
+	print("Loading compatible dataset from local storage: %s" % get_stored_embeddings_filename(size))
 	filepath = find_stored_embeddings_filepath(size)
 	return load_pickle_file(filepath)
 

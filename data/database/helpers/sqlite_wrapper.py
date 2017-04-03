@@ -5,7 +5,6 @@ import numpy as np
 
 import settings
 
-
 def adapt_array(arr):
 	""" http://stackoverflow.com/a/31312102/190597 (SoulNibbler) """
 	out = io.BytesIO()

@@ -1,5 +1,6 @@
 import os
 import pickle
+import settings
 
 
 def save_pickle_file(data, name):
@@ -21,3 +22,4 @@ def check_pickle_file(name):
 	if os.path.isfile(name):
 		return True
 	return False
+

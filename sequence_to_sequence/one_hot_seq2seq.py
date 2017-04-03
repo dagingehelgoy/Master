@@ -89,9 +89,9 @@ def predict_embedding_to_onehot(conf, data, id_to_word, test_model):
 		print
 
 
-def inference(conf, id_to_word, model_filename, sequences, weights_filename):
-	filename = "text_generators/logs/" + model_filename + "/weights/" + weights_filename
-	saved_model_path = "text_generators/logs/" + model_filename + "/model.json"
+def infer(conf, id_to_word, model_filename, sequences, weights_filename):
+	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
+	saved_model_path = "sequence_to_sequence/logs/" + model_filename + "/model.json"
 	if os.path.exists(saved_model_path):
 		with open(saved_model_path, "r") as json_file:
 			loaded_model_json = json_file.read()
@@ -115,7 +115,7 @@ def train_model(conf, sequences):
 	val_gen = batch_generator(data[-conf.VAL_DATA_SIZE:], conf.BATCH_SIZE, conf.NB_WORDS)
 	train_gen = batch_generator(data[:-conf.VAL_DATA_SIZE], conf.BATCH_SIZE, conf.NB_WORDS)
 	if 'SSH_CONNECTION' in os.environ.keys():
-		tensorboard = keras.callbacks.TensorBoard(log_dir='text_generators/logs/' + log_folder, histogram_freq=1,
+		tensorboard = keras.callbacks.TensorBoard(log_dir='sequence_to_sequence/logs/' + log_folder, histogram_freq=1,
 												  write_graph=True)
 		es = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=0, mode='auto')
 		checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=10, filepath=filepath,
@@ -136,11 +136,11 @@ def train_model(conf, sequences):
 												   mode='min',
 												   period=3)
 		from keras.utils.visualize_util import plot
-		plot(model, show_shapes=True, to_file='text_generators/logs/' + log_folder + "/model.png")
+		plot(model, show_shapes=True, to_file='sequence_to_sequence/logs/' + log_folder + "/model.png")
 		model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
 
 
-def one_hot_seq2seq(train=True):
+def one_hot_seq2seq(inference=False):
 	conf = EmbToOnehotConf
 
 	lines = open_corpus()
@@ -152,11 +152,10 @@ def one_hot_seq2seq(train=True):
 	word_to_id = tokenizer.word_index
 	id_to_word = {token: idx for idx, token in word_to_id.items()}
 
-	if train:
-		train_model(conf, sequences)
-
-	else:
+	if inference:
 		model_filename = "S2S_2EMB_2017-03-27_VS2+1000_BS128_HD10_DHL1_ED20_WEMword2vec"
 		weights_filename = "E:131-L:0.0294.hdf5"
 
-		inference(conf, id_to_word, model_filename, sequences, weights_filename)
+		infer(conf, id_to_word, model_filename, sequences, weights_filename)
+	else:
+		train_model(conf, sequences)

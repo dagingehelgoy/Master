@@ -85,9 +85,9 @@ def get_word_embedding_matrix(word_to_id, embedding_dim, word_embedding_method):
 			embedding_matrix[i] = embedding_vector
 
 
-def inference(conf, inference_sentences, inference_vectors, model_filename, weights_filename, word_embeddings):
-	filename = "text_generators/logs/" + model_filename + "/weights/" + weights_filename
-	saved_model_path = "text_generators/logs/" + model_filename + "/model.json"
+def infer(conf, inference_sentences, inference_vectors, model_filename, weights_filename, word_embeddings):
+	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
+	saved_model_path = "sequence_to_sequence/logs/" + model_filename + "/model.json"
 	if os.path.exists(saved_model_path):
 		with open(saved_model_path, "r") as json_file:
 			loaded_model_json = json_file.read()
@@ -133,7 +133,7 @@ def train_model(conf, data):
 	val_gen = batch_generator(data[-conf.VAL_DATA_SIZE:], conf)
 	train_gen = batch_generator(data[:-conf.VAL_DATA_SIZE], conf)
 	if 'SSH_CONNECTION' in os.environ.keys():
-		tensorboard = keras.callbacks.TensorBoard(log_dir='text_generators/logs/' + log_folder, histogram_freq=1,
+		tensorboard = keras.callbacks.TensorBoard(log_dir='sequence_to_sequence/logs/' + log_folder, histogram_freq=1,
 												  write_graph=True)
 		es = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=0, mode='auto')
 		checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=10, filepath=filepath,
@@ -154,7 +154,7 @@ def train_model(conf, data):
 												   mode='min',
 												   period=3)
 		from keras.utils.visualize_util import plot
-		plot(model, show_shapes=True, to_file='text_generators/logs/' + log_folder + "/model.png")
+		plot(model, show_shapes=True, to_file='sequence_to_sequence/logs/' + log_folder + "/model.png")
 		model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
 
 
@@ -182,7 +182,7 @@ def set_model_name(conf):
 	log_folder = "S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(conf.EMBEDDING_DIMENSION) + "_WEM" + conf.WORD_EMBEDDING_METHOD
-	log_dir = "text_generators/logs/"
+	log_dir = "sequence_to_sequence/logs/"
 	if not os.path.exists(log_dir + log_folder):
 		os.makedirs(log_dir + log_folder)
 	if not os.path.exists(log_dir + log_folder + "/weights"):
@@ -263,17 +263,17 @@ def emb_get_training_batch(training_batch, word_embedding_dict, conf):
 	return np.asarray(embedding_lists)
 
 
-def seq2seq(train=True):
+def seq2seq(inference=False):
 	conf = W2VEmbToEmbConf
 
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
-	if train:
-		np.random.shuffle(embedded_data)
-		train_model(conf, embedded_data)
+	if inference:
+		model_filename = "S2S_2EMB_2017-03-27_VS2+1000_BS128_HD10_DHL1_ED20_WEMword2vec"
+		weights_filename = "E:131-L:0.0294.hdf5"
+		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
+		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
 
 	else:
-		model_filename = "S2S_2EMB_2017-03-28_VS2+1000_BS128_HD30_DHL1_ED50_WEMword2vec"
-		weights_filename = "E:170-L:0.0102.hdf5"
-		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
-		inference(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
+		np.random.shuffle(embedded_data)
+		train_model(conf, embedded_data)

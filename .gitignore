@@ -87,3 +87,19 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.DS_STORE
+
+/GAN/GAN_log/
+.idea/
+GAN/GAN_log/
+data/database/sqlite/
+data/datasets/Flickr30k.txt
+data/datasets/glove.6B.300d.txt
+data/embeddings/stored-embeddings/
+word2vec/saved_models/
+word2vec/saved_models_nopad/
+/word2vec/saved_models/
+/word2vec/saved_models_nopad/
+/data/datasets/
+/data/database/sqlite/

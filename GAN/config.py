@@ -1,7 +1,7 @@
 # coding=utf-8
 import datetime
 
-from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding
+from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 
 
 # noinspection SpellCheckingInspection
@@ -38,7 +38,7 @@ config = {
 
 	Conf.EMBEDDING_SIZE: 50,
 	Conf.NOISE_SIZE: 200,
-	Conf.LOAD_GENERATOR: False,
+	Conf.PREINIT: PreInit.ENCODER_DECODER,
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 

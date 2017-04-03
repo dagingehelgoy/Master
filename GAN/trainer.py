@@ -1,11 +1,11 @@
 from keras.models import Sequential
 from keras.optimizers import Adam
 
+from GAN.embedding import emb_create_generator, emb_create_discriminator
 from GAN.helpers.datagen import generate_index_captions, generate_input_noise, \
 	generate_embedding_captions_from_flickr30k, \
 	emb_get_training_batch
 from GAN.helpers.enums import WordEmbedding, Conf
-from GAN.embedding import emb_create_generator, emb_create_discriminator
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 from data.embeddings.helpers.embeddings_helper import *
 
@@ -45,9 +45,9 @@ def train(gan_logger, config):
 
 	print "Compiling generator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		g_model = oh_create_generator(config, preinit=config[Conf.LOAD_GENERATOR])
+		g_model = oh_create_generator(config, preinit=config[Conf.PREINIT])
 	else:
-		g_model = emb_create_generator(config, preinit=config[Conf.LOAD_GENERATOR])
+		g_model = emb_create_generator(config, preinit=config[Conf.PREINIT])
 
 	print "Compiling discriminator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -68,7 +68,6 @@ def train(gan_logger, config):
 		print("Epoch: %s" % epoch_cnt)
 		np.random.shuffle(training_data)
 		for batch_counter in range(nb_batches):
-			noise_batch = generate_input_noise(config)
 			training_batch = training_data[
 			                 batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]]
 
@@ -77,6 +76,7 @@ def train(gan_logger, config):
 			else:
 				training_batch = emb_get_training_batch(training_batch, word_embedding_dict, config)
 
+			noise_batch = generate_input_noise(config)
 			generated_batch = g_model.predict(noise_batch)
 
 			training_batch_y_zeros = np.random.uniform(0.0, 0.3, config[Conf.BATCH_SIZE])

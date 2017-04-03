@@ -33,9 +33,9 @@ def train(gan_logger, config):
 
 	print "Compiling generator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		g_model = oh_create_generator(config, preinit=config[Conf.LOAD_GENERATOR])
+		g_model = oh_create_generator(config, preinit=config[Conf.PREINIT])
 	else:
-		g_model = emb_create_generator(config, preinit=config[Conf.LOAD_GENERATOR])
+		g_model = emb_create_generator(config, preinit=config[Conf.PREINIT])
 
 	print "Compiling discriminator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:

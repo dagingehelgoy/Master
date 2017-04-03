@@ -8,7 +8,7 @@ def generate_name_prefix(config):
 	suffix = ""
 	if config[Conf.NAME_SUFFIX] is not None:
 		suffix = "_%s" % config[Conf.NAME_SUFFIX]
-	return "%s_%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_Dataset%s%s" % (
+	return "%s_%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
 		config[Conf.DATE],
 		config[Conf.WORD_EMBEDDING],
 		config[Conf.VOCAB_SIZE],
@@ -18,6 +18,7 @@ def generate_name_prefix(config):
 		config[Conf.NOISE_MODE],
 		config[Conf.NOISE_SIZE],
 		# config[Conf.MAX_LOSS_DIFF],
+		config[Conf.PREINIT],
 		config[Conf.DATASET_SIZE],
 		suffix
 	)

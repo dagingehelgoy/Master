@@ -16,6 +16,11 @@ class WordEmbedding(Enum):
 	WORD2VEC = "word2vec"
 
 
+class PreInit(Enum):
+	NONE = "None"
+	DECODER = "Dec"
+	ENCODER_DECODER = "EncDec"
+
 class Conf(Enum):
 	DATE = 1
 	VOCAB_SIZE = 2
@@ -27,7 +32,7 @@ class Conf(Enum):
 	MAX_LOSS_DIFF = 8
 	EPOCHS = 9
 	WORD_EMBEDDING = 10
-	LOAD_GENERATOR = 11
+	PREINIT = 11
 	EMBEDDING_SIZE = 12
 	NAME_SUFFIX = 13
 	WORD2VEC_NUM_STEPS = 14

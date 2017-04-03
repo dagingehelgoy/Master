@@ -71,7 +71,7 @@ def emb_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_embedding_captions_from_flickr30k(config)
-	if config[Conf.LOAD_GENERATOR]:
+	if config[Conf.PREINIT]:
 		g_model = get_decoder(config)
 	else:
 		g_model = generator_model(config)

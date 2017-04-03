@@ -4,7 +4,7 @@ import keras.backend.tensorflow_backend as ker
 def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--code", type=str)
-	parser.add_argument("--inference", action='store_false')
+	parser.add_argument("--inference", action='store_true')
 	parser.add_argument("--env", type=str)
 	args = parser.parse_args()
 	return args

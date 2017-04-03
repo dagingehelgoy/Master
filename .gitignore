@@ -88,7 +88,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
-.DS_STORE
+.DS_Store
 
 /GAN/GAN_log/
 .idea/

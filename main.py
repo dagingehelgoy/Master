@@ -7,6 +7,7 @@ def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--code", type=str)
 	parser.add_argument("--inference", action='store_true')
+	parser.add_argument("--encode_data", action='store_true')
 	parser.add_argument("--env", type=str)
 	args = parser.parse_args()
 	return args
@@ -18,11 +19,11 @@ if __name__ == "__main__":
 	k_tf.set_session(k_tf.tf.Session(config=tf_config))
 	args = get_args()
 	if args.code == "seq2seq":
-		from sequence_to_sequence.seq2seq import seq2seq
-		seq2seq(args.inference)
+		from sequence_to_sequence.embedding_seq2seq import seq2seq
+		seq2seq(args.inference, args.encode_data)
 	elif args.code == "one_hot_seq2seq":
 		from sequence_to_sequence.one_hot_seq2seq import seq2seq
-		seq2seq(args.inference)
+		seq2seq(args.inference, args.encode_data)
 	elif args.code == "gan":
 		from GAN.main import gan_main
 		gan_main(args.inference)

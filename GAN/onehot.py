@@ -1,27 +1,56 @@
-from keras.layers import LSTM, TimeDistributed, Dense
+from keras.layers import LSTM, TimeDistributed, Dense, Embedding, RepeatVector
 from keras.models import Sequential
 
 from GAN.helpers.datagen import *
-from helpers.enums import Conf
+from helpers.enums import Conf, PreInit
 
 
 def get_decoder(config):
+	# TODO: Hardcoded, move into conf
 	nb_words = 1000
 	hidden_dim = 1024
 	decoder_hidden_layers = 1
+	seq_length = 20
 
 	decoder = Sequential()
 	decoder.add(LSTM(output_dim=hidden_dim,
-	                 input_shape=(20, hidden_dim),
-	                 return_sequences=True))
+					 input_shape=(seq_length, hidden_dim),
+					 return_sequences=True))
 	for _ in range(1, decoder_hidden_layers):
 		decoder.add(LSTM(output_dim=hidden_dim, return_sequences=True))
-
-	decoder.add(TimeDistributed(Dense(output_dim=nb_words, input_shape=(20, hidden_dim), activation='softmax')))
-
-	decoder.load_weights("300_emb_decoder.hdf5")
-
+	decoder.add(TimeDistributed(Dense(output_dim=nb_words, input_shape=(seq_length, hidden_dim), activation='softmax')))
 	return decoder
+
+
+def get_encoder(config):
+	# TODO: Hardcoded, move into conf
+	nb_words = 1000
+	hidden_dim = 1024
+	seq_length = 20
+	embedding_dimension = 300
+
+	encoder = Sequential()
+	embedding_layer = Embedding(nb_words + 2, embedding_dimension, input_length=seq_length,
+								trainable=True, mask_zero=True)
+	encoder.add(embedding_layer)
+	encoder.add(LSTM(output_dim=hidden_dim, input_shape=(seq_length, embedding_dimension),
+					 return_sequences=False))
+	encoder.add(RepeatVector(seq_length))  # Get the last output of the RNN and repeats it
+
+
+def load_decoder(config):
+	decoder = get_decoder(config)
+	decoder.load_weights("300_emb_decoder.hdf5")
+	return decoder
+
+
+def load_encoder_decoder(config):
+	model = Sequential()
+	model.add(get_encoder(config))
+	model.add(get_decoder(config))
+
+	model.load_weights("300_emb_encoder_decoder.hdf5")
+	return model
 
 
 def generator_model(config):
@@ -108,7 +137,7 @@ def oh_test_generator(config):
 	one_hot_caption_batch = to_categorical_lists(index_caption_batch, config)
 	softmax_caption = onehot_to_softmax(one_hot_caption_batch)
 
-	g_model = get_decoder(config)
+	g_model = load_decoder(config)
 	# g_model.compile(loss='categorical_crossentropy', optimizer="adam")
 
 	print "Setting initial generator weights..."
@@ -150,10 +179,13 @@ def oh_test_generator(config):
 	print ""
 
 
-def oh_create_generator(config, preinit=False):
-	if preinit:
+def oh_create_generator(config):
+	if config[Conf.PREINIT] == PreInit.DECODER:
 		print "Setting initial generator weights..."
-		g_model = get_decoder(config)
+		g_model = load_decoder(config)
+	elif config[Conf.PREINIT] == PreInit.ENCODER_DECODER:
+		# TODO: Add code for preinitializing with entire sequence to sequence model
+		pass
 	else:
 		g_model = generator_model(config)
 	g_model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
@@ -174,7 +206,7 @@ def oh_predict(config, logger):
 	# weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
 	# weights_file = "generator-0-46-LOCAL-MINIMA"
 
-	g_model = get_decoder(config)
+	g_model = load_decoder(config)
 	# g_model.compile(loss='categorical_crossentropy', optimizer="adam")
 	# g_model.load_weights(str(weights_folder) + str(weights_file))
 

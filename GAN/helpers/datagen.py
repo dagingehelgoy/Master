@@ -5,8 +5,6 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
 
-FLICKR_PATH = "data/datasets/Flickr30k.txt"
-
 
 def to_categorical_lists(captions, config):
 	matrix = np.zeros((len(captions), config[Conf.MAX_SEQ_LENGTH], config[Conf.VOCAB_SIZE]))
@@ -32,30 +30,11 @@ def onehot_to_softmax(one_hot, max_range=(0.5, 1.0), min_range=(0.0, 0.001)):
 	return softmax
 
 
-def conditional_onehot_to_softmax(one_hot_sentences, predictions):
-	softmax = np.random.uniform(min_range[0], min_range[1], one_hot_sentences.shape).astype(dtype="float32")
-	for i, one_hot_sentence in enumerate(one_hot_sentences):
-		for j, one_hot_word in enumerate(one_hot_sentence):
-			new_word = softmax[i][j]
-			new_word[np.argmax(one_hot_word)] = np.random.uniform(max_range[0], max_range[1])
-			word_sum = new_word.sum()
-			softmax[i][j] = new_word / word_sum
-	return softmax
-
-
-def generate_index_captions(config, cap_data=-1):
+def generate_index_sentences(config, cap_data=-1):
 	max_seq_length = config[Conf.MAX_SEQ_LENGTH]
 	nb_words = config[Conf.VOCAB_SIZE]
-	path = FLICKR_PATH
 
-	sentence_file = open(path)
-	if cap_data == -1:
-		word_captions = sentence_file.readlines()
-	else:
-		word_captions = sentence_file.readlines()[:cap_data]
-	sentence_file.close()
-
-	word_captions = [(line.split("\t")[1]).strip() for line in word_captions]
+	word_captions = get_flickr_sentences(cap_data)
 	word_captions = ['<SOS> ' + line + ' <EOS>' for line in word_captions]
 
 	tokenizer = Tokenizer(nb_words=nb_words, filters="""!"#$%&'()*+-/:;=?@[\]^_`{|}~""")
@@ -69,8 +48,34 @@ def generate_index_captions(config, cap_data=-1):
 	return index_captions, id_to_word_dict, word_to_id_dict
 
 
+def generate_string_sentences(config):
+	cap_data = config[Conf.DATASET_SIZE]
+	print "Loading Flickr sentences..."
+	sentences = get_flickr_sentences(cap_data)
+	word_list_sentences = []
+	for sentence in sentences:
+		word_list = ["<sos>"]
+		for word in sentence.split(" "):
+			word_list.append(word.lower())
+		word_list.append("<eos>")
+		while len(word_list) < config[Conf.MAX_SEQ_LENGTH]:
+			word_list.append("<pad>")
+		word_list_sentences.append(word_list)
+	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
+
+	if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
+		print "Loading Glove dictionary..."
+		word_embedding_dict = get_word_embeddings()
+	else:
+		print "Loading Word2Vec dictionary (%s)..." % config[Conf.WORD_EMBEDDING]
+		word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (
+			config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
+	return np.asarray(word_list_sentences), word_embedding_dict
+
+
 def get_flickr_sentences(cap_data):
-	path = FLICKR_PATH
+	path = "data/datasets/Flickr30k.txt"
+
 	sentence_file = open(path)
 	if cap_data == -1:
 		word_captions = sentence_file.readlines()
@@ -79,9 +84,6 @@ def get_flickr_sentences(cap_data):
 	sentence_file.close()
 	word_captions = [(line.split("\t")[1]).strip() for line in word_captions]
 	return word_captions
-
-
-np_noise = None
 
 
 def generate_input_noise(config):
@@ -138,33 +140,7 @@ def get_word_embeddings():
 	return embeddings_index
 
 
-def generate_embedding_captions_from_flickr30k(config):
-	cap_data = config[Conf.DATASET_SIZE]
-	print "Loading Flickr sentences..."
-	sentences = get_flickr_sentences(cap_data)
-	word_list_sentences = []
-	for sentence in sentences:
-		word_list = ["<sos>"]
-		for word in sentence.split(" "):
-			word_list.append(word.lower())
-		word_list.append("<eos>")
-		while len(word_list) < config[Conf.MAX_SEQ_LENGTH]:
-			word_list.append("<pad>")
-		word_list_sentences.append(word_list)
-	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
-
-	if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
-		print "Loading Glove dictionary..."
-		word_embedding_dict = get_word_embeddings()
-	else:
-		print "Loading Word2Vec dictionary (%s)..." % config[Conf.WORD_EMBEDDING]
-		word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (
-			config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
-	return np.asarray(word_list_sentences), word_embedding_dict
-
-
-def generate_embedding_captions_from_captions(config, captions):
-	sentences = captions
+def generate_embedding_captions_from_captions(config, sentences):
 	word_list_sentences = []
 	for sentence in sentences:
 		word_list = ["<sos>"]

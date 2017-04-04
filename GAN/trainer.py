@@ -2,10 +2,10 @@ from keras.models import Sequential
 from keras.optimizers import Adam
 
 from GAN.embedding import emb_create_generator, emb_create_discriminator
-from GAN.helpers.datagen import generate_index_captions, generate_input_noise, \
-	generate_embedding_captions_from_flickr30k, \
-	emb_get_training_batch
-from GAN.helpers.enums import WordEmbedding, Conf
+from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, \
+	generate_string_sentences, \
+	emb_get_training_batch, generate_embedding_captions_from_captions
+from GAN.helpers.enums import WordEmbedding, Conf, Problem
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 from data.embeddings.helpers.embeddings_helper import *
 
@@ -35,25 +35,18 @@ def train(gan_logger, config):
 		raw_input("\nModel already trained.\nPress enter to continue.\n")
 
 	print "Generating data..."
-	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		training_data, _, _ = generate_index_captions(config, cap_data=config[Conf.DATASET_SIZE])
-	# TODO: Add encoded data in elif
-	else:
-		# filenames, image_vectors, captions = fetch_embeddings(10)
-		# caption_training_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
-		# print caption_training_data
-		training_data, word_embedding_dict = generate_embedding_captions_from_flickr30k(config)
-
-	print "Compiling generator..."
-	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		g_model = oh_create_generator(config)
-	else:
+	if config[Conf.PROBLEM] == Problem.CaptionGen:
+		filenames, image_vectors, captions = fetch_embeddings(10)
+		caption_training_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
 		g_model = emb_create_generator(config)
-
-	print "Compiling discriminator..."
-	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+		d_model = emb_create_discriminator(config)
+	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+		training_data, _, _ = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
+		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
 	else:
+		training_data, word_embedding_dict = generate_string_sentences(config)
+		g_model = emb_create_generator(config)
 		d_model = emb_create_discriminator(config)
 
 	print "Compiling gan..."

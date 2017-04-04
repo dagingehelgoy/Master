@@ -1,15 +1,20 @@
 import datetime
 import os
+import sys
 
-from GAN.helpers.enums import Conf
+from GAN.helpers.enums import Conf, Problem
 
 
 def generate_name_prefix(config):
 	suffix = ""
 	if config[Conf.NAME_SUFFIX] is not None:
 		suffix = "_%s" % config[Conf.NAME_SUFFIX]
-	return "%s_%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
+	problem_string = ""
+	if config[Conf.PROBLEM] == Problem.CaptionGen:
+		problem_string = "%s_" % Problem.CaptionGen
+	return "%s_%s%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
 		config[Conf.DATE],
+		problem_string,
 		config[Conf.WORD_EMBEDDING],
 		config[Conf.VOCAB_SIZE],
 		config[Conf.MAX_SEQ_LENGTH],
@@ -27,7 +32,11 @@ def generate_name_prefix(config):
 class GANLogger:
 	def __init__(self, config):
 		self.exists = False
-		self.name_prefix = generate_name_prefix(config)
+		print "config[Conf.MODELNAME]: %s" % config[Conf.MODELNAME]
+		if config[Conf.MODELNAME] is not None:
+			self.name_prefix = config[Conf.MODELNAME]
+		else:
+			self.name_prefix = generate_name_prefix(config)
 
 		print "Initialize logging..."
 
@@ -54,6 +63,7 @@ class GANLogger:
 		self.create_dirs(model_filepath)
 
 	def save_model(self, model, name):
+		self.save_model_summary(model, name)
 		self.save_to_json(model, name)
 
 	def save_to_json(self, model, name):
@@ -87,3 +97,13 @@ class GANLogger:
 				generator_weights.append(weightfile)
 
 		return generator_weights
+
+	def save_model_summary(self, model, name=str()):
+		summary_file = open("GAN/GAN_log/%s/model_summary.txt" % self.name_prefix, "a")
+		orig_stdout = sys.stdout
+		sys.stdout = summary_file
+		print "%s" % name.upper()
+		model.summary()
+		print "\n"
+		sys.stdout = orig_stdout
+		summary_file.close()

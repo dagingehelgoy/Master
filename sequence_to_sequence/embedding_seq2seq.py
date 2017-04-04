@@ -1,7 +1,7 @@
 import os
 import random
-from datetime import datetime
 
+from datetime import datetime
 import keras
 import numpy as np
 import tensorflow as tf
@@ -12,7 +12,7 @@ from keras.models import Sequential, model_from_json
 from sklearn.metrics.pairwise import cosine_similarity
 
 from enums import W2VEmbToEmbConf
-from helpers.io_helper import load_pickle_file
+from helpers.io_helper import load_pickle_file, save_pickle_file
 from helpers.list_helpers import print_progress
 from sequence_to_sequence.encoder_decoder_model_checkpoint import EncoderDecoderModelCheckpoint
 
@@ -51,6 +51,47 @@ def batch_generator(data, conf):
 			yield (Xs, Xs)
 
 
+def get_word_embedding_matrix(word_to_id, embedding_dim, word_embedding_method):
+	embeddings_index = get_word_embeddings(word_embedding_method)
+	embedding_matrix = np.zeros((len(word_to_id) + 1, embedding_dim))
+	for word, i in word_to_id.items():
+		embedding_vector = embeddings_index.get(word)
+		if embedding_vector is not None:
+			# words not found in embedding index will be all-zeros.
+			embedding_matrix[i] = embedding_vector
+
+
+def load_model(conf, model_filename, weights_filename):
+	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
+	saved_model_path = "sequence_to_sequence/logs/" + model_filename + "/model.json"
+	if os.path.exists(saved_model_path):
+		with open(saved_model_path, "r") as json_file:
+			loaded_model_json = json_file.read()
+		test_model = model_from_json(loaded_model_json)
+	else:
+		_, _, model = get_model(conf)
+		test_model = model
+	test_model.load_weights(filename)
+	return test_model
+
+
+def load_encoder(conf, model_filename, weights_filename):
+	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
+	model = get_encoder(conf)
+	model.load_weights(filename)
+	return model
+
+
+def get_random_data(conf, nb_predictions, embedded_data, string_training_data):
+	random_sentences = []
+	random_vectors = []
+	for _ in range(nb_predictions):
+		index = random.randint(0, len(embedded_data))
+		random_sentences.append(string_training_data[index][:conf.MAX_SEQUENCE_LENGTH])
+		random_vectors.append(embedded_data[index])
+	return random_sentences, random_vectors
+
+
 def get_word_embeddings(conf):
 	if conf.WORD_EMBEDDING_METHOD == 'glove':
 		embeddings_index = {}
@@ -75,50 +116,19 @@ def get_word_embeddings(conf):
 	return None
 
 
-def get_word_embedding_matrix(word_to_id, embedding_dim, word_embedding_method):
-	embeddings_index = get_word_embeddings(word_embedding_method)
-	embedding_matrix = np.zeros((len(word_to_id) + 1, embedding_dim))
-	for word, i in word_to_id.items():
-		embedding_vector = embeddings_index.get(word)
-		if embedding_vector is not None:
-			# words not found in embedding index will be all-zeros.
-			embedding_matrix[i] = embedding_vector
-
-
-def infer(conf, inference_sentences, inference_vectors, model_filename, weights_filename, word_embeddings):
-	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
-	saved_model_path = "sequence_to_sequence/logs/" + model_filename + "/model.json"
-	if os.path.exists(saved_model_path):
-		with open(saved_model_path, "r") as json_file:
-			loaded_model_json = json_file.read()
-		test_model = model_from_json(loaded_model_json)
-	else:
-		_, _, model = get_model(conf)
-		test_model = model
-
-	test_model.load_weights(filename)
-
-	preds = test_model.predict(np.asarray(inference_vectors), verbose=0)
-	for i in range(len(preds)):
-		print "Sentence %s" % i
-		most_sim_words_list = pairwise_cosine_similarity(preds[i], word_embeddings)
-		# most_sim_words_list = pairwise_cosine_similarity(inference_vectors[i], word_embeddings)
-		print " ".join(inference_sentences[i])
-		sentence = ""
-		for word in most_sim_words_list:
-			sentence += word[0] + " "
-			# sentence += "(" + " ".join(word) + ") "
-		print sentence + "\n"
-
-
-def get_random_data(conf, nb_predictions, embedded_data, string_training_data):
-	random_sentences = []
-	random_vectors = []
-	for _ in range(nb_predictions):
-		index = random.randint(0, len(embedded_data))
-		random_sentences.append(string_training_data[index][:conf.MAX_SEQUENCE_LENGTH])
-		random_vectors.append(embedded_data[index])
-	return random_sentences, random_vectors
+def set_model_name(conf):
+	log_folder = "S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
+		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
+		conf.EMBEDDING_DIMENSION) + "_SEQ" + conf.MAX_SEQUENCE_LENGTH + "_WEM" + conf.WORD_EMBEDDING_METHOD
+	log_dir = "sequence_to_sequence/logs/"
+	if not os.path.exists(log_dir + log_folder):
+		os.makedirs(log_dir + log_folder)
+	if not os.path.exists(log_dir + log_folder + "/weights"):
+		os.makedirs(log_dir + log_folder + "/weights")
+	print "Working on: %s" % log_folder
+	filepath = log_dir + log_folder + "/weights/E:{epoch:02d}-L:{val_loss:.4f}.hdf5"
+	return filepath, log_dir, log_folder
 
 
 def train_model(conf, data):
@@ -127,7 +137,9 @@ def train_model(conf, data):
 	if conf.LOSS == "contrastive_loss":
 		model.compile(metrics=['accuracy'], loss=contrastive_loss, optimizer='adam')
 	else:
-		model.compile(metrics=['accuracy', 'mean_absolute_error', metrics.cosine_proximity, metrics.kullback_leibler_divergence], loss=conf.LOSS, optimizer='adam')
+		model.compile(
+			metrics=['accuracy', 'mean_absolute_error', metrics.cosine_proximity, metrics.kullback_leibler_divergence],
+			loss=conf.LOSS, optimizer='adam')
 	filepath, log_dir, log_folder = set_model_name(conf)
 
 	val_gen = batch_generator(data[-conf.VAL_DATA_SIZE:], conf)
@@ -159,10 +171,16 @@ def train_model(conf, data):
 
 
 def get_model(conf):
-	encoder = Sequential()
-	encoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION),
-					 return_sequences=False))
-	encoder.add(RepeatVector(conf.MAX_SEQUENCE_LENGTH))  # Get the last output of the RNN and repeats it
+	encoder = get_encoder(conf)
+	decoder = get_decoder(conf)
+	model = Sequential()
+	model.add(encoder)
+	model.add(decoder)
+	model.summary()
+	return decoder, encoder, model
+
+
+def get_decoder(conf):
 	decoder = Sequential()
 	decoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.HIDDEN_DIM),
 					 return_sequences=True))
@@ -171,25 +189,15 @@ def get_model(conf):
 	decoder.add(TimeDistributed(
 		Dense(output_dim=conf.EMBEDDING_DIMENSION, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.HIDDEN_DIM),
 			  activation=conf.OUTPUT_LAYER_ACTIVATION)))
-	model = Sequential()
-	model.add(encoder)
-	model.add(decoder)
-	model.summary()
-	return decoder, encoder, model
+	return decoder
 
 
-def set_model_name(conf):
-	log_folder = "S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
-		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
-		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(conf.EMBEDDING_DIMENSION) + "_WEM" + conf.WORD_EMBEDDING_METHOD
-	log_dir = "sequence_to_sequence/logs/"
-	if not os.path.exists(log_dir + log_folder):
-		os.makedirs(log_dir + log_folder)
-	if not os.path.exists(log_dir + log_folder + "/weights"):
-		os.makedirs(log_dir + log_folder + "/weights")
-	print "Working on: %s" % log_folder
-	filepath = log_dir + log_folder + "/weights/E:{epoch:02d}-L:{val_loss:.4f}.hdf5"
-	return filepath, log_dir, log_folder
+def get_encoder(conf):
+	encoder = Sequential()
+	encoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION),
+					 return_sequences=False))
+	encoder.add(RepeatVector(conf.MAX_SEQUENCE_LENGTH))  # Get the last output of the RNN and repeats it
+	return encoder
 
 
 def pairwise_cosine_similarity(predicted_word_vectors, glove_dictionary):
@@ -263,17 +271,43 @@ def emb_get_training_batch(training_batch, word_embedding_dict, conf):
 	return np.asarray(embedding_lists)
 
 
-def seq2seq(inference=False):
+def infer(conf, inference_sentences, inference_vectors, model_filename, weights_filename, word_embeddings):
+	test_model = load_model(conf, model_filename, weights_filename)
+
+	preds = test_model.predict(np.asarray(inference_vectors), verbose=0)
+	for i in range(len(preds)):
+		print "Sentence %s" % i
+		most_sim_words_list = pairwise_cosine_similarity(preds[i], word_embeddings)
+		# most_sim_words_list = pairwise_cosine_similarity(inference_vectors[i], word_embeddings)
+		print " ".join(inference_sentences[i])
+		sentence = ""
+		for word in most_sim_words_list:
+			sentence += word[0] + " "
+		# sentence += "(" + " ".join(word) + ") "
+		print sentence + "\n"
+
+
+def encode(conf, embedded_data, string_training_data, model_filename, weights_filename):
+	test_model = load_encoder(conf, model_filename, weights_filename)
+	predictions = test_model.predict(np.asarray(embedded_data))
+	save_pickle_file(predictions, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
+
+
+def seq2seq(inference=False, encode_data=False):
 	conf = W2VEmbToEmbConf
 
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
-	if inference:
-		model_filename = "S2S_2EMB_2017-03-27_VS2+1000_BS128_HD10_DHL1_ED20_WEMword2vec"
-		weights_filename = "E:131-L:0.0294.hdf5"
-		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
-		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
 
+	model_filename = "S2S_2EMB_2017-03-27_VS2+1000_BS128_HD10_DHL1_ED20_WEMword2vec"
+	if inference:
+		weights_filename = "E:131-L:0.0294.hdf5"
+		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:],
+																   string_training_data[-conf.VAL_DATA_SIZE:])
+		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
+	elif encode_data:
+		weights_filename = "E:131-L:0.0294.hdf5_encoder"
+		encode(conf, embedded_data, string_training_data, model_filename, weights_filename)
 	else:
 		np.random.shuffle(embedded_data)
 		train_model(conf, embedded_data)

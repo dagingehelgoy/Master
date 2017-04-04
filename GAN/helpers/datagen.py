@@ -1,7 +1,7 @@
 import numpy as np
 from keras.preprocessing.text import Tokenizer
 
-from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding
+from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
 
@@ -85,33 +85,40 @@ np_noise = None
 
 
 def generate_input_noise(config):
+	if config[Conf.PREINIT] == PreInit.ENCODER_DECODER:
+		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+			noise_size = config[Conf.VOCAB_SIZE]
+		else:
+			noise_size = config[Conf.EMBEDDING_SIZE]
+	else:
+		noise_size = config[Conf.NOISE_SIZE]
+
 	if config[Conf.NOISE_MODE] == NoiseMode.REPEAT:
-		noise_matrix = np.zeros(
-			(config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]))
+		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 		for batch_index in range(config[Conf.BATCH_SIZE]):
-			word_noise = np.random.uniform(-1, 1, config[Conf.NOISE_SIZE])
+			word_noise = np.random.uniform(-1, 1, noise_size)
 			for word_index in range(config[Conf.MAX_SEQ_LENGTH]):
 				noise_matrix[batch_index][word_index] = word_noise
 
 		return noise_matrix
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.NEW:
-		return np.random.rand(config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE])
+		return np.random.rand(config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size)
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.FIRST_ONLY:
-		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]))
+		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 		for batch_index in range(config[Conf.BATCH_SIZE]):
-			word_noise = np.random.uniform(0, 1, config[Conf.NOISE_SIZE])
+			word_noise = np.random.uniform(0, 1, noise_size)
 			noise_matrix[batch_index][0] = word_noise
 		return noise_matrix
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.ONES:
-		return np.ones((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]))
+		return np.ones((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.ENCODING:
 		global np_noise
 		if np_noise is None:
-			np_noise = load_pickle_file("pred.pkl")[:1]
+			np_noise = load_pickle_file("encoded_data.pkl")[:1]
 		return np_noise
 
 

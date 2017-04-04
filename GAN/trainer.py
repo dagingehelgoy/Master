@@ -37,6 +37,7 @@ def train(gan_logger, config):
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		training_data, _, _ = generate_index_captions(config, cap_data=config[Conf.DATASET_SIZE])
+	# TODO: Add encoded data in elif
 	else:
 		# filenames, image_vectors, captions = fetch_embeddings(10)
 		# caption_training_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
@@ -45,9 +46,9 @@ def train(gan_logger, config):
 
 	print "Compiling generator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		g_model = oh_create_generator(config, preinit=config[Conf.PREINIT])
+		g_model = oh_create_generator(config)
 	else:
-		g_model = emb_create_generator(config, preinit=config[Conf.PREINIT])
+		g_model = emb_create_generator(config)
 
 	print "Compiling discriminator..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:

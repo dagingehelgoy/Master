@@ -10,7 +10,7 @@ from keras.preprocessing.text import Tokenizer
 from keras.utils.np_utils import to_categorical
 
 from enums import EmbToOnehotConf
-from seq2seq import get_word_embeddings, set_model_name
+from sequence_to_sequence.embedding_seq2seq import get_word_embeddings, set_model_name
 from sequence_to_sequence.encoder_decoder_model_checkpoint import EncoderDecoderModelCheckpoint
 
 
@@ -140,7 +140,7 @@ def train_model(conf, sequences):
 		model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
 
 
-def one_hot_seq2seq(inference=False):
+def onehot_seq2seq(inference=False, encode_data=False):
 	conf = EmbToOnehotConf
 
 	lines = open_corpus()

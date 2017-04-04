@@ -2,15 +2,19 @@ import datetime
 import os
 import sys
 
-from GAN.helpers.enums import Conf
+from GAN.helpers.enums import Conf, Problem
 
 
 def generate_name_prefix(config):
 	suffix = ""
 	if config[Conf.NAME_SUFFIX] is not None:
 		suffix = "_%s" % config[Conf.NAME_SUFFIX]
-	return "%s_%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
+	problem_string = ""
+	if config[Conf.PROBLEM] == Problem.CaptionGen:
+		problem_string = "%s_" % Problem.CaptionGen
+	return "%s_%s%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
 		config[Conf.DATE],
+		problem_string,
 		config[Conf.WORD_EMBEDDING],
 		config[Conf.VOCAB_SIZE],
 		config[Conf.MAX_SEQ_LENGTH],

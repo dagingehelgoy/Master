@@ -1,8 +1,7 @@
 # coding=utf-8
 import datetime
 
-from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
-
+from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit, Problem
 
 # noinspection SpellCheckingInspection
 """
@@ -11,10 +10,11 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 		- Teste alle NoiseModes
 		- Teste VocabSize
 		- Teste Embedding Size
-
 """
 
 config = {
+	Conf.PROBLEM: Problem.CaptionGen,
+
 	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
@@ -40,6 +40,7 @@ config = {
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
 	# Conf.MODELNAME: "2017-03-31_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeDandG",
-	Conf.MODELNAME: None
+	Conf.MODELNAME: None,
+
 
 }

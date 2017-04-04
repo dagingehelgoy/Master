@@ -84,15 +84,6 @@ def emb_predict(config, logger):
 
 	g_model = load_generator(logger)
 
-	# print "Pretrained"
-	# predictions = g_model.predict(noise_batch)
-	# for prediction in predictions:
-	# 	sentence = ""
-	# 	most_sim_words_list = pairwise_cosine_similarity(prediction, word_embedding_dict)s
-	# 	for word in most_sim_words_list:
-	# 		sentence += word[0] + " "
-	# 	print sentence + "\n"
-
 	weights = logger.get_generator_weights()
 	print "Num weights: %s" % len(weights)
 	for weight in weights:
@@ -107,6 +98,3 @@ def emb_predict(config, logger):
 				sentence += word[0] + " "
 			print sentence + "\n"
 
-		# print "First sentence prediction vectors:"
-		# for vector in predictions[0]:
-		# 	print "%s" % (sum(vector))

@@ -48,8 +48,8 @@ def discriminator_model(config):
 
 def oh_test_discriminator():
 	print "Generating data..."
-	index_captions, id_to_word_dict, word_to_id_dict = generate_index_captions(MAX_SEQUENCE_LENGTH, VOCAB_SIZE,
-	                                                                           cap_data=DATASET_SIZE)
+	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(MAX_SEQUENCE_LENGTH, VOCAB_SIZE,
+	                                                                            cap_data=DATASET_SIZE)
 
 	# test_caption = "<sos> boy swimming in water <eos>"
 	# test_caption = "<sos> <sos> <sos> <sos> <sos> <sos> <sos> <sos> <sos> <sos> <sos>"
@@ -103,7 +103,7 @@ def oh_test_generator(config):
 	index = 0
 
 	print "Generating data..."
-	index_captions, id_to_word_dict, word_to_id_dict = generate_index_captions(config)
+	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config)
 	index_caption_batch = index_captions[index * config[Conf.BATCH_SIZE]:(index + 1) * config[Conf.BATCH_SIZE]]
 	one_hot_caption_batch = to_categorical_lists(index_caption_batch, config)
 	softmax_caption = onehot_to_softmax(one_hot_caption_batch)
@@ -182,8 +182,8 @@ def oh_predict(config, logger):
 
 	predictions = g_model.predict(g_input_noise)
 
-	index_captions, id_to_word_dict, word_to_id_dict = generate_index_captions(config,
-	                                                                           cap_data=config[Conf.DATASET_SIZE])
+	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config,
+	                                                                            cap_data=config[Conf.DATASET_SIZE])
 	for prediction in predictions:
 		sentence = ""
 		for softmax_word in prediction:

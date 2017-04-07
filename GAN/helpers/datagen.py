@@ -98,7 +98,7 @@ def generate_input_noise(config):
 	if config[Conf.NOISE_MODE] == NoiseMode.REPEAT:
 		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 		for batch_index in range(config[Conf.BATCH_SIZE]):
-			word_noise = np.random.uniform(-1, 1, noise_size)
+			word_noise = np.random.normal(size=noise_size)
 			for word_index in range(config[Conf.MAX_SEQ_LENGTH]):
 				noise_matrix[batch_index][word_index] = word_noise
 

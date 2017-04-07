@@ -5,11 +5,13 @@ from datetime import datetime
 import keras
 import numpy as np
 import tensorflow as tf
+import keras.backend as K
 from keras import metrics
 from keras.callbacks import EarlyStopping
-from keras.layers import LSTM, RepeatVector, TimeDistributed, Dense
+from keras.layers import LSTM, RepeatVector, TimeDistributed, Dense, Lambda
 from keras.models import Sequential, model_from_json
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize
 
 from enums import W2VEmbToEmbConf
 from helpers.io_helper import load_pickle_file, save_pickle_file
@@ -109,7 +111,7 @@ def get_word_embeddings(conf):
 		return embeddings_index
 
 	elif conf.WORD_EMBEDDING_METHOD == 'word2vec':
-		embedding_dict_name = "data/embeddings/word2vec_embedding_dict_" + str(conf.EMBEDDING_DIMENSION) + ".pkl"
+		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict.pkl" % (conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
 		return load_pickle_file(embedding_dict_name)
 
 	print("WORD_EMBEDDING_METHOD not found")
@@ -117,13 +119,15 @@ def get_word_embeddings(conf):
 
 
 def set_model_name(conf):
-	log_folder = "S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+	log_folder = "NORM_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
-		conf.EMBEDDING_DIMENSION) + "_SEQ" + conf.MAX_SEQUENCE_LENGTH + "_WEM" + conf.WORD_EMBEDDING_METHOD
+		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD
 	log_dir = "sequence_to_sequence/logs/"
 	if not os.path.exists(log_dir + log_folder):
 		os.makedirs(log_dir + log_folder)
+	else:
+		raw_input("\nModel already trained.\nPress enter to continue.\n")
 	if not os.path.exists(log_dir + log_folder + "/weights"):
 		os.makedirs(log_dir + log_folder + "/weights")
 	print "Working on: %s" % log_folder
@@ -140,6 +144,7 @@ def train_model(conf, data):
 		model.compile(
 			metrics=['accuracy', 'mean_absolute_error', metrics.cosine_proximity, metrics.kullback_leibler_divergence],
 			loss=conf.LOSS, optimizer='adam')
+
 	filepath, log_dir, log_folder = set_model_name(conf)
 
 	val_gen = batch_generator(data[-conf.VAL_DATA_SIZE:], conf)
@@ -156,9 +161,9 @@ def train_model(conf, data):
 							validation_data=val_gen, nb_val_samples=conf.VAL_DATA_SIZE, nb_epoch=conf.EPOCHS,
 							callbacks=callbacks_list)
 
-		model_json = model.to_json()
-		with open(log_dir + log_folder + "/model.json", "w") as json_file:
-			json_file.write(model_json)
+		save_model(log_dir, log_folder, model, "model")
+		save_model(log_dir, log_folder, encoder, "encoder")
+		save_model(log_dir, log_folder, decoder, "decoder")
 	else:
 
 		checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=2, filepath=filepath,
@@ -168,6 +173,12 @@ def train_model(conf, data):
 		from keras.utils.visualize_util import plot
 		plot(model, show_shapes=True, to_file='sequence_to_sequence/logs/' + log_folder + "/model.png")
 		model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
+
+
+def save_model(log_dir, log_folder, model, name):
+	model_json = model.to_json()
+	with open(log_dir + log_folder + "/" + name + ".json", "w") as json_file:
+		json_file.write(model_json)
 
 
 def get_model(conf):
@@ -196,6 +207,7 @@ def get_encoder(conf):
 	encoder = Sequential()
 	encoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION),
 					 return_sequences=False))
+	encoder.add(Lambda(lambda x: K.l2_normalize(x, axis=1)))
 	encoder.add(RepeatVector(conf.MAX_SEQUENCE_LENGTH))  # Get the last output of the RNN and repeats it
 	return encoder
 
@@ -287,9 +299,24 @@ def infer(conf, inference_sentences, inference_vectors, model_filename, weights_
 		print sentence + "\n"
 
 
-def encode(conf, embedded_data, string_training_data, model_filename, weights_filename):
-	test_model = load_encoder(conf, model_filename, weights_filename)
+def test_encoding(conf, string_training_data, predictions, model_filename, weights_filename, word_embeddings):
+	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
+	decoder = get_decoder(conf)
+	decoder.load_weights(filename)
+	predictions = decoder.predict(predictions)
+	most_sim_words_list = pairwise_cosine_similarity(predictions[0], word_embeddings)
+	print " ".join(string_training_data[0][:5])
+	sentence = ""
+	for word in most_sim_words_list:
+		sentence += word[0] + " "
+	# sentence += "(" + " ".join(word) + ") "
+	print sentence + "\n"
+
+
+def encode(conf, embedded_data, string_training_data, model_filename, weights_filename, word_embeddings):
+	test_model = load_encoder(conf, model_filename, weights_filename + "_encoder")
 	predictions = test_model.predict(np.asarray(embedded_data))
+	test_encoding(conf, string_training_data, predictions, model_filename, weights_filename + "_decoder", word_embeddings)
 	save_pickle_file(predictions, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
@@ -299,15 +326,15 @@ def seq2seq(inference=False, encode_data=False):
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 
-	model_filename = "S2S_2EMB_2017-03-27_VS2+1000_BS128_HD10_DHL1_ED20_WEMword2vec"
+	model_filename = "NORM_S2S_2EMB_2017-04-07_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
+	weights_filename = "E:197-L:0.0117.hdf5"
 	if inference:
-		weights_filename = "E:131-L:0.0294.hdf5"
 		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:],
 																   string_training_data[-conf.VAL_DATA_SIZE:])
 		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
 	elif encode_data:
-		weights_filename = "E:131-L:0.0294.hdf5_encoder"
-		encode(conf, embedded_data, string_training_data, model_filename, weights_filename)
+		encoder_weights_filename = weights_filename
+		encode(conf, embedded_data, string_training_data, model_filename, encoder_weights_filename, word_embedding_dict)
 	else:
 		np.random.shuffle(embedded_data)
 		train_model(conf, embedded_data)

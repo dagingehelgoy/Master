@@ -65,6 +65,8 @@ def train(gan_logger, config):
 		print("Epoch: %s" % epoch_cnt)
 		np.random.shuffle(training_data)
 		for batch_counter in range(nb_batches):
+			if batch_counter % 10 == 0:
+				print_progress(batch_counter, nb_batches, prefix="Training batches")
 			training_batch = training_data[
 			                 batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]]
 

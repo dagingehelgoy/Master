@@ -10,12 +10,6 @@ class NoiseMode(Enum):
 	ENCODING = "encoding"
 
 
-class Problem(Enum):
-	OneHotGen = "OneHot"
-	EmbeddingGen = "Embedding"
-	CaptionGen = "Caption"
-
-
 class WordEmbedding(Enum):
 	ONE_HOT = "onehot"
 	GLOVE = "glove"
@@ -44,4 +38,4 @@ class Conf(Enum):
 	NAME_SUFFIX = 13
 	WORD2VEC_NUM_STEPS = 14
 	MODELNAME = 15
-	PROBLEM = 16
+	IMAGE_CAPTION = 16

@@ -5,7 +5,7 @@ from GAN.embedding import emb_create_generator, emb_create_discriminator
 from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, \
 	generate_string_sentences, \
 	emb_get_training_batch, generate_embedding_captions_from_captions
-from GAN.helpers.enums import WordEmbedding, Conf, Problem
+from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 from data.embeddings.helpers.embeddings_helper import *
 
@@ -35,19 +35,22 @@ def train(gan_logger, config):
 		raw_input("\nModel already trained.\nPress enter to continue.\n")
 
 	print "Generating data..."
-	if config[Conf.PROBLEM] == Problem.CaptionGen:
-		filenames, image_vectors, captions = fetch_embeddings(10)
-		caption_training_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
-		g_model = emb_create_generator(config)
-		d_model = emb_create_discriminator(config)
-	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		training_data, _, _ = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
 	else:
-		training_data, word_embedding_dict = generate_string_sentences(config)
-		g_model = emb_create_generator(config)
-		d_model = emb_create_discriminator(config)
+		# Generate image captions
+		if config[Conf.IMAGE_CAPTION]:
+			filenames, image_vectors, captions = fetch_embeddings(10)
+			training_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
+			g_model = emb_create_generator(config)
+			d_model = emb_create_discriminator(config)
+		# Generate sentences
+		else:
+			training_data, word_embedding_dict = generate_string_sentences(config)
+			g_model = emb_create_generator(config)
+			d_model = emb_create_discriminator(config)
 
 	print "Compiling gan..."
 	discriminator_on_generator = generator_containing_discriminator(g_model, d_model)

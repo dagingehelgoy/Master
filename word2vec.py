@@ -22,7 +22,9 @@ from __future__ import print_function
 
 import math
 
-from main import *
+import tensorflow as tf
+
+from GAN.config import *
 from word2vec.word2vec_helpers import build_dataset, generate_batch, plot_with_labels, save_model, load_model
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
@@ -141,13 +143,6 @@ else:
 
 		final_embeddings = normalized_embeddings.eval()
 
-	# Step 6: Visualize the embeddings.
-
-
-	# Saving embedding space to file
-
-
-	# Settings
 	plotting = False
 	saving = True
 

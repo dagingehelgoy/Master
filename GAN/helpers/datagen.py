@@ -118,10 +118,12 @@ def generate_input_noise(config):
 		return np.ones((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.ENCODING:
-		global np_noise
-		if np_noise is None:
-			np_noise = load_pickle_file("encoded_data.pkl")[:1]
-		return np_noise
+		embedded_data = load_pickle_file("sequence_to_sequence/logs/S2S_2EMB_2017-04-04_VS2+1000_BS128_HD30_DHL1_ED50_SEQ5_WEMword2vec/encoded_data.pkl")
+		random_distribution_of_embedded_data = []
+		for i in range(config[Conf.BATCH_SIZE]):
+			# random_distribution_of_embedded_data.append(embedded_data[np.random.randint(0, len(embedded_data))])
+			random_distribution_of_embedded_data.append(embedded_data[i])
+		return np.asarray(random_distribution_of_embedded_data)
 
 
 def get_word_embeddings():

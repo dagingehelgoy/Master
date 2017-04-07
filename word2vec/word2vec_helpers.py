@@ -2,6 +2,7 @@ import collections
 import random
 
 import numpy as np
+from matplotlib.pyplot import legend
 from sklearn.manifold import TSNE
 
 from helpers.io_helper import save_pickle_file, load_pickle_file
@@ -88,6 +89,23 @@ def plot_with_labels(reverse_dictionary, final_embeddings, filename='tsne'):
 		plt.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
 
 	plt.savefig("word2vec/saved_models/%s.png" % filename)
+
+
+def plot_collections(collection_list, collection_list_names, perplexity, suffix, use_legend=False):
+	print "Plot collections"
+	import matplotlib.pyplot as plt
+	plt.figure(figsize=(18, 18))  # in inches
+	# colors = ['#F95400', '#F9C000', '#004FA2', 'y']
+	colors = ['#F9C000', '#004FA2']
+	for i in range(len(collection_list)):
+		plt.scatter(collection_list[i][:, 0], collection_list[i][:, 1], c=colors[i], label=collection_list_names[i])
+	if use_legend:
+		legend()
+	plot_filename = "word2vec/plots/comparison_"
+	for i in range(len(collection_list)):
+		plot_filename += collection_list_names[i] + "_"
+	plt.savefig("%s%s%s" % (plot_filename, str(perplexity), suffix))
+	print "Plot collections done"
 
 
 def save_model(reverse_dictionary, embeddings, embedding_size, vocab_size, num_steps):

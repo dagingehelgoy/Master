@@ -27,6 +27,11 @@ if __name__ == "__main__":
 	elif args.code == "gan":
 		from GAN.main import gan_main
 		gan_main(args.inference)
+	elif args.code == "compare_distributions":
+		from word2vec.distribution_comparison import compare_distributions
+		compare_distributions()
+
+
 
 	else:
 		print("### No suitable --code ###")

@@ -20,6 +20,7 @@ def convert_array(text):
 
 
 db = sqlite3.connect(settings.DB_FILE_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
+print "connecting to %s" % settings.DB_FILE_PATH
 # TODO str Not working in python 2, unicode does
 # db.text_factory = lambda x: unicode(x, "utf-8", "ignore")
 
@@ -28,6 +29,7 @@ sqlite3.register_converter("array", convert_array)
 
 c = db.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS images (filename TEXT UNIQUE, image_vector array)''')
+c.execute('''CREATE TABLE IF NOT EXISTS pca (filename TEXT UNIQUE, pca_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS captions (filename TEXT, caption_text TEXT, caption_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS words (word_text TEXT UNIQUE, word_vector array)''')
 c.execute('''CREATE TABLE IF NOT EXISTS classes (filename TEXT, class_text TEXT, class_vector array)''')
@@ -114,6 +116,46 @@ def db_get_filename_from_image_vector(image_vector):
 def db_insert_image_vector_list(tuple_list):
 	cursor = db.cursor()
 	cursor.executemany("""UPDATE images SET image_vector = ? WHERE filename = ?""", tuple_list)
+	db.commit()
+
+
+""" TABLE: PCA VECTORS """
+
+
+def db_get_pca_vector(filename, default=None):
+	cursor = db.cursor()
+	result = cursor.execute("""SELECT pca_vector FROM pca WHERE filename = ?""", (filename,)).fetchone()
+	if result is None:
+		return default
+	return result
+
+
+def db_all_filename_pca_vec_pairs():
+	cursor = db.cursor()
+	return cursor.execute("""SELECT filename, pca_vector FROM pca""").fetchall()
+
+
+def db_update_filename_pca_vec_pairs():
+	cursor = db.cursor()
+	return cursor.execute("""SELECT filename, pca_vector FROM pca""").fetchall()
+
+
+def db_insert_pca_vector(filename, image_vector):
+	cursor = db.cursor()
+	cursor.execute("""INSERT INTO pca VALUES (?,?)""", (filename, image_vector))
+	db.commit()
+
+
+def db_get_filename_from_pca_vector(image_vector):
+	cursor = db.cursor()
+	result = cursor.execute("""SELECT filename FROM pca WHERE pca_vector = ?""",
+	                        (image_vector,)).fetchone()
+	return result
+
+
+def db_insert_pca_vector_list(tuple_list):
+	cursor = db.cursor()
+	cursor.executemany("""UPDATE pca SET pca_vector = ? WHERE filename = ?""", tuple_list)
 	db.commit()
 
 

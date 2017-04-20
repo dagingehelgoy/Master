@@ -24,7 +24,7 @@ config = {
 	Conf.MAX_SEQ_LENGTH: 5,
 
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 10,
+	Conf.BATCH_SIZE: 128,
 	Conf.EPOCHS: 10000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,

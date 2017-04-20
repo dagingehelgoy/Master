@@ -32,8 +32,8 @@ def change_learning_rate(discriminator_on_generator):
 
 
 def train(gan_logger, config):
-	# if gan_logger.exists:
-	# 	raw_input("\nModel already trained.\nPress enter to continue.\n")
+	if gan_logger.exists:
+		raw_input("\nModel already trained.\nPress enter to continue.\n")
 
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -67,8 +67,8 @@ def train(gan_logger, config):
 		print("Epoch: %s" % epoch_cnt)
 		np.random.shuffle(all_raw_caption_data)
 		for batch_counter in range(nb_batches):
-			# if batch_counter % 10 == 0:
-			# 	print_progress(batch_counter, nb_batches, prefix="Training batches")
+			if batch_counter % 10 == 0:
+				print_progress(batch_counter, nb_batches, prefix="Training batches")
 			raw_caption_training_batch = all_raw_caption_data[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]]
 
 			if config[Conf.IMAGE_CAPTION]:

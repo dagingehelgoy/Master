@@ -43,7 +43,7 @@ def train(gan_logger, config):
 	else:
 		# Generate image captions
 		if config[Conf.IMAGE_CAPTION]:
-			filenames, all_image_vectors, captions = fetch_embeddings(10)
+			filenames, all_image_vectors, captions = fetch_embeddings()
 			all_raw_caption_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
 			del captions, filenames
 		else:

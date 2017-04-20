@@ -164,7 +164,7 @@ def generate_embedding_captions_from_captions(config, sentences):
 	return np.asarray(word_list_sentences), word_embedding_dict
 
 
-def emb_get_training_batch(training_batch, word_embedding_dict, config):
+def emb_generate_caption_training_batch(training_batch, word_embedding_dict, config):
 	embedding_lists = []
 	for word_list in training_batch:
 		embedding_sentence = []
@@ -179,3 +179,8 @@ def emb_get_training_batch(training_batch, word_embedding_dict, config):
 			embedding_sentence.insert(0, zeros)
 		embedding_lists.append(embedding_sentence)
 	return np.asarray(embedding_lists)
+
+
+def generate_image_training_batch(image_batch, config):
+	image_batch = [[x] for x in image_batch]
+	return np.repeat(image_batch, config[Conf.MAX_SEQ_LENGTH], axis=1)

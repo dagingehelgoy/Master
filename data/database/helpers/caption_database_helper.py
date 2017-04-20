@@ -53,44 +53,18 @@ def fetch_all_caption_text_tuples():
 	return db_wrapper.db_all_caption_text_tuples()
 
 
-def compare_vectors(v1, v2):
-	return mean_squared_error(v1, v2)
-
-
-def find_n_most_similar_captions(caption_embedding, n=1):
-	caption_vector_pairs = fetch_all_caption_rows()
-
-	first_caption_vector = caption_vector_pairs[0][1]
-	first_caption_text = caption_vector_pairs[0][2]
-	first_caption_mse = compare_vectors(caption_embedding, first_caption_vector)
-
-	best_caption_vector_mse_list = [0 for i in range(n)]
-	best_caption_text_list = ["" for i in range(n)]
-	best_caption_vector_list = [[] for i in range(n)]
-
-	best_caption_vector_mse_list = insert_and_remove_last(0, best_caption_vector_mse_list, first_caption_mse)
-	best_caption_text_list = insert_and_remove_last(0, best_caption_text_list, first_caption_text)
-	best_caption_vector_list = insert_and_remove_last(0, best_caption_vector_list, first_caption_vector)
-	total_captions = len(caption_vector_pairs)
-	counter = 1
-
-	print_progress(counter, total_captions, prefix="Searching for caption")
-	for temp_caption_filename, temp_caption_vector, temp_caption_text in caption_vector_pairs:
-		temp_image_mse = compare_vectors(caption_embedding, temp_caption_vector)
-		for index in range(len(best_caption_vector_list)):
-			if temp_image_mse < best_caption_vector_mse_list[index]:
-				best_caption_vector_mse_list = insert_and_remove_last(index, best_caption_vector_mse_list, temp_image_mse)
-				best_caption_text_list = insert_and_remove_last(index, best_caption_text_list, temp_caption_text)
-				best_caption_vector_list = insert_and_remove_last(index, best_caption_vector_list, temp_caption_vector)
-				break
-		counter += 1
-		if counter % 100 == 0 or counter > total_captions - 1:
-			print_progress(counter, total_captions, prefix="Searching for caption")
-	print_progress(total_captions, total_captions, prefix="Searching for caption")
-	return best_caption_text_list
+def store_caption_text_to_db():
+	text_file_path = "/Users/markus/workspace/master/Master/data/datasets/Flickr8k.txt"
+	text_file = open(text_file_path)
+	lines = text_file.readlines()
+	text_file.close()
+	captions = []
+	for line in lines:
+		image_name = line.split("#")[0]
+		caption_text = ((line.split("#")[1])[1:]).strip()
+		captions.append((image_name, caption_text, None))
+	save_caption_vector_list(captions)
 
 
 if __name__ == "__main__":
-	caps = fetch_caption_vectors_for_image_name("1000092795.jpg")
-	for cap in caps:
-		print len(cap)
+	store_caption_text_to_db()

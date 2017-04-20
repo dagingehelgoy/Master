@@ -14,7 +14,10 @@ def gan_main(inference):
 		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 			oh_predict(config, logger)
 		else:
-			emb_predict(config, logger)
+			if config[Conf.IMAGE_CAPTION]:
+				img_caption_predict(config, logger)
+			else:
+				emb_predict(config, logger)
 	else:
 		print "training"
 		train(logger, config)

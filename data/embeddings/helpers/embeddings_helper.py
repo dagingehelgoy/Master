@@ -2,6 +2,7 @@
 
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
+from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs
 from helpers.io_helper import *
 
 
@@ -13,7 +14,7 @@ def fetch_embeddings(size=-1):
 		all_image_names, image_name_caption_dict = create_dictionaries(size)
 		image_names, image_data, image_captions = get_examples(all_image_names, image_name_caption_dict)
 
-		dataset = [image_names, image_data, image_captions]
+		dataset = [image_names, np.asarray(image_data), image_captions]
 		print("Finished generating %s training example" % len(image_captions))
 		save_embeddings(dataset, size)
 
@@ -48,15 +49,15 @@ def get_examples(all_image_names, image_name_caption_vector_dict):
 	sorted_caption_vector_data = []
 	sorted_image_data = []
 	sorted_image_names = []
-	image_name_image_vector_dict = {key: value for (key, value) in fetch_all_image_vector_pairs()}
+	image_name_pca_vector_dict = {key: value for (key, value) in fetch_all_pca_vector_pairs()}
 	all_image_names_total = len(all_image_names)
 	for i in range(all_image_names_total):
 		image_name = all_image_names[i]
-		image_vector = image_name_image_vector_dict[image_name]
+		pca_vector = image_name_pca_vector_dict[image_name]
 		caption_vectors = image_name_caption_vector_dict[image_name]
 
 		for caption_vector in caption_vectors:
-			sorted_image_data.append(image_vector)
+			sorted_image_data.append(pca_vector)
 			sorted_image_names.append(image_name)
 			sorted_caption_vector_data.append(caption_vector)
 		print_progress(i + 1, all_image_names_total, prefix='Generating data:', suffix='Complete', barLength=50)

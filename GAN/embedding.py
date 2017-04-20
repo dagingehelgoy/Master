@@ -1,11 +1,11 @@
+from keras.engine import Input, merge, Model
 from keras.layers import LSTM, TimeDistributed, Dense
 from keras.models import Sequential, model_from_json
-import settings
-from GAN.helpers.datagen import generate_input_noise, generate_string_sentences
-from GAN.helpers.enums import Conf, PreInit
 
-# from helpers.list_helpers import *
-from sequence_to_sequence.seq2seq import pairwise_cosine_similarity
+from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch
+from GAN.helpers.enums import Conf, PreInit
+from GAN.helpers.list_helpers import *
+from data.database.helpers.pca_database_helper import fetch_pca_vector
 
 
 def get_decoder(config):
@@ -23,7 +23,7 @@ def get_decoder(config):
 
 def generator_model(config):
 	if config[Conf.IMAGE_CAPTION]:
-		noise_size = settings.IMAGE_EMBEDDING_DIMENSIONS
+		noise_size = config[Conf.IMAGE_DIM]
 	else:
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
@@ -56,6 +56,44 @@ def emb_create_generator(config):
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 
 	return g_model
+
+
+def emb_create_image_gan(config):
+	if config[Conf.IMAGE_CAPTION]:
+		noise_size = config[Conf.IMAGE_DIM]
+	else:
+		noise_size = config[Conf.NOISE_SIZE]
+
+	# Generator
+
+	g_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], noise_size), name="g_model_lstm_input")
+	g_tensor = LSTM(config[Conf.EMBEDDING_SIZE], return_sequences=True)(g_lstm_input)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=g_lstm_input, output=g_tensor)
+
+	# Discriminator
+
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
+	d_lstm_out = LSTM(50)(d_lstm_input)
+
+	img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = merge([d_lstm_out, img_input], mode='concat')
+	d_tensor = Dense(1, activation='sigmoid')(d_tensor)
+	d_model = Model(input=[d_lstm_input, img_input], output=d_tensor, name="d_model")
+
+	# GAN
+	gan_tensor = d_model([g_tensor, img_input])
+	gan_model = Model(input=[g_lstm_input, img_input], output=gan_tensor)
+
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="g_model.png", show_shapes=True)
+	# plot(d_model, to_file="d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	return g_model, d_model, gan_model
 
 
 def emb_create_discriminator(config):
@@ -107,3 +145,25 @@ def emb_predict(config, logger):
 		# print "First sentence prediction vectors:"
 		# for vector in predictions[0]:
 		# 	print "%s" % (sum(vector))
+
+
+def img_caption_predict(config, logger):
+	g_model = load_generator(logger)
+	weights = logger.get_generator_weights()
+
+	image_to_predict = "123889082_d3751e0350.jpg"
+	pca_vector = fetch_pca_vector(image_to_predict)
+	repeated_pca_vector = generate_image_training_batch([pca_vector], config)
+	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
+	print "Num weights: %s" % len(weights)
+	for weight in weights:
+		print "\nTesting generator: %s\n" % weight
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, weight))
+		predictions = g_model.predict(repeated_pca_vector)
+
+		for prediction in predictions:
+			sentence = ""
+			most_sim_words_list = pairwise_cosine_similarity(prediction, word_embedding_dict)
+			for word in most_sim_words_list:
+				sentence += word[0] + " "
+			print sentence + "\n"

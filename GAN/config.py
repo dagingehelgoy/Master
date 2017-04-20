@@ -24,7 +24,7 @@ config = {
 	Conf.MAX_SEQ_LENGTH: 5,
 
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 256,
+	Conf.BATCH_SIZE: 10,
 	Conf.EPOCHS: 10000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -33,13 +33,14 @@ config = {
 
 	Conf.EMBEDDING_SIZE: 50,
 	Conf.NOISE_SIZE: 40,
-	Conf.PREINIT: PreInit.DECODER,
+	Conf.PREINIT: PreInit.NONE,
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
 	# Conf.MODELNAME: "2017-03-31_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeDandG",
 	Conf.MODELNAME: None,
-	Conf.IMAGE_CAPTION: False
+	Conf.IMAGE_CAPTION: True,
+	Conf.IMAGE_DIM: 50
 
 
 }

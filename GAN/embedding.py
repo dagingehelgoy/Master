@@ -1,5 +1,5 @@
 from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense
+from keras.layers import LSTM, TimeDistributed, Dense, Dropout
 from keras.models import Sequential, model_from_json
 
 from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch
@@ -40,7 +40,7 @@ def discriminator_model(config):
 	model.add(LSTM(
 		50,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=False))
+		return_sequences=False, dropout_U=0.4, dropout_W=0.4))
 	model.add(Dense(1, activation="sigmoid"))
 	return model
 

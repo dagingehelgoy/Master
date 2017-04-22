@@ -23,8 +23,10 @@ config = {
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 5,
 
+	Conf.LIMITED_DATASET: "surf.txt",
+	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 10,
 	Conf.EPOCHS: 10000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -39,7 +41,7 @@ config = {
 
 	# Conf.MODELNAME: "2017-03-31_word2vec_Vocab1000_Seq5_Batch256_EmbSize50_repeat_Noise200_Dataset-1_largeDandG",
 	Conf.MODELNAME: None,
-	Conf.IMAGE_CAPTION: True,
+	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50
 
 

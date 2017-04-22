@@ -1,6 +1,8 @@
 import random
 
 from PIL import Image, ImageDraw, ImageFont
+
+from data.database.helpers.caption_database_helper import fetch_caption_texts_for_image_name
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
 from helpers.list_helpers import *
@@ -24,11 +26,14 @@ def show_image(file, title, index, mode):
 
 def test_image_vectors():
 	test_size = 1
-	all_image_names = fetch_all_image_names()
+	num_similar_images = 10
+	# all_image_names = fetch_all_image_names()
+	all_image_names = ["3331900249_5872e90b25.jpg"]
 	np.random.shuffle(all_image_names)
 	start = random.randint(0, len(all_image_names) - test_size)
 	samples = all_image_names[start:start + test_size]
 	image_vector_pairs = fetch_all_image_vector_pairs()
+
 	print "All images %s" % len(image_vector_pairs)
 	print("\nRESULTS")
 	for i in range(len(samples)):
@@ -40,9 +45,9 @@ def test_image_vectors():
 		first_image_vector = image_vector_pairs[0][1]
 		first_image_mse = compare_vectors(correct_image_vector, first_image_vector)
 
-		best_image_vector_mse_list = [0 for _ in range(5)]
-		best_image_vector_name_list = ["" for _ in range(5)]
-		best_image_vector_list = [[] for _ in range(5)]
+		best_image_vector_mse_list = [0 for _ in range(num_similar_images)]
+		best_image_vector_name_list = ["" for _ in range(num_similar_images)]
+		best_image_vector_list = [[] for _ in range(num_similar_images)]
 
 		best_image_vector_mse_list = insert_and_remove_last(0, best_image_vector_mse_list, first_image_mse)
 		best_image_vector_name_list = insert_and_remove_last(0, best_image_vector_name_list, first_image_filename)
@@ -68,6 +73,11 @@ def test_image_vectors():
 			show_image(settings.IMAGE_DIR + filename, filename, j, "inc")
 			print(j + 1, filename)
 		print("")
+		for name in best_image_vector_name_list:
+			caps = fetch_caption_texts_for_image_name(name)
+			for cap in caps:
+				print cap
+				# print "<sos> %s" % " ".join(cap.split(" ")[:9])
 
 
 def test_pca_vectors():

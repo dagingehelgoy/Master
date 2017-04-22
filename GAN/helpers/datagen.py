@@ -50,8 +50,11 @@ def generate_index_sentences(config, cap_data=-1):
 
 def generate_string_sentences(config):
 	cap_data = config[Conf.DATASET_SIZE]
-	print "Loading Flickr sentences..."
-	sentences = get_flickr_sentences(cap_data)
+	if config[Conf.LIMITED_DATASET] is not None:
+		sentences = get_custom_sentences(config)
+	else:
+		print "Loading Flickr sentences..."
+		sentences = get_flickr_sentences(cap_data)
 	word_list_sentences = []
 	for sentence in sentences:
 		word_list = ["<sos>"]
@@ -74,7 +77,7 @@ def generate_string_sentences(config):
 
 
 def get_flickr_sentences(cap_data):
-	path = "data/datasets/Flickr30k.txt"
+	path = "data/datasets/Flickr8k.txt"
 
 	sentence_file = open(path)
 	if cap_data == -1:
@@ -85,6 +88,14 @@ def get_flickr_sentences(cap_data):
 	word_captions = [(line.split("\t")[1]).strip() for line in word_captions]
 	return word_captions
 
+
+def get_custom_sentences(config):
+	path = "data/datasets/%s" % config[Conf.LIMITED_DATASET]
+	sentence_file = open(path)
+	word_captions = sentence_file.readlines()
+	sentence_file.close()
+	word_captions = [line.strip() for line in word_captions]
+	return word_captions
 
 def generate_input_noise(config):
 	if config[Conf.PREINIT] == PreInit.ENCODER_DECODER:

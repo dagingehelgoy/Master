@@ -151,7 +151,7 @@ def img_caption_predict(config, logger):
 	g_model = load_generator(logger)
 	weights = logger.get_generator_weights()
 
-	image_to_predict = "123889082_d3751e0350.jpg"
+	image_to_predict = "3250589803_3f440ba781.jpg"
 	pca_vector = fetch_pca_vector(image_to_predict)
 	repeated_pca_vector = generate_image_training_batch([pca_vector], config)
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)

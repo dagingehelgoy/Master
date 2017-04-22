@@ -9,6 +9,10 @@ def generate_name_prefix(config):
 	suffix = ""
 	if config[Conf.NAME_SUFFIX] is not None:
 		suffix = "_%s" % config[Conf.NAME_SUFFIX]
+	if config[Conf.LIMITED_DATASET] is not None:
+		dataset_name = "_%s" % config[Conf.LIMITED_DATASET][:-4]
+	else:
+		dataset_name = config[Conf.DATASET_SIZE]
 	return "%s_ImgCap%s_%s_Vocab%s_Seq%s_Batch%s_EmbSize%s_%s_Noise%s_PreInit%s_Dataset%s%s" % (
 		config[Conf.DATE],
 		config[Conf.IMAGE_CAPTION],
@@ -21,7 +25,7 @@ def generate_name_prefix(config):
 		config[Conf.NOISE_SIZE],
 		# config[Conf.MAX_LOSS_DIFF],
 		config[Conf.PREINIT],
-		config[Conf.DATASET_SIZE],
+		dataset_name,
 		suffix
 	)
 

@@ -29,7 +29,7 @@ config = {
 	Conf.BATCH_SIZE: 10,
 	Conf.EPOCHS: 100000,
 
-	Conf.NOISE_MODE: NoiseMode.ONES,
+	Conf.NOISE_MODE: NoiseMode.REPEAT,
 
 	Conf.MAX_LOSS_DIFF: 0,
 

@@ -86,8 +86,11 @@ def train(gan_logger, config):
 				noise_batch = generate_input_noise(config)
 				generated_batch = g_model.predict(noise_batch)
 
-			training_batch_y_zeros = np.random.uniform(0.0, 0.3, config[Conf.BATCH_SIZE])
-			training_batch_y_ones = np.random.uniform(0.7, 1.2, config[Conf.BATCH_SIZE])
+			# training_batch_y_zeros = np.random.uniform(0.0, 0.3, config[Conf.BATCH_SIZE])
+			# training_batch_y_ones = np.random.uniform(0.7, 1.2, config[Conf.BATCH_SIZE])
+
+			training_batch_y_zeros = np.zeros(config[Conf.BATCH_SIZE])
+			training_batch_y_ones = np.ones(config[Conf.BATCH_SIZE])
 
 			# Train discriminator
 
@@ -108,9 +111,9 @@ def train(gan_logger, config):
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 
 			if batch_counter % int(nb_batches / 1) == 0:
-				print("d_loss_gen:\t%f d_acc_gen:\t%f" % (d_loss_gen, d_acc_gen))
 				print("d_loss_train:\t%f d_acc_train:\t%f" % (d_loss_train, d_acc_train))
-				print("g_loss:\t\t%f g_acc:\t\t%f" % (g_loss, g_acc))
+				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
+				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
 
 		if (epoch_cnt < 100 and epoch_cnt % 10 == 0) or (

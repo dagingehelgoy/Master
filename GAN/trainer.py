@@ -111,7 +111,7 @@ def train(gan_logger, config):
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 
 			if batch_counter % int(nb_batches / 1) == 0:
-				print("d_loss_train:\t\t%f d_acc_train:\t%f" % (d_loss_train, d_acc_train))
+				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
 				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)

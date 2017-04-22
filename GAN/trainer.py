@@ -80,7 +80,6 @@ def train(gan_logger, config):
 			else:
 				caption_training_batch = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
-
 			if config[Conf.IMAGE_CAPTION]:
 				generated_batch = g_model.predict(image_training_batch)
 			else:

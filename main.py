@@ -30,9 +30,6 @@ if __name__ == "__main__":
 	elif args.code == "compare_distributions":
 		from word2vec.distribution_comparison import compare_distributions
 		compare_distributions()
-
-
-
 	else:
 		print("### No suitable --code ###")
 

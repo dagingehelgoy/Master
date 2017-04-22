@@ -51,6 +51,7 @@ def generate_index_sentences(config, cap_data=-1):
 def generate_string_sentences(config):
 	cap_data = config[Conf.DATASET_SIZE]
 	if config[Conf.LIMITED_DATASET] is not None:
+		print "Loading %s sentences" % config[Conf.LIMITED_DATASET]
 		sentences = get_custom_sentences(config)
 	else:
 		print "Loading Flickr sentences..."
@@ -180,14 +181,15 @@ def emb_generate_caption_training_batch(training_batch, word_embedding_dict, con
 	for word_list in training_batch:
 		embedding_sentence = []
 		for word_string in word_list:
+			if word_string == 'surfs':
+				word_string = 'surfing'
 			if word_string in word_embedding_dict:
 				word_embedding = word_embedding_dict[word_string]
 				embedding_sentence.append(word_embedding)
 		if len(embedding_sentence) > config[Conf.MAX_SEQ_LENGTH]:
 			embedding_sentence = embedding_sentence[:config[Conf.MAX_SEQ_LENGTH]]
 		while len(embedding_sentence) < config[Conf.MAX_SEQ_LENGTH]:
-			zeros = np.zeros(config[Conf.EMBEDDING_SIZE])
-			embedding_sentence.insert(0, zeros)
+			embedding_sentence.append(word_embedding_dict["<pad>"])
 		embedding_lists.append(embedding_sentence)
 	return np.asarray(embedding_lists)
 

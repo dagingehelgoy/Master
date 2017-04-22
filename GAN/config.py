@@ -21,7 +21,7 @@ config = {
 	# Conf.NAME_SUFFIX: "largeG",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 5,
+	Conf.MAX_SEQ_LENGTH: 10,
 
 	Conf.LIMITED_DATASET: "surf.txt",
 	# Conf.LIMITED_DATASET: None,

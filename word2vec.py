@@ -33,16 +33,17 @@ from word2vec.word2vec_helpers import build_dataset, generate_batch, plot_with_l
 VOCABULARY_SIZE = config[Conf.VOCAB_SIZE]
 EMBEDDING_SIZE = config[Conf.EMBEDDING_SIZE]  # Dimension of the embedding vector.
 NUM_STEPS = config[Conf.WORD2VEC_NUM_STEPS]
+DATASET = "flowers"  # flowers/flickr
 
 if "plot" in sys.argv:
-	reverse_dictionary, final_embeddings = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS)
+	reverse_dictionary, final_embeddings = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
 	plot_with_labels(reverse_dictionary, final_embeddings,
 	                 filename="word2vec_%sd%svoc%ssteps_plot" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS))
 else:
 
 	# num_steps = 1
 
-	data, count, dictionary, reverse_dictionary = build_dataset(VOCABULARY_SIZE)
+	data, count, dictionary, reverse_dictionary = build_dataset(VOCABULARY_SIZE, DATASET)
 	print('Most common words (+UNK)', count[:5])
 	print('Sample datasets', data[:10], [reverse_dictionary[i] for i in data[:10]])
 	data_index = 0
@@ -149,7 +150,7 @@ else:
 	saving = True
 
 	if saving:
-		save_model(reverse_dictionary, final_embeddings, EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS)
+		save_model(reverse_dictionary, final_embeddings, EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
 
 	if plotting:
 		plot_with_labels(reverse_dictionary, final_embeddings)

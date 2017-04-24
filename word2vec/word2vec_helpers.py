@@ -48,10 +48,12 @@ def read_flower_data():
 	return data
 
 
-def build_dataset(vocabulary_size):
+def build_dataset(vocabulary_size, dataset):
 	# Read the datasets into a list of strings.
-	words = read_flickr_data()
-	# words = read_flower_data()
+	if dataset == 'flickr':
+		words = read_flickr_data()
+	else:
+		words = read_flower_data()
 	print('Data size', len(words))
 	count = [['UNK', -1]]
 	count.extend(collections.Counter(words).most_common(vocabulary_size - 1))
@@ -129,36 +131,36 @@ def plot_collections(collection_list, collection_list_names, perplexity, suffix,
 	print "Plot collections done"
 
 
-def save_model(reverse_dictionary, embeddings, embedding_size, vocab_size, num_steps):
+def save_model(reverse_dictionary, embeddings, embedding_size, vocab_size, num_steps, dataset):
 	word_embeddings_dict = {}
 	count = 0
 	for word_text, word_vector in zip(reverse_dictionary, embeddings):
 		count += 1
 		word_embeddings_dict[reverse_dictionary[word_text]] = word_vector
 	print count
-	dict_filename = get_dict_filename(embedding_size, num_steps, vocab_size)
-	reverse_filename = get_reverse_filename(embedding_size, num_steps, vocab_size)
-	embeddings_filename = get_embeddin_filename(embedding_size, num_steps, vocab_size)
+	dict_filename = get_dict_filename(embedding_size, num_steps, vocab_size, dataset)
+	reverse_filename = get_reverse_filename(embedding_size, num_steps, vocab_size, dataset)
+	embeddings_filename = get_embeddin_filename(embedding_size, num_steps, vocab_size, dataset)
 	save_pickle_file(word_embeddings_dict, dict_filename)
 	save_pickle_file(reverse_dictionary, reverse_filename)
 	save_pickle_file(embeddings, embeddings_filename)
 
 
-def load_model(embedding_size, vocab_size, num_steps):
-	reverse_filename = get_reverse_filename(embedding_size, num_steps, vocab_size)
-	embeddings_filename = get_embeddin_filename(embedding_size, num_steps, vocab_size)
+def load_model(embedding_size, vocab_size, num_steps, dataset):
+	reverse_filename = get_reverse_filename(embedding_size, num_steps, vocab_size, dataset)
+	embeddings_filename = get_embeddin_filename(embedding_size, num_steps, vocab_size, dataset)
 	reverse_dictionary = load_pickle_file(reverse_filename)
 	final_embeddings = load_pickle_file(embeddings_filename)
 	return reverse_dictionary, final_embeddings
 
 
-def get_dict_filename(embedding_size, num_steps, vocab_size):
-	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (embedding_size, vocab_size, num_steps)
+def get_dict_filename(embedding_size, num_steps, vocab_size, dataset):
+	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict_%s.pkl" % (embedding_size, vocab_size, num_steps, dataset)
 
 
-def get_embeddin_filename(embedding_size, num_steps, vocab_size):
-	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_embs.pkl" % (embedding_size, vocab_size, num_steps)
+def get_embeddin_filename(embedding_size, num_steps, vocab_size, dataset):
+	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_embs_%s.pkl" % (embedding_size, vocab_size, num_steps, dataset)
 
 
-def get_reverse_filename(embedding_size, num_steps, vocab_size):
-	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_reverse.pkl" % (embedding_size, vocab_size, num_steps)
+def get_reverse_filename(embedding_size, num_steps, vocab_size, dataset):
+	return "word2vec/saved_models/word2vec_%sd%svoc%ssteps_reverse_%s.pkl" % (embedding_size, vocab_size, num_steps, dataset)

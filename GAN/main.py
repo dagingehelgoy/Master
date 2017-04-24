@@ -7,7 +7,7 @@ from GAN.trainer import train
 
 
 def gan_main(inference):
-	logger = GANLogger(config)
+	logger = GANLogger(config, inference)
 	logger.print_start_message()
 	if inference:
 		print "Predicting"

@@ -31,7 +31,7 @@ def generate_name_prefix(config):
 
 
 class GANLogger:
-	def __init__(self, config):
+	def __init__(self, config, inference):
 		self.exists = False
 		print "config[Conf.MODELNAME]: %s" % config[Conf.MODELNAME]
 		if config[Conf.MODELNAME] is not None:
@@ -40,10 +40,10 @@ class GANLogger:
 			self.name_prefix = generate_name_prefix(config)
 
 		print "Initialize logging..."
-
-		self.create_dirs("GAN/GAN_log")
-		self.create_model_folders_and_files()
-		self.create_model_files()
+		if not inference:
+			self.create_dirs("GAN/GAN_log")
+			self.create_model_folders_and_files()
+			self.create_model_files()
 
 	@staticmethod
 	def create_dirs(directory):
@@ -75,6 +75,12 @@ class GANLogger:
 	def save_loss(self, g_loss, d_loss, epoch, batch):
 		loss_file = open("GAN/GAN_log/%s/loss.txt" % self.name_prefix, "a")
 		loss_file.write("%s,%s,%s,%s\n" % (epoch, batch, g_loss, d_loss))
+		loss_file.close()
+
+	def save_loss_acc(self, g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch, batch):
+		loss_file = open("GAN/GAN_log/%s/loss.txt" % self.name_prefix, "a")
+		loss_file.write("%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+			epoch, batch, g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train))
 		loss_file.close()
 
 	def save_model_weights(self, model, epoch, name, suffix=""):

@@ -2,6 +2,8 @@ import argparse
 
 import keras.backend.tensorflow_backend as k_tf
 
+from data.data_main import fetch_flower_captions
+
 
 def get_args():
 	parser = argparse.ArgumentParser()
@@ -30,6 +32,8 @@ if __name__ == "__main__":
 	elif args.code == "compare_distributions":
 		from word2vec.distribution_comparison import compare_distributions
 		compare_distributions()
+	elif args.code == "data":
+		fetch_flower_captions()
 	else:
 		print("### No suitable --code ###")
 

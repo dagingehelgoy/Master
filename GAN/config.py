@@ -27,7 +27,7 @@ config = {
 	Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 10,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 100000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,

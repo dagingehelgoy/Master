@@ -38,7 +38,7 @@ DATASET = "flowers"  # flowers/flickr
 if "plot" in sys.argv:
 	reverse_dictionary, final_embeddings = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
 	plot_with_labels(reverse_dictionary, final_embeddings,
-	                 filename="word2vec_%sd%svoc%ssteps_plot" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS))
+	                 filename="word2vec_%sd%svoc%ssteps_plot_%s" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET))
 else:
 
 	# num_steps = 1

@@ -1,8 +1,10 @@
+import numpy as np
 from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense, Dropout
+from keras.layers import LSTM, TimeDistributed, Dense
 from keras.models import Sequential, model_from_json
 
-from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch
+from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch, \
+	emb_generate_caption_training_batch
 from GAN.helpers.enums import Conf, PreInit
 from GAN.helpers.list_helpers import *
 from data.database.helpers.pca_database_helper import fetch_pca_vector
@@ -110,41 +112,65 @@ def load_generator(logger):
 	return model_from_json(loaded_model_json)
 
 
+def load_discriminator(logger):
+	json_file = open("GAN/GAN_log/%s/model_files/discriminator.json" % logger.name_prefix, 'r')
+	loaded_model_json = json_file.read()
+	json_file.close()
+	return model_from_json(loaded_model_json)
+
+
 def emb_predict(config, logger):
 	print "Compiling generator..."
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
+	# raw_caption_training_batch = word_list_sentences[:6]
+	raw_caption_training_batch = np.random.choice(word_list_sentences, 6)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
+	                                                              config)
 
 	g_model = load_generator(logger)
+	d_model = load_discriminator(logger)
 
 	# print "Pretrained"
 	# predictions = g_model.predict(noise_batch)
 	# for prediction in predictions:
-	# 	sentence = ""
-	# 	most_sim_words_list = pairwise_cosine_similarity(prediction, word_embedding_dict)s
-	# 	for word in most_sim_words_list:
-	# 		sentence += word[0] + " "
-	# 	print sentence + "\n"
+	# 	generated_sentence = ""
+	# 	gen_most_sim_words_list = pairwise_cosine_similarity(prediction, word_embedding_dict)s
+	# 	for word in gen_most_sim_words_list:
+	# 		generated_sentence += word[0] + " "
+	# 	print generated_sentence + "\n"
 
-	weights = logger.get_generator_weights()
-	print "Num weights: %s" % len(weights)
-	for weight in weights:
-		print "\nTesting generator: %s\n" % weight
-		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, weight))
-		predictions = g_model.predict(noise_batch[:10])
+	g_weights = logger.get_generator_weights()
+	d_weights = logger.get_discriminator_weights()
 
-		for prediction in predictions:
-			sentence = ""
-			most_sim_words_list = pairwise_cosine_similarity(prediction, word_embedding_dict)
-			for word in most_sim_words_list:
-				sentence += word[0] + " "
-			print sentence + "\n"
+	print "Num g_weights: %s" % len(g_weights)
+	print "Num d_weights: %s" % len(g_weights)
+	for i in range(len(g_weights)):
+		g_weight = g_weights[i]
+		d_weight = d_weights[i]
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
+		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
+		generated_sentences = g_model.predict(noise_batch[:6])
+		generated_classifications = d_model.predict(generated_sentences)
+		print "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
+		for j in range(len(generated_sentences)):
+			embedded_generated_sentence = generated_sentences[j]
+			generated_sentence = ""
+			gen_most_sim_words_list = pairwise_cosine_similarity(embedded_generated_sentence, word_embedding_dict)
+			for word in gen_most_sim_words_list:
+				generated_sentence += word[0] + " "
+			print "%5.4f\t%s" % (generated_classifications[j], generated_sentence)
 
-		# print "First sentence prediction vectors:"
-		# for vector in predictions[0]:
-		# 	print "%s" % (sum(vector))
+		print "\nREAL SENTENCES: (%s)\n" % d_weight
+		real_classifications = d_model.predict(real_embedded_sentences)
+		for j in range(len(real_classifications)):
+			real_sentence = ""
+			real_most_sim_words_list = pairwise_cosine_similarity(real_embedded_sentences[j], word_embedding_dict)
+			for word in real_most_sim_words_list:
+				real_sentence += word[0] + " "
+			print "%5.4f\t%s" % (real_classifications[j], real_sentence)
 
 
 def img_caption_predict(config, logger):

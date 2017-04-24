@@ -105,6 +105,16 @@ class GANLogger:
 		generator_weights.sort(key=lambda x: int(x.split("-")[-1]))
 		return generator_weights
 
+	def get_discriminator_weights(self):
+		path = "GAN/GAN_log/%s/model_files/stored_weights/" % self.name_prefix
+		weigthfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+		d_weights = []
+		for weightfile in weigthfiles:
+			if "discriminator" in weightfile:
+				d_weights.append(weightfile)
+		d_weights.sort(key=lambda x: int(x.split("-")[-1]))
+		return d_weights
+
 	def save_model_summary(self, model, name=str()):
 		summary_file = open("GAN/GAN_log/%s/model_summary.txt" % self.name_prefix, "a")
 		orig_stdout = sys.stdout

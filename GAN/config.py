@@ -21,14 +21,14 @@ config = {
 	# Conf.NAME_SUFFIX: "dropout0.25",
 
 	Conf.VOCAB_SIZE: 5000,
-	Conf.MAX_SEQ_LENGTH: 8,
+	Conf.MAX_SEQ_LENGTH: 10,
 
 	# Conf.LIMITED_DATASET: "flowers",
-	# Conf.LIMITED_DATASET: "00058.txt",
-	Conf.LIMITED_DATASET: "person_surf.txt",
+	Conf.LIMITED_DATASET: "00058.txt",
+	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 10,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 100000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -36,13 +36,13 @@ config = {
 	Conf.MAX_LOSS_DIFF: 0,
 
 	Conf.EMBEDDING_SIZE: 50,
-	Conf.NOISE_SIZE: 40,
+	Conf.NOISE_SIZE: 50,
 	Conf.PREINIT: PreInit.NONE,
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-04-24_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch10_EmbSize50_repeat_Noise40_PreInitNone_Dataset_person_surf_dropout0.25",
-	# Conf.MODELNAME: None,
+	# Conf.MODELNAME: "2017-04-24_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch10_EmbSize50_repeat_Noise40_PreInitNone_Dataset_person_surf_dropout0.25",
+	Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50

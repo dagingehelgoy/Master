@@ -20,7 +20,7 @@ config = {
 	Conf.NAME_SUFFIX: None,
 	# Conf.NAME_SUFFIX: "dropout0.25",
 
-	Conf.VOCAB_SIZE: 10000,
+	Conf.VOCAB_SIZE: 8000,
 	Conf.MAX_SEQ_LENGTH: 8,
 
 	# Conf.LIMITED_DATASET: "flowers",

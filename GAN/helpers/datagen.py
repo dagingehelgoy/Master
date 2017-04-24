@@ -6,6 +6,9 @@ from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
 import os
 
+from word2vec.word2vec_helpers import get_dict_filename
+
+
 def to_categorical_lists(captions, config):
 	matrix = np.zeros((len(captions), config[Conf.MAX_SEQ_LENGTH], config[Conf.VOCAB_SIZE]))
 	for caption_index in range(len(captions)):
@@ -72,8 +75,8 @@ def generate_string_sentences(config):
 		word_embedding_dict = get_word_embeddings()
 	else:
 		print "Loading Word2Vec dictionary (%s)..." % config[Conf.WORD_EMBEDDING]
-		word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (
-			config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
+		# word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
+		word_embedding_dict = load_pickle_file(get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], "flowers"))
 	return np.asarray(word_list_sentences), word_embedding_dict
 
 

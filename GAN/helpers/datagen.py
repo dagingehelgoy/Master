@@ -74,9 +74,10 @@ def generate_string_sentences(config):
 		print "Loading Glove dictionary..."
 		word_embedding_dict = get_word_embeddings()
 	else:
-		print "Loading Word2Vec dictionary (%s)..." % config[Conf.WORD_EMBEDDING]
+		filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], "flowers")
+		print "Loading Word2Vec dictionary (%s)..." % filename
 		# word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
-		word_embedding_dict = load_pickle_file(get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], "flowers"))
+		word_embedding_dict = load_pickle_file(filename)
 	return np.asarray(word_list_sentences), word_embedding_dict
 
 

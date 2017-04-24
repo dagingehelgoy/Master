@@ -125,8 +125,7 @@ def emb_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	# raw_caption_training_batch = word_list_sentences[:6]
-	raw_caption_training_batch = np.random.choice(word_list_sentences, 6)
+	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
 	                                                              config)
 
@@ -152,7 +151,7 @@ def emb_predict(config, logger):
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
-		generated_sentences = g_model.predict(noise_batch[:6])
+		generated_sentences = g_model.predict(noise_batch[:10])
 		generated_classifications = d_model.predict(generated_sentences)
 		print "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		for j in range(len(generated_sentences)):

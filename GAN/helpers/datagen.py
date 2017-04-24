@@ -4,7 +4,7 @@ from keras.preprocessing.text import Tokenizer
 from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
-
+import os
 
 def to_categorical_lists(captions, config):
 	matrix = np.zeros((len(captions), config[Conf.MAX_SEQ_LENGTH], config[Conf.VOCAB_SIZE]))
@@ -91,11 +91,15 @@ def get_flickr_sentences(cap_data):
 
 
 def get_custom_sentences(config):
-	path = "data/datasets/%s" % config[Conf.LIMITED_DATASET]
-	sentence_file = open(path)
-	word_captions = sentence_file.readlines()
-	sentence_file.close()
-	word_captions = [line.strip() for line in word_captions]
+	if config[Conf.LIMITED_DATASET].endswith(".txt"):
+		path = "data/datasets/%s" % config[Conf.LIMITED_DATASET]
+		sentence_file = open(path)
+		word_captions = sentence_file.readlines()
+		sentence_file.close()
+		word_captions = [line.strip() for line in word_captions]
+	else:
+		word_captions = fetch_flower_captions(config)
+
 	return word_captions
 
 def generate_input_noise(config):

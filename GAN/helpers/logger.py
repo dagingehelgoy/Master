@@ -96,7 +96,7 @@ class GANLogger:
 		for weightfile in weigthfiles:
 			if "generator" in weightfile:
 				generator_weights.append(weightfile)
-
+		generator_weights.sort(key=lambda x: int(x.split("-")[-1]))
 		return generator_weights
 
 	def save_model_summary(self, model, name=str()):

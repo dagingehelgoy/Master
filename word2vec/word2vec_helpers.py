@@ -2,7 +2,7 @@ import collections
 import random
 
 import numpy as np
-from matplotlib.pyplot import legend
+
 from sklearn.manifold import TSNE
 
 from helpers.io_helper import save_pickle_file, load_pickle_file
@@ -115,6 +115,7 @@ def plot_with_labels(reverse_dictionary, final_embeddings, filename='tsne'):
 
 
 def plot_collections(collection_list, collection_list_names, perplexity, suffix, use_legend=False):
+	from matplotlib.pyplot import legend
 	print "Plot collections"
 	import matplotlib.pyplot as plt
 	plt.figure(figsize=(18, 18))  # in inches

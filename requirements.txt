@@ -17,7 +17,6 @@ PyYAML==3.12
 scikit-learn==0.18.1
 scipy==0.18.1
 sklearn==0.0
-tensorflow-gpu==0.12.0rc0
 cycler==0.10.0
 functools32==3.2.3.post2
 matplotlib==2.0.0

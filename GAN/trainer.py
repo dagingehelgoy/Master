@@ -64,7 +64,7 @@ def train(gan_logger, config):
 	nb_batches = int(total_training_data / config[Conf.BATCH_SIZE])
 	print("Number of batches: %s" % nb_batches)
 	for epoch_cnt in range(config[Conf.EPOCHS]):
-		print("Epoch: %s" % epoch_cnt)
+		print("Epoch: %s\t%s" % (epoch_cnt, gan_logger.name_prefix))
 		np.random.shuffle(all_raw_caption_data)
 		for batch_counter in range(nb_batches):
 			# if batch_counter % 10 == 0:

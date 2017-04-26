@@ -98,9 +98,8 @@ def generate_batch(data, batch_size, num_skips, skip_window, data_index):
 	return batch, labels, data_index
 
 
-def plot_with_labels(reverse_dictionary, final_embeddings, filename='tsne'):
+def plot_with_labels(reverse_dictionary, final_embeddings, filename='tsne', plot_only=500):
 	tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-	plot_only = 500
 	low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
 	labels = [reverse_dictionary[i] for i in range(plot_only)]
 	import matplotlib.pyplot as plt
@@ -110,6 +109,22 @@ def plot_with_labels(reverse_dictionary, final_embeddings, filename='tsne'):
 		x, y = low_dim_embs[i, :]
 		plt.scatter(x, y)
 		plt.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
+
+	plt.savefig("word2vec/saved_models/%s.png" % filename)
+
+
+def plot_with_labels_selected(reverse_dictionary, final_embeddings, selected_word_list, filename='tsne', plot_only=500):
+	tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+	low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
+	labels = [reverse_dictionary[i] for i in range(plot_only)]
+	import matplotlib.pyplot as plt
+	assert low_dim_embs.shape[0] >= len(labels), "More labels than embeddings"
+	plt.figure(figsize=(18, 18))  # in inches
+	for i, label in enumerate(labels):
+		if label in selected_word_list:
+			x, y = low_dim_embs[i, :]
+			plt.scatter(x, y)
+			plt.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
 
 	plt.savefig("word2vec/saved_models/%s.png" % filename)
 
@@ -152,7 +167,9 @@ def load_model(embedding_size, vocab_size, num_steps, dataset):
 	embeddings_filename = get_embeddin_filename(embedding_size, num_steps, vocab_size, dataset)
 	reverse_dictionary = load_pickle_file(reverse_filename)
 	final_embeddings = load_pickle_file(embeddings_filename)
-	return reverse_dictionary, final_embeddings
+	dict_filename = get_dict_filename(embedding_size, num_steps, vocab_size, dataset)
+	dictionary = load_pickle_file(dict_filename)
+	return reverse_dictionary, final_embeddings, dictionary
 
 
 def get_dict_filename(embedding_size, num_steps, vocab_size, dataset):

@@ -27,18 +27,25 @@ import numpy as np
 import tensorflow as tf
 
 from GAN.config import *
-from word2vec.word2vec_helpers import build_dataset, generate_batch, plot_with_labels, save_model, load_model
+from word2vec.word2vec_helpers import build_dataset, generate_batch, plot_with_labels, save_model, load_model, \
+	plot_with_labels_selected
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
 VOCABULARY_SIZE = config[Conf.VOCAB_SIZE]
 EMBEDDING_SIZE = config[Conf.EMBEDDING_SIZE]  # Dimension of the embedding vector.
 NUM_STEPS = config[Conf.WORD2VEC_NUM_STEPS]
-DATASET = "flowers"  # flowers/flickr
+DATASET = "flickr"  # flowers/flickr
 
 if "plot" in sys.argv:
-	reverse_dictionary, final_embeddings = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
+	reverse_dictionary, final_embeddings, _ = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
 	plot_with_labels(reverse_dictionary, final_embeddings,
-	                 filename="word2vec_%sd%svoc%ssteps_plot_%s" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET))
+	                 filename="word2vec_%sd%svoc%ssteps_plot_%s" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET), plot_only=500)
+elif "plot_selection" in sys.argv:
+	reverse_dictionary, final_embeddings, dictionary = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)
+	selected_word_list = ["man", "woman", "boy", "girl", "blue", "yellow", "green", "red", "one", "two", "three", "chair", "table", "sweater", "dress", "suit"]
+	plot_with_labels_selected(reverse_dictionary, final_embeddings, selected_word_list,
+	                 filename="word2vec_selection_%sd%svoc%ssteps_plot_%s" % (EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET))
+
 else:
 
 	# num_steps = 1

@@ -14,8 +14,13 @@ pydot==1.2.3
 pymongo==3.4.0
 pyparsing==2.1.10
 PyYAML==3.12
-recurrentshop==0.0.1
 scikit-learn==0.18.1
 scipy==0.18.1
 sklearn==0.0
 tensorflow-gpu==0.12.0rc0
+cycler==0.10.0
+functools32==3.2.3.post2
+matplotlib==2.0.0
+python-dateutil==2.6.0
+pytz==2017.2
+subprocess32==3.2.7

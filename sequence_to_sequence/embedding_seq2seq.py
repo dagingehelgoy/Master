@@ -111,7 +111,8 @@ def get_word_embeddings(conf):
 		return embeddings_index
 
 	elif conf.WORD_EMBEDDING_METHOD == 'word2vec':
-		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict.pkl" % (conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
+		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict.pkl" % (
+		conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
 		return load_pickle_file(embedding_dict_name)
 
 	print("WORD_EMBEDDING_METHOD not found")
@@ -119,7 +120,7 @@ def get_word_embeddings(conf):
 
 
 def set_model_name(conf):
-	log_folder = "NORM_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+	log_folder = "NORM_DROP_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
 		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD
@@ -206,7 +207,7 @@ def get_decoder(conf):
 def get_encoder(conf):
 	encoder = Sequential()
 	encoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION),
-					 return_sequences=False))
+					 return_sequences=False, dropout_U=0.2, dropout_W=0.2))
 	encoder.add(Lambda(lambda x: K.l2_normalize(x, axis=1)))
 	encoder.add(RepeatVector(conf.MAX_SEQUENCE_LENGTH))  # Get the last output of the RNN and repeats it
 	return encoder
@@ -304,20 +305,24 @@ def test_encoding(conf, string_training_data, predictions, model_filename, weigh
 	decoder = get_decoder(conf)
 	decoder.load_weights(filename)
 	predictions = decoder.predict(predictions)
-	most_sim_words_list = pairwise_cosine_similarity(predictions[0], word_embeddings)
-	print " ".join(string_training_data[0][:5])
-	sentence = ""
-	for word in most_sim_words_list:
-		sentence += word[0] + " "
-	# sentence += "(" + " ".join(word) + ") "
-	print sentence + "\n"
+	# save_pickle_file(predictions, "decoder_predictions.pkl")
+
+	for i in range(5):
+		most_sim_words_list = pairwise_cosine_similarity(predictions[i], word_embeddings)
+		print " ".join(string_training_data[i][:5])
+		sentence = ""
+		for word in most_sim_words_list:
+			sentence += word[0] + " "
+		# sentence += "(" + " ".join(word) + ") "
+		print sentence + "\n"
 
 
 def encode(conf, embedded_data, string_training_data, model_filename, weights_filename, word_embeddings):
 	test_model = load_encoder(conf, model_filename, weights_filename + "_encoder")
 	predictions = test_model.predict(np.asarray(embedded_data))
-	test_encoding(conf, string_training_data, predictions, model_filename, weights_filename + "_decoder", word_embeddings)
-	save_pickle_file(predictions, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
+	test_encoding(conf, string_training_data, predictions, model_filename, weights_filename + "_decoder",
+				  word_embeddings)
+	# save_pickle_file(predictions, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
 def seq2seq(inference=False, encode_data=False):
@@ -326,12 +331,12 @@ def seq2seq(inference=False, encode_data=False):
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 
-	model_filename = "NORM_S2S_2EMB_2017-04-07_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
-	weights_filename = "E:197-L:0.0117.hdf5"
+	model_filename = "NORM_DROP_S2S_2EMB_2017-04-24_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
+	weights_filename = "E:152-L:0.0122.hdf5"
 	if inference:
-		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:],
-																   string_training_data[-conf.VAL_DATA_SIZE:])
+		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
 		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
+		# infer(conf, string_training_data[:10][:conf.MAX_SEQUENCE_LENGTH], embedded_data[:10][:conf.MAX_SEQUENCE_LENGTH], model_filename, weights_filename, word_embedding_dict)
 	elif encode_data:
 		encoder_weights_filename = weights_filename
 		encode(conf, embedded_data, string_training_data, model_filename, encoder_weights_filename, word_embedding_dict)

@@ -8,7 +8,9 @@ from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, 
 	generate_image_training_batch
 from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
-from data.embeddings.helpers.embeddings_helper import *
+# from data.embeddings.helpers.embeddings_helper import *
+
+import numpy as np
 
 
 def generator_containing_discriminator(generator, discriminator):

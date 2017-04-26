@@ -7,7 +7,7 @@ from GAN.helpers.datagen import generate_input_noise, generate_string_sentences,
 	emb_generate_caption_training_batch
 from GAN.helpers.enums import Conf, PreInit
 from GAN.helpers.list_helpers import *
-from data.database.helpers.pca_database_helper import fetch_pca_vector
+# from data.database.helpers.pca_database_helper import fetch_pca_vector
 
 
 def get_decoder(config):

@@ -10,6 +10,7 @@ def get_args():
 	parser.add_argument("--code", type=str)
 	parser.add_argument("--inference", action='store_true')
 	parser.add_argument("--encode_data", action='store_true')
+	parser.add_argument("--decode_random", action='store_true')
 	parser.add_argument("--env", type=str)
 	args = parser.parse_args()
 	return args
@@ -22,7 +23,7 @@ def main():
 	args = get_args()
 	if args.code == "seq2seq":
 		from sequence_to_sequence.embedding_seq2seq import seq2seq
-		seq2seq(args.inference, args.encode_data)
+		seq2seq(args.inference, args.encode_data, args.decode_random)
 	elif args.code == "one_hot_seq2seq":
 		from sequence_to_sequence.one_hot_seq2seq import seq2seq
 		seq2seq(args.inference, args.encode_data)

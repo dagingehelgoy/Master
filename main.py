@@ -18,7 +18,7 @@ def get_args():
 	return args
 
 
-if __name__ == "__main__":
+def main():
 	tf_config = k_tf.tf.ConfigProto()
 	tf_config.gpu_options.allow_growth = True
 	k_tf.set_session(k_tf.tf.Session(config=tf_config))
@@ -39,4 +39,8 @@ if __name__ == "__main__":
 		fetch_flower_captions()
 	else:
 		print("### No suitable --code ###")
+
+
+if __name__ == "__main__":
+	main()
 

@@ -111,8 +111,8 @@ def get_word_embeddings(conf):
 		return embeddings_index
 
 	elif conf.WORD_EMBEDDING_METHOD == 'word2vec':
-		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict_flowers.pkl" % (
-		conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
+		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict_%s.pkl" % (
+		conf.EMBEDDING_DIMENSION, conf.NB_WORDS, conf.DATASET if conf.DATASET != None else "flickr")
 		return load_pickle_file(embedding_dict_name)
 
 	print("WORD_EMBEDDING_METHOD not found")
@@ -261,6 +261,7 @@ def get_flowers_sentences():
 
 def generate_embedding_captions(conf):
 	if conf.DATASET == "flowers":
+		print "A"
 		sentences = get_flowers_sentences()
 	else:
 		sentences = get_flickr_sentences()
@@ -338,9 +339,7 @@ def encode(conf, embedded_data, string_training_data, model_filename, weights_fi
 	save_pickle_file(latent_data, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
-def seq2seq(inference=False, encode_data=False, decode_random=False, model_filename="S2S_2EMB_2017-04-04_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec", weights_filename="E:143-L:0.0118.hdf5"):
-	conf = W2VEmbToEmbConf
-
+def seq2seq(inference=False, encode_data=False, decode_random=False, conf=W2VEmbToEmbConf, model_filename="NORM_DROP_S2S_2EMB_2017-04-27_VS2+1000_BS128_HD500_DHL1_ED50_SEQ5_WEMword2vec", weights_filename="E:101-L:0.0104.hdf5"):
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 

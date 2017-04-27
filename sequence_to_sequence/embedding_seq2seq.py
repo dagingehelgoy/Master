@@ -120,7 +120,7 @@ def get_word_embeddings(conf):
 
 
 def set_model_name(conf):
-	log_folder = "NORM_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+	log_folder = "NORM_DROP_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
 		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD
@@ -260,7 +260,7 @@ def get_flowers_sentences():
 
 
 def generate_embedding_captions(conf):
-	
+
 	sentences = get_flowers_sentences()
 	word_list_sentences = []
 	for sentence in sentences:
@@ -311,7 +311,7 @@ def infer(conf, inference_sentences, inference_vectors, model_filename, weights_
 		print sentence + "\n"
 
 
-def test_encoding(conf, string_training_data, predictions, model_filename, weights_filename, word_embeddings):
+def decode(conf, string_training_data, predictions, model_filename, weights_filename, word_embeddings):
 	filename = "sequence_to_sequence/logs/" + model_filename + "/weights/" + weights_filename
 	decoder = get_decoder(conf)
 	decoder.load_weights(filename)
@@ -330,27 +330,30 @@ def test_encoding(conf, string_training_data, predictions, model_filename, weigh
 
 def encode(conf, embedded_data, string_training_data, model_filename, weights_filename, word_embeddings):
 	test_model = load_encoder(conf, model_filename, weights_filename + "_encoder")
-	predictions = test_model.predict(np.asarray(embedded_data))
-	test_encoding(conf, string_training_data, predictions, model_filename, weights_filename + "_decoder",
-				  word_embeddings)
-	# save_pickle_file(predictions, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
+	latent_data = test_model.predict(np.asarray(embedded_data))
+	decode(conf, string_training_data, latent_data, model_filename, weights_filename + "_decoder",
+		   word_embeddings)
+	save_pickle_file(latent_data, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
-def seq2seq(inference=False, encode_data=False):
+def seq2seq(inference=False, encode_data=False, decode_random=False):
 	conf = W2VEmbToEmbConf
-    
+
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 
-	model_filename = "NORM_DROP_S2S_2EMB_2017-04-24_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
-	weights_filename = "E:152-L:0.0122.hdf5"
+	model_filename = "S2S_2EMB_2017-04-04_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
+	weights_filename = "E:143-L:0.0118.hdf5"
 	if inference:
 		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
 		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)
 		# infer(conf, string_training_data[:10][:conf.MAX_SEQUENCE_LENGTH], embedded_data[:10][:conf.MAX_SEQUENCE_LENGTH], model_filename, weights_filename, word_embedding_dict)
 	elif encode_data:
-		encoder_weights_filename = weights_filename
-		encode(conf, embedded_data, string_training_data, model_filename, encoder_weights_filename, word_embedding_dict)
+		encode(conf, embedded_data, string_training_data, model_filename, weights_filename, word_embedding_dict)
+	elif decode_random:
+		latent_data = np.random.normal(size=(conf.BATCH_SIZE, conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION))
+		decode(conf, string_training_data, latent_data, model_filename, weights_filename + "_decoder",
+			   word_embedding_dict)
 	else:
 		np.random.shuffle(embedded_data)
 		train_model(conf, embedded_data)

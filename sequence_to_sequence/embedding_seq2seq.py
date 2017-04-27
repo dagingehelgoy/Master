@@ -261,7 +261,6 @@ def get_flowers_sentences():
 
 def generate_embedding_captions(conf):
 	if conf.DATASET == "flowers":
-		print "A"
 		sentences = get_flowers_sentences()
 	else:
 		sentences = get_flickr_sentences()

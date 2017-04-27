@@ -31,7 +31,7 @@ def generator_model(config):
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
 	model.add(LSTM(
-		50,
+		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
 		return_sequences=True))
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
@@ -40,24 +40,25 @@ def generator_model(config):
 
 def discriminator_model(config):
 	model = Sequential()
-	model.add(Convolution1D(50, 4, input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE])))
-	model.add(Dropout(0.5))
-	model.add(Convolution1D(25, 2, input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE])))
-	model.add(MaxPooling1D(pool_length=2))
-	model.add(Dropout(0.5))
-	model.add(Flatten())
-	model.add(Dense(50, activation='relu'))
-	model.add(Dropout(0.5))
-	model.add(Dense(1, activation='sigmoid'))
-	print model.input_shape
-	print model.output_shape
-	model.summary()
-	#
-	# model.add(LSTM(
-	# 	50,
-	# 	input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-	# 	return_sequences=False, dropout_U=0.25, dropout_W=0.25))
-	# model.add(Dense(1, activation="sigmoid"))
+
+	# model.add(Convolution1D(50, 4, input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE])))
+	# model.add(Dropout(0.5))
+	# model.add(Convolution1D(25, 2, input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE])))
+	# model.add(MaxPooling1D(pool_length=2))
+	# model.add(Dropout(0.5))
+	# model.add(Flatten())
+	# model.add(Dense(50, activation='relu'))
+	# model.add(Dropout(0.5))
+	# model.add(Dense(1, activation='sigmoid'))
+	# print model.input_shape
+	# print model.output_shape
+	# model.summary()
+
+	model.add(LSTM(
+		500,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+		return_sequences=False, dropout_U=0.2, dropout_W=0.2))
+	model.add(Dense(1, activation="sigmoid"))
 	return model
 
 

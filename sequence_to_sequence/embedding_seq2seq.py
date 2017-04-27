@@ -120,10 +120,10 @@ def get_word_embeddings(conf):
 
 
 def set_model_name(conf):
-	log_folder = "NORM_DROP_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+	log_folder = "NORM_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
-		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD
+		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD + "_DATA" + conf.DATASET
 	log_dir = "sequence_to_sequence/logs/"
 	if not os.path.exists(log_dir + log_folder):
 		os.makedirs(log_dir + log_folder)
@@ -260,8 +260,10 @@ def get_flowers_sentences():
 
 
 def generate_embedding_captions(conf):
-
-	sentences = get_flowers_sentences()
+	if conf.DATASET == "flowers":
+		sentences = get_flowers_sentences()
+	else:
+		sentences = get_flickr_sentences()
 	word_list_sentences = []
 	for sentence in sentences:
 		if conf.WORD_EMBEDDING_METHOD == "word2vec":

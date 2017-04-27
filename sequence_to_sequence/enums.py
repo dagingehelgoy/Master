@@ -81,3 +81,4 @@ class W2VEmbToEmbConf(Enum):
 	DECODER_HIDDEN_LAYERS = 1
 	WORD_EMBEDDING_METHOD = "word2vec"
 	MAX_SEQUENCE_LENGTH = 15
+	DATASET = "flowers"

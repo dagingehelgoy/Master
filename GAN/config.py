@@ -18,14 +18,14 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "500hidden_dropout0.2",
+	Conf.NAME_SUFFIX: "cnn",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 10,
+	Conf.MAX_SEQ_LENGTH: 8,
 
 	# Conf.LIMITED_DATASET: "flowers",
-	# Conf.LIMITED_DATASET: "00058.txt",
-	Conf.LIMITED_DATASET: "all_flowers.txt",
+	Conf.LIMITED_DATASET: "00058.txt",
+	# Conf.LIMITED_DATASET: "all_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
@@ -42,7 +42,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-04-24_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch10_EmbSize50_repeat_Noise40_PreInitNone_Dataset_person_surf_dropout0.25",
+	# Conf.MODELNAME: "2017-04-25_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_00058",
 	Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,

@@ -111,7 +111,7 @@ def get_word_embeddings(conf):
 		return embeddings_index
 
 	elif conf.WORD_EMBEDDING_METHOD == 'word2vec':
-		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict.pkl" % (
+		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict_flowers.pkl" % (
 		conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
 		return load_pickle_file(embedding_dict_name)
 
@@ -120,7 +120,7 @@ def get_word_embeddings(conf):
 
 
 def set_model_name(conf):
-	log_folder = "NORM_DROP_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
+	log_folder = "NORM_S2S_" + conf.EMBEDDING_METHOD + "_" + str(datetime.now().date()) + "_VS2+" + str(
 		conf.NB_WORDS) + "_BS" + str(conf.BATCH_SIZE) + "_HD" + str(conf.HIDDEN_DIM) + "_DHL" + str(
 		conf.DECODER_HIDDEN_LAYERS) + "_ED" + str(
 		conf.EMBEDDING_DIMENSION) + "_SEQ" + str(conf.MAX_SEQUENCE_LENGTH) + "_WEM" + conf.WORD_EMBEDDING_METHOD
@@ -143,37 +143,37 @@ def train_model(conf, data):
 		model.compile(metrics=['accuracy'], loss=contrastive_loss, optimizer='adam')
 	else:
 		model.compile(
-			metrics=['accuracy', 'mean_absolute_error', metrics.cosine_proximity, metrics.kullback_leibler_divergence],
+			metrics=['accuracy', 'mean_absolute_error'],
 			loss=conf.LOSS, optimizer='adam')
 
 	filepath, log_dir, log_folder = set_model_name(conf)
 
 	val_gen = batch_generator(data[-conf.VAL_DATA_SIZE:], conf)
 	train_gen = batch_generator(data[:-conf.VAL_DATA_SIZE], conf)
-	if 'SSH_CONNECTION' in os.environ.keys():
-		tensorboard = keras.callbacks.TensorBoard(log_dir='sequence_to_sequence/logs/' + log_folder, histogram_freq=1,
+	#if 'SSH_CONNECTION' in os.environ.keys():
+	tensorboard = keras.callbacks.TensorBoard(log_dir='sequence_to_sequence/logs/' + log_folder, histogram_freq=1,
 												  write_graph=True)
-		es = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=0, mode='auto')
-		checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=10, filepath=filepath,
+	es = EarlyStopping(monitor='val_loss', min_delta=0, patience=3, verbose=0, mode='auto')
+	checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=10, filepath=filepath,
 												   monitor='val_loss', verbose=1, save_best_only=True, mode='min',
 												   period=3)
-		callbacks_list = [checkpoint, tensorboard, es]
-		model.fit_generator(generator=train_gen, samples_per_epoch=len(data) - conf.VAL_DATA_SIZE,
+	callbacks_list = [checkpoint, tensorboard, es]
+	model.fit_generator(generator=train_gen, samples_per_epoch=len(data) - conf.VAL_DATA_SIZE,
 							validation_data=val_gen, nb_val_samples=conf.VAL_DATA_SIZE, nb_epoch=conf.EPOCHS,
 							callbacks=callbacks_list)
 
-		save_model(log_dir, log_folder, model, "model")
-		save_model(log_dir, log_folder, encoder, "encoder")
-		save_model(log_dir, log_folder, decoder, "decoder")
-	else:
+	save_model(log_dir, log_folder, model, "model")
+	save_model(log_dir, log_folder, encoder, "encoder")
+	save_model(log_dir, log_folder, decoder, "decoder")
+	#else:
 
-		checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=2, filepath=filepath,
-												   monitor='val_loss', verbose=1, save_best_only=True,
-												   mode='min',
-												   period=3)
-		from keras.utils.visualize_util import plot
-		plot(model, show_shapes=True, to_file='sequence_to_sequence/logs/' + log_folder + "/model.png")
-		model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
+		#checkpoint = EncoderDecoderModelCheckpoint(decoder, encoder, start_after_epoch=2, filepath=filepath,
+												#monitor='val_loss', verbose=1, save_best_only=True,
+												#mode='min',
+												#period=3)
+		#from keras.utils.visualize_util import plot
+		#plot(model, show_shapes=True, to_file='sequence_to_sequence/logs/' + log_folder + "/model.png")
+		#model.fit_generator(train_gen, len(data), conf.EPOCHS, callbacks=[checkpoint])
 
 
 def save_model(log_dir, log_folder, model, name):
@@ -207,7 +207,7 @@ def get_decoder(conf):
 def get_encoder(conf):
 	encoder = Sequential()
 	encoder.add(LSTM(output_dim=conf.HIDDEN_DIM, input_shape=(conf.MAX_SEQUENCE_LENGTH, conf.EMBEDDING_DIMENSION),
-					 return_sequences=False, dropout_U=0.2, dropout_W=0.2))
+					 return_sequences=False))
 	encoder.add(Lambda(lambda x: K.l2_normalize(x, axis=1)))
 	encoder.add(RepeatVector(conf.MAX_SEQUENCE_LENGTH))  # Get the last output of the RNN and repeats it
 	return encoder
@@ -240,6 +240,7 @@ def pairwise_cosine_similarity(predicted_word_vectors, glove_dictionary):
 
 
 def get_flickr_sentences():
+	print "Loading Flickr sentences..."
 	path = "data/datasets/Flickr30k.txt"
 	sentence_file = open(path)
 	word_captions = sentence_file.readlines()
@@ -248,9 +249,19 @@ def get_flickr_sentences():
 	return word_captions
 
 
+def get_flowers_sentences():
+	print "Loading Flower sentences..."
+	path = "data/datasets/all_flowers.txt"
+	sentence_file = open(path)
+	word_captions = sentence_file.readlines()
+	sentence_file.close()
+	word_captions = [line.strip() for line in word_captions]
+	return word_captions
+
+
 def generate_embedding_captions(conf):
-	print "Loading Flickr sentences..."
-	sentences = get_flickr_sentences()
+	
+	sentences = get_flowers_sentences()
 	word_list_sentences = []
 	for sentence in sentences:
 		if conf.WORD_EMBEDDING_METHOD == "word2vec":
@@ -327,7 +338,7 @@ def encode(conf, embedded_data, string_training_data, model_filename, weights_fi
 
 def seq2seq(inference=False, encode_data=False):
 	conf = W2VEmbToEmbConf
-
+    
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 

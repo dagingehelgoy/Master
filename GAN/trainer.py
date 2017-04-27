@@ -66,6 +66,7 @@ def train(gan_logger, config):
 	nb_batches = int(total_training_data / config[Conf.BATCH_SIZE])
 	print("Number of batches: %s" % nb_batches)
 	for epoch_cnt in range(config[Conf.EPOCHS]):
+		start_time_epoch = time.time()
 		print("Epoch: %s\t%s" % (epoch_cnt, gan_logger.name_prefix))
 		np.random.shuffle(all_raw_caption_data)
 		for batch_counter in range(nb_batches):
@@ -127,6 +128,7 @@ def train(gan_logger, config):
 			gan_logger.save_model_weights(d_model, epoch_cnt, "discriminator")
 		if g_loss and d_loss_gen and batch_counter:
 			gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
+		print("--- %s\t seconds ---" % (time.time() - start_time_epoch))
 
 	gan_logger.save_model_weights(g_model, epoch_cnt, "generator")
 	gan_logger.save_model_weights(d_model, epoch_cnt, "discriminator")

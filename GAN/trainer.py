@@ -125,7 +125,7 @@ def train(gan_logger, config):
 				# gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
 				gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter)
 		# if (epoch_cnt < 1000 and epoch_cnt % 100 == 0) or (epoch_cnt < 10000 and epoch_cnt % 1000 == 0) or epoch_cnt % 5000 == 0:
-		if (epoch_cnt < 1000 and epoch_cnt % 100 == 0) or epoch_cnt % 500 == 0:
+		if epoch_cnt % 100 == 0:
 			gan_logger.save_model_weights(g_model, epoch_cnt, "generator")
 			gan_logger.save_model_weights(d_model, epoch_cnt, "discriminator")
 		if g_loss and d_loss_gen and batch_counter:

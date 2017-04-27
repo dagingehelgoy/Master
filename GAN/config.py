@@ -17,8 +17,9 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: None,
 	# Conf.NAME_SUFFIX: "cnn",
+	Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 10,

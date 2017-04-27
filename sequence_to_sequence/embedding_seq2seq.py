@@ -339,7 +339,10 @@ def encode(conf, embedded_data, string_training_data, model_filename, weights_fi
 	save_pickle_file(latent_data, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
-def seq2seq(inference=False, encode_data=False, decode_random=False, conf=W2VEmbToEmbConf, model_filename="NORM_DROP_S2S_2EMB_2017-04-27_VS2+1000_BS128_HD500_DHL1_ED50_SEQ5_WEMword2vec", weights_filename="E:101-L:0.0104.hdf5"):
+def seq2seq(inference=False, encode_data=False, decode_random=False, conf=W2VEmbToEmbConf):
+	model_filename = "NORM_DROP25_S2S_2EMB_2017-04-24_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
+	weights_filename = "E:152-L:0.0122.hdf5"
+
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 

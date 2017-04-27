@@ -9,7 +9,7 @@ from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, 
 from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 # from data.embeddings.helpers.embeddings_helper import *
-
+import time
 import numpy as np
 
 
@@ -96,6 +96,8 @@ def train(gan_logger, config):
 
 			# Train discriminator
 
+
+			start_time_d = time.time()
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
 				d_loss_train, d_acc_train = d_model.train_on_batch([caption_training_batch, raw_image_training_batch], training_batch_y_ones)
@@ -104,14 +106,16 @@ def train(gan_logger, config):
 				d_loss_train, d_acc_train = d_model.train_on_batch(caption_training_batch, training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch(generated_batch, training_batch_y_zeros)
 			d_model.trainable = False
+			print("Discriminator --- %s\tseconds ---" % (time.time() - start_time_d))
 
+			noise_batch = generate_input_noise(config)
+			start_time_g = time.time()
 			# Train generator
 			if config[Conf.IMAGE_CAPTION]:
 				g_loss, g_acc = gan_model.train_on_batch([image_training_batch, raw_image_training_batch], training_batch_y_ones)
 			else:
-				noise_batch = generate_input_noise(config)
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
-
+				print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
 			if batch_counter % int(nb_batches / 1) == 0:
 				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))

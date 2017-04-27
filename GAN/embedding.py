@@ -31,7 +31,7 @@ def generator_model(config):
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
 	model.add(LSTM(
-		500,
+		300,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
 		return_sequences=True))
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
@@ -55,7 +55,7 @@ def discriminator_model(config):
 	# model.summary()
 
 	model.add(LSTM(
-		500,
+		300,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 		return_sequences=False, dropout_U=0.2, dropout_W=0.2))
 	model.add(Dense(1, activation="sigmoid"))

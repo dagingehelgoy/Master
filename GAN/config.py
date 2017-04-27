@@ -17,20 +17,20 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
+	Conf.NAME_SUFFIX: None,
 	# Conf.NAME_SUFFIX: "cnn",
-	Conf.NAME_SUFFIX: "sam1",
+	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 10,
+	Conf.MAX_SEQ_LENGTH: 15,
 
 	# Conf.LIMITED_DATASET: "flowers",
 	# Conf.LIMITED_DATASET: "00058.txt",
-	Conf.LIMITED_DATASET: "all_flowers.txt",
+	Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,

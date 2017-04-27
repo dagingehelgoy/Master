@@ -338,14 +338,12 @@ def encode(conf, embedded_data, string_training_data, model_filename, weights_fi
 	save_pickle_file(latent_data, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
-def seq2seq(inference=False, encode_data=False, decode_random=False):
+def seq2seq(inference=False, encode_data=False, decode_random=False, model_filename="S2S_2EMB_2017-04-04_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec", weights_filename="E:143-L:0.0118.hdf5"):
 	conf = W2VEmbToEmbConf
 
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 
-	model_filename = "S2S_2EMB_2017-04-04_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
-	weights_filename = "E:143-L:0.0118.hdf5"
 	if inference:
 		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
 		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)

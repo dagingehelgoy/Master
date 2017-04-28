@@ -13,6 +13,8 @@ from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_trai
 import time
 import numpy as np
 
+from data.embeddings.helpers.embeddings_helper import fetch_embeddings
+
 
 def generator_containing_discriminator(generator, discriminator):
 	model = Sequential()

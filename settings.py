@@ -7,10 +7,10 @@ IMAGE_EMBEDDING_METHOD = "inception"
 IMAGE_EMBEDDING_DIMENSIONS = 4096 if IMAGE_EMBEDDING_METHOD == "vgg" else 2048
 
 # word2vec | glove | sequence
-WORD_EMBEDDING_METHOD = "glove"
+WORD_EMBEDDING_METHOD = "word2vec"
 
-# Flickr8k | Flickr30k
-DATASET = "Flickr8k"
+# Flickr8k | Flickr30k | flowers
+DATASET = "flowers"
 
 RES_DIR = ROOT_DIR + "res/"
 IMAGE_DIR = ROOT_DIR + "data/datasets/" + DATASET + "/images/"

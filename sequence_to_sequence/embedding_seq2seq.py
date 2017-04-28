@@ -288,6 +288,8 @@ def emb_get_training_batch(training_batch, word_embedding_dict, conf):
 			if word_string in word_embedding_dict:
 				word_embedding = word_embedding_dict[word_string]
 				embedding_sentence.append(word_embedding)
+			else:
+				embedding_sentence.append(word_embedding_dict['UNK'])
 		if len(embedding_sentence) > conf.MAX_SEQUENCE_LENGTH:
 			embedding_sentence = embedding_sentence[:conf.MAX_SEQUENCE_LENGTH]
 		while len(embedding_sentence) < conf.MAX_SEQUENCE_LENGTH:

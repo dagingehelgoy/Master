@@ -46,7 +46,7 @@ config = {
 	# Conf.MODELNAME: "2017-04-25_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_00058",
 	Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: False,
+	Conf.IMAGE_CAPTION: True,
 	Conf.IMAGE_DIM: 50
 
 }

@@ -111,8 +111,8 @@ def get_word_embeddings(conf):
 		return embeddings_index
 
 	elif conf.WORD_EMBEDDING_METHOD == 'word2vec':
-		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict_flowers.pkl" % (
-		conf.EMBEDDING_DIMENSION, conf.NB_WORDS)
+		embedding_dict_name = "word2vec/saved_models/word2vec_%sd%svoc100001steps_dict_%s.pkl" % (
+		conf.EMBEDDING_DIMENSION, conf.NB_WORDS, conf.DATASET if conf.DATASET != None else "flickr")
 		return load_pickle_file(embedding_dict_name)
 
 	print("WORD_EMBEDDING_METHOD not found")
@@ -274,6 +274,10 @@ def generate_embedding_captions(conf):
 			word_list.append(word.lower())
 		if conf.WORD_EMBEDDING_METHOD == "word2vec":
 			word_list.append("<eos>")
+
+		while len(word_list) < conf.MAX_SEQUENCE_LENGTH:
+			word_list.append("<pad>")
+
 		word_list_sentences.append(word_list)
 
 	word_embedding_dict = get_word_embeddings(conf)
@@ -292,9 +296,6 @@ def emb_get_training_batch(training_batch, word_embedding_dict, conf):
 				embedding_sentence.append(word_embedding_dict['UNK'])
 		if len(embedding_sentence) > conf.MAX_SEQUENCE_LENGTH:
 			embedding_sentence = embedding_sentence[:conf.MAX_SEQUENCE_LENGTH]
-		while len(embedding_sentence) < conf.MAX_SEQUENCE_LENGTH:
-			zeros = np.zeros(conf.EMBEDDING_DIMENSION)
-			embedding_sentence.insert(0, zeros)
 		embedding_lists.append(embedding_sentence)
 	return np.asarray(embedding_lists)
 
@@ -340,14 +341,10 @@ def encode(conf, embedded_data, string_training_data, model_filename, weights_fi
 	save_pickle_file(latent_data, "sequence_to_sequence/logs/" + model_filename + "/encoded_data.pkl")
 
 
-def seq2seq(inference=False, encode_data=False, decode_random=False):
-	conf = W2VEmbToEmbConf
-
+def seq2seq(inference=False, encode_data=False, decode_random=False, conf=W2VEmbToEmbConf, model_filename="NORM_DROP25_S2S_2EMB_2017-04-24_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec", weights_filename="E:101-L:0.0104.hdf5"):
 	string_training_data, word_embedding_dict = generate_embedding_captions(conf)
 	embedded_data = emb_get_training_batch(string_training_data, word_embedding_dict, conf)
 
-	model_filename = "S2S_2EMB_2017-04-04_VS2+1000_BS128_HD40_DHL1_ED50_SEQ5_WEMword2vec"
-	weights_filename = "E:143-L:0.0118.hdf5"
 	if inference:
 		sample_string_data, sample_embedded_data = get_random_data(conf, 10, embedded_data[-conf.VAL_DATA_SIZE:], string_training_data[-conf.VAL_DATA_SIZE:])
 		infer(conf, sample_string_data, sample_embedded_data, model_filename, weights_filename, word_embedding_dict)

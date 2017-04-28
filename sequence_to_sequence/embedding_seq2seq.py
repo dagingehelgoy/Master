@@ -274,6 +274,10 @@ def generate_embedding_captions(conf):
 			word_list.append(word.lower())
 		if conf.WORD_EMBEDDING_METHOD == "word2vec":
 			word_list.append("<eos>")
+
+		while len(word_list) < conf.MAX_SEQUENCE_LENGTH:
+			word_list.append("<pad>")
+
 		word_list_sentences.append(word_list)
 
 	word_embedding_dict = get_word_embeddings(conf)
@@ -288,11 +292,10 @@ def emb_get_training_batch(training_batch, word_embedding_dict, conf):
 			if word_string in word_embedding_dict:
 				word_embedding = word_embedding_dict[word_string]
 				embedding_sentence.append(word_embedding)
+			else:
+				embedding_sentence.append(word_embedding_dict['UNK'])
 		if len(embedding_sentence) > conf.MAX_SEQUENCE_LENGTH:
 			embedding_sentence = embedding_sentence[:conf.MAX_SEQUENCE_LENGTH]
-		while len(embedding_sentence) < conf.MAX_SEQUENCE_LENGTH:
-			zeros = np.zeros(conf.EMBEDDING_DIMENSION)
-			embedding_sentence.insert(0, zeros)
 		embedding_lists.append(embedding_sentence)
 	return np.asarray(embedding_lists)
 

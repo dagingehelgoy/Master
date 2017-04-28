@@ -22,11 +22,11 @@ config = {
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 15,
+	Conf.MAX_SEQ_LENGTH: 8,
 
 	# Conf.LIMITED_DATASET: "flowers",
-	# Conf.LIMITED_DATASET: "00058.txt",
-	Conf.LIMITED_DATASET: "two_flowers.txt",
+	Conf.LIMITED_DATASET: "00058.txt",
+	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
@@ -43,10 +43,10 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-04-25_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_00058",
-	Conf.MODELNAME: None,
+	Conf.MODELNAME: "2017-04-25_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_00058",
+	# Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: True,
+	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50
 
 }

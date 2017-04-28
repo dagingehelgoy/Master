@@ -34,7 +34,7 @@ from word2vec.word2vec_helpers import build_dataset, generate_batch, plot_with_l
 VOCABULARY_SIZE = config[Conf.VOCAB_SIZE]
 EMBEDDING_SIZE = config[Conf.EMBEDDING_SIZE]  # Dimension of the embedding vector.
 NUM_STEPS = config[Conf.WORD2VEC_NUM_STEPS]
-DATASET = "flickr"  # flowers/flickr
+DATASET = "flowers"  # flowers/flickr
 
 if "plot" in sys.argv:
 	reverse_dictionary, final_embeddings, _ = load_model(EMBEDDING_SIZE, VOCABULARY_SIZE, NUM_STEPS, DATASET)

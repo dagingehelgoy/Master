@@ -31,7 +31,7 @@ def read_flickr_data():
 
 def read_flower_data():
 	index = 0
-	filename = 'data/datasets/flowers/text/all.txt'
+	filename = 'data/datasets/all_flowers.txt'
 	"""Extract the first file enclosed in a zip file as a list of words"""
 	with open(filename) as f:
 		data = []

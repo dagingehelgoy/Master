@@ -130,8 +130,6 @@ def train(gan_logger, config):
 		if epoch_cnt % 100 == 0:
 			gan_logger.save_model_weights(g_model, epoch_cnt, "generator")
 			gan_logger.save_model_weights(d_model, epoch_cnt, "discriminator")
-		if g_loss and d_loss_gen and batch_counter:
-			gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
 		print("--- %7.4f seconds ---" % (time.time() - start_time_epoch))
 
 	gan_logger.save_model_weights(g_model, epoch_cnt, "generator")

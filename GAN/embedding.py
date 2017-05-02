@@ -31,7 +31,7 @@ def generator_model(config):
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
 	model.add(LSTM(
-		300,
+		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
 		return_sequences=True))
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
@@ -55,9 +55,9 @@ def discriminator_model(config):
 	# model.summary()
 
 	model.add(LSTM(
-		300,
+		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=False, dropout_U=0.2, dropout_W=0.2))
+		return_sequences=False, dropout_U=0.5, dropout_W=0.5))
 	model.add(Dense(1, activation="sigmoid"))
 	return model
 
@@ -161,30 +161,41 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
+	prediction_string = ""
 	for i in range(len(g_weights)):
+	# for i in range(0, len(g_weights), 100):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
 		generated_sentences = g_model.predict(noise_batch[:10])
 		generated_classifications = d_model.predict(generated_sentences)
-		print "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
+		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
+		prediction_string += gen_header_string
+		# print gen_header_string
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
 			generated_sentence = ""
 			gen_most_sim_words_list = pairwise_cosine_similarity(embedded_generated_sentence, word_embedding_dict)
 			for word in gen_most_sim_words_list:
 				generated_sentence += word[0] + " "
-			print "%5.4f\t%s" % (generated_classifications[j], generated_sentence)
+			gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
+			prediction_string += gen_sentence_string
+			# print gen_sentence_string
 
-		print "\nREAL SENTENCES: (%s)\n" % d_weight
+		pred_header_string = "\nREAL SENTENCES: (%s)\n" % d_weight
+		prediction_string += pred_header_string
+		# print pred_header_string
 		real_classifications = d_model.predict(real_embedded_sentences)
 		for j in range(len(real_classifications)):
 			real_sentence = ""
 			real_most_sim_words_list = pairwise_cosine_similarity(real_embedded_sentences[j], word_embedding_dict)
 			for word in real_most_sim_words_list:
 				real_sentence += word[0] + " "
-			print "%5.4f\t%s" % (real_classifications[j], real_sentence)
+			pred_sentence_string = "\n%5.4f\t%s" % (real_classifications[j], real_sentence)
+			prediction_string += pred_sentence_string
+			# print pred_sentence_string
+		print prediction_string
 
 
 def img_caption_predict(config, logger):

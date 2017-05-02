@@ -17,20 +17,21 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	Conf.NAME_SUFFIX: None,
-	# Conf.NAME_SUFFIX: "cnn",
+	# Conf.NAME_SUFFIX: None,
+	Conf.NAME_SUFFIX: "dropout0.5",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 8,
+	Conf.MAX_SEQ_LENGTH: 15,
 
 	# Conf.LIMITED_DATASET: "flowers",
-	Conf.LIMITED_DATASET: "00058.txt",
+	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
+	Conf.LIMITED_DATASET: "all_flowers.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 64,
+	Conf.BATCH_SIZE: 128,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -43,8 +44,8 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-04-25_ImgCapFalse_word2vec_Vocab1000_Seq8_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_00058",
-	# Conf.MODELNAME: None,
+	# Conf.MODELNAME: "2017-04-26_ImgCapFalse_WordEmbedding.WORD2VEC_Vocab1000_Seq10_Batch128_EmbSize50_NoiseMode.REPEAT_Noise50_PreInitPreInit.NONE_Dataset_all_flowers_500hidden_dropout0.2",
+	Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50

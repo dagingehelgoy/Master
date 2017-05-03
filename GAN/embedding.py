@@ -88,7 +88,7 @@ def emb_create_image_gan(config):
 	# Discriminator
 
 	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
-	d_lstm_out = LSTM(500, dropout_W=0.5, dropout_U=0.5)(d_lstm_input)
+	d_lstm_out = LSTM(100, dropout_W=0.5, dropout_U=0.5)(d_lstm_input)
 
 	img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
 	d_tensor = merge([d_lstm_out, img_input], mode='concat')

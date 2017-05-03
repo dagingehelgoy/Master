@@ -113,8 +113,6 @@ def train(gan_logger, config):
 			# start_time_d = time.time()
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
-				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(), size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([real_caption_batch, fake_images], training_batch_y_zeros)
 				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch, real_image_batch], training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch, real_image_batch], training_batch_y_zeros)
 			else:
@@ -133,7 +131,7 @@ def train(gan_logger, config):
 				# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
 			if batch_counter % int(nb_batches / 1) == 0:
 				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
-				print("d_loss_fake_img:\t\t%f d_acc_fake_img:\t\t%f" % (d_loss_fake_img, d_acc_fake_img))
+				# print("d_loss_fake_img:\t\t%f d_acc_fake_img:\t\t%f" % (d_loss_fake_img, d_acc_fake_img))
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
 				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				# gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)

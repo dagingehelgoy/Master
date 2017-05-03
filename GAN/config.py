@@ -17,8 +17,8 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "dropout0.5",
+	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: "dropout0.5",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
@@ -31,7 +31,7 @@ config = {
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
 	Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,

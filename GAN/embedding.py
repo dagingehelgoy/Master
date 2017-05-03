@@ -92,6 +92,7 @@ def emb_create_image_gan(config):
 
 	img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
 	d_tensor = merge([d_lstm_out, img_input], mode='concat')
+	d_tensor = Dropout(0.5)(d_tensor)
 	d_tensor = Dense(1, activation='sigmoid')(d_tensor)
 	d_model = Model(input=[d_lstm_input, img_input], output=d_tensor, name="d_model")
 

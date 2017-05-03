@@ -108,6 +108,7 @@ def get_custom_sentences(config):
 
 	return word_captions
 
+
 def generate_input_noise(config):
 	if config[Conf.PREINIT] == PreInit.ENCODER_DECODER:
 		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -140,7 +141,8 @@ def generate_input_noise(config):
 		return np.ones((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 
 	elif config[Conf.NOISE_MODE] == NoiseMode.ENCODING:
-		embedded_data = load_pickle_file("sequence_to_sequence/logs/S2S_2EMB_2017-04-04_VS2+1000_BS128_HD30_DHL1_ED50_SEQ5_WEMword2vec/encoded_data.pkl")
+		embedded_data = load_pickle_file(
+			"sequence_to_sequence/logs/S2S_2EMB_2017-04-04_VS2+1000_BS128_HD30_DHL1_ED50_SEQ5_WEMword2vec/encoded_data.pkl")
 		random_distribution_of_embedded_data = []
 		for i in range(config[Conf.BATCH_SIZE]):
 			# random_distribution_of_embedded_data.append(embedded_data[np.random.randint(0, len(embedded_data))])
@@ -162,9 +164,6 @@ def get_word_embeddings():
 			print_progress(count, 400000, prefix="Producing glove word embeddings")
 	f.close()
 	return embeddings_index
-
-
-
 
 
 def emb_generate_caption_training_batch(training_batch, word_embedding_dict, config):

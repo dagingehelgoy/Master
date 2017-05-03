@@ -74,10 +74,11 @@ def train(gan_logger, config):
 
 		# Shuffle data
 		if config[Conf.IMAGE_CAPTION]:
-			shuffle_indices = np.arange(all_raw_caption_data.shape[0])
-			np.random.shuffle(shuffle_indices)
-			all_raw_caption_data = all_raw_caption_data[shuffle_indices]
-			all_image_vectors = all_image_vectors[shuffle_indices]
+			pass
+			# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+			# np.random.shuffle(shuffle_indices)
+			# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+			# all_image_vectors = all_image_vectors[shuffle_indices]
 		else:
 			np.random.shuffle(all_raw_caption_data)
 

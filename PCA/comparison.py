@@ -26,9 +26,9 @@ def show_image(file, title, index, mode):
 
 def test_image_vectors():
 	test_size = 1
-	num_similar_images = 10
-	# all_image_names = fetch_all_image_names()
-	all_image_names = ["3331900249_5872e90b25.jpg"]
+	num_similar_images = 5
+	all_image_names = fetch_all_image_names()
+	# all_image_names = ["3331900249_5872e90b25.jpg"]
 	np.random.shuffle(all_image_names)
 	start = random.randint(0, len(all_image_names) - test_size)
 	samples = all_image_names[start:start + test_size]
@@ -130,5 +130,5 @@ def test_pca_vectors():
 
 
 if __name__ == '__main__':
-	test_image_vectors()
-	# test_pca_vectors()
+	# test_image_vectors()
+	test_pca_vectors()

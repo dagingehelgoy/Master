@@ -76,22 +76,19 @@ def emb_create_generator(config):
 
 
 def emb_create_image_gan(config):
-	if config[Conf.IMAGE_CAPTION]:
-		noise_size = config[Conf.IMAGE_DIM]
-	else:
-		noise_size = config[Conf.NOISE_SIZE]
+	noise_size = config[Conf.IMAGE_DIM]
 
 	# Generator
 
 	g_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], noise_size), name="g_model_lstm_input")
-	g_tensor = LSTM(config[Conf.EMBEDDING_SIZE], return_sequences=True)(g_lstm_input)
+	g_tensor = LSTM(500, return_sequences=True)(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=g_lstm_input, output=g_tensor)
 
 	# Discriminator
 
 	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
-	d_lstm_out = LSTM(50)(d_lstm_input)
+	d_lstm_out = LSTM(500, dropout_W=0.5, dropout_U=0.5)(d_lstm_input)
 
 	img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
 	d_tensor = merge([d_lstm_out, img_input], mode='concat')

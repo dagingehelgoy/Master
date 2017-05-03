@@ -1,8 +1,9 @@
 # encoding=utf8
+import copy
 
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
-from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs
+from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
 from helpers.io_helper import *
 
 
@@ -20,6 +21,38 @@ def fetch_embeddings(size=-1):
 
 		return dataset
 
+
+def fetch_custom_embeddings():
+	print("Generating compatible dataset...")
+	# all_image_names, image_name_caption_dict = create_dictionaries(size)
+	# image_names, image_data, image_captions = get_examples(all_image_names, image_name_caption_dict)
+	filename_class_dict, image_name_caption_dict = create_custom_dictionaries()
+	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, image_name_caption_dict)
+
+	dataset = [image_names, np.asarray(image_data), image_captions]
+	print("Finished generating %s training example" % len(image_captions))
+	save_embeddings(dataset, 0)
+
+	return dataset
+
+
+def create_custom_dictionaries():
+	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
+	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
+	all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
+	num_images = len(all_image_name_class_tuples)
+	validate_database(num_images)
+	image_name_caption_dict = dict()
+	name_cap_tuples = fetch_all_caption_text_tuples()
+	filenames = [x[0] for x in all_image_name_class_tuples]
+	for (name, caption) in name_cap_tuples:
+		if name in filenames:
+			if name in image_name_caption_dict:
+				image_name_caption_dict[name].append(caption)
+			else:
+				image_name_caption_dict[name] = [caption]
+	filename_class_dict = dict(all_image_name_class_tuples)
+	return filename_class_dict, image_name_caption_dict
 
 def create_dictionaries(size):
 	if size > 0:
@@ -63,6 +96,35 @@ def get_examples(all_image_names, image_name_caption_vector_dict):
 		print_progress(i + 1, all_image_names_total, prefix='Generating data:', suffix='Complete', barLength=50)
 
 	return sorted_image_names, sorted_image_data, sorted_caption_vector_data
+
+
+def get_custom_examples(filename_class_dict, filename_caption_dict):
+	sorted_caption_data = []
+	sorted_image_data = []
+	sorted_image_names = []
+	filename_red = 'image_02644'
+	filename_yellow = 'image_03230'
+	pca_red = fetch_pca_vector(filename_red + ".jpg")
+	pca_yellow = fetch_pca_vector(filename_yellow + ".jpg")
+	all_image_names_total = len(filename_class_dict)
+	filenames = filename_class_dict.keys()
+	for i in range(len(filenames)):
+		image_name = filenames[i]
+		if filename_class_dict[image_name] == filename_class_dict[filename_red]:
+			pca_vector = copy.deepcopy(pca_red)
+		elif filename_class_dict[image_name] == filename_class_dict[filename_yellow]:
+			pca_vector = copy.deepcopy(pca_yellow)
+		else:
+			pca_vector = None
+
+		captions = filename_caption_dict[image_name]
+		for caption in captions:
+			sorted_image_data.append(pca_vector)
+			sorted_image_names.append(image_name)
+			sorted_caption_data.append(caption)
+		print_progress(i + 1, all_image_names_total, prefix='Generating data:', suffix='Complete', barLength=50)
+
+	return sorted_image_names, sorted_image_data, sorted_caption_data
 
 
 def get_class_examples(image_name_class_vector_dict):
@@ -131,7 +193,9 @@ def validate_database(num_images):
 
 
 def get_stored_embeddings_filename(size):
-	if size == -1:
+	if size == 0:
+		size = 'custom'
+	elif size == -1:
 		size = "all"
 	return "%s-%s.picklefile" % (settings.STORED_EMBEDDINGS_NAME, size)
 

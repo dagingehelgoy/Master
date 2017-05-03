@@ -172,6 +172,11 @@ def db_all_caption_text_tuples():
 	return cursor.execute("""SELECT filename, caption_text FROM captions""").fetchall()
 
 
+def db_caption_text_tuples(filename):
+	cursor = db.cursor()
+	return cursor.execute("""SELECT filename, caption_text FROM captions WHERE filename = ?""", (filename,)).fetchall()
+
+
 def db_all_filename_caption_vector_tuple():
 	cursor = db.cursor()
 	return cursor.execute("""SELECT filename, caption_vector FROM captions""").fetchall()
@@ -249,6 +254,11 @@ def db_get_caption_table_size():
 def db_keys_classes():
 	cursor = db.cursor()
 	return cursor.execute("""SELECT filename FROM classes""").fetchall()
+
+
+def db_filenames_by_class(class_string):
+	cursor = db.cursor()
+	return cursor.execute("""SELECT filename, class_text FROM classes WHERE class_text = ?""", (class_string, )).fetchall()
 
 
 def db_all_filename_class_vector_tuple():

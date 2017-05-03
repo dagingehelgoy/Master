@@ -1,16 +1,13 @@
+import os
 import sys
 
 import numpy as np
-
-import os
-import sys
 
 file_par_dir = os.path.join(__file__, os.pardir)
 file_par_par_dir = os.path.join(file_par_dir, os.pardir)
 file_par_par_par_dir = os.path.join(file_par_par_dir, os.pardir)
 ROOT_DIR = os.path.dirname((os.path.abspath(file_par_par_par_dir))) + "/"
 sys.path.append(ROOT_DIR)
-import settings
 
 import sqlite_wrapper as wrapper
 
@@ -21,6 +18,10 @@ def store_image_vector_to_db(image_name, vector):
 
 def fetch_all_image_names():
 	return [x[0] for x in wrapper.db_keys_images()]
+
+
+def fetch_all_image_names_with_class(class_string):
+	return [(x[0], x[1]) for x in wrapper.db_filenames_by_class(class_string)]
 
 
 def fetch_image_vector(image_name):

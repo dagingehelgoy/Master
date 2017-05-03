@@ -5,7 +5,7 @@ from GAN.embedding import emb_create_generator, emb_create_discriminator, emb_cr
 from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, \
 	generate_string_sentences, \
 	emb_generate_caption_training_batch, generate_embedding_captions_from_captions, \
-	generate_image_training_batch
+	generate_image_training_batch, generate_image_with_noise_training_batch
 from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 
@@ -13,7 +13,7 @@ from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_trai
 import time
 import numpy as np
 
-from data.embeddings.helpers.embeddings_helper import fetch_embeddings
+from data.embeddings.helpers.embeddings_helper import fetch_embeddings, fetch_custom_embeddings
 
 
 def generator_containing_discriminator(generator, discriminator):
@@ -48,7 +48,8 @@ def train(gan_logger, config):
 	else:
 		# Generate image captions
 		if config[Conf.IMAGE_CAPTION]:
-			filenames, all_image_vectors, captions = fetch_embeddings()
+			# filenames, all_image_vectors, captions = fetch_embeddings()
+			filenames, all_image_vectors, captions = fetch_custom_embeddings()
 			all_raw_caption_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
 			del captions, filenames
 		else:
@@ -71,7 +72,16 @@ def train(gan_logger, config):
 	for epoch_cnt in range(config[Conf.EPOCHS]):
 		start_time_epoch = time.time()
 		print("Epoch: %s\t%s" % (epoch_cnt, gan_logger.name_prefix))
-		np.random.shuffle(all_raw_caption_data)
+
+		# Shuffle data
+		if config[Conf.IMAGE_CAPTION]:
+			shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+			np.random.shuffle(shuffle_indices)
+			all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+			all_image_vectors = all_image_vectors[shuffle_indices]
+		else:
+			np.random.shuffle(all_raw_caption_data)
+
 		for batch_counter in range(nb_batches):
 			# if batch_counter % 10 == 0:
 			# 	print_progress(batch_counter, nb_batches, prefix="Training batches")
@@ -79,7 +89,7 @@ def train(gan_logger, config):
 
 			if config[Conf.IMAGE_CAPTION]:
 				raw_image_training_batch = np.asarray(all_image_vectors[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]])
-				image_training_batch = generate_image_training_batch(raw_image_training_batch, config)
+				noise_image_training_batch = generate_image_with_noise_training_batch(raw_image_training_batch, config)
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 				caption_training_batch = oh_get_training_batch(raw_caption_training_batch, config)
@@ -87,7 +97,7 @@ def train(gan_logger, config):
 				caption_training_batch = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 			if config[Conf.IMAGE_CAPTION]:
-				generated_batch = g_model.predict(image_training_batch)
+				generated_batch = g_model.predict(noise_image_training_batch)
 			else:
 				noise_batch = generate_input_noise(config)
 				generated_batch = g_model.predict(noise_batch)
@@ -116,7 +126,7 @@ def train(gan_logger, config):
 			# start_time_g = time.time()
 			# Train generator
 			if config[Conf.IMAGE_CAPTION]:
-				g_loss, g_acc = gan_model.train_on_batch([image_training_batch, raw_image_training_batch], training_batch_y_ones)
+				g_loss, g_acc = gan_model.train_on_batch([noise_image_training_batch, raw_image_training_batch], training_batch_y_ones)
 			else:
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 				# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))

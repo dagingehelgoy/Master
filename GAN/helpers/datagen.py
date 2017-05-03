@@ -4,8 +4,6 @@ from keras.preprocessing.text import Tokenizer
 from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
-import os
-
 from word2vec.word2vec_helpers import get_dict_filename
 
 
@@ -205,3 +203,10 @@ def emb_generate_caption_training_batch(training_batch, word_embedding_dict, con
 def generate_image_training_batch(image_batch, config):
 	image_batch = [[x] for x in image_batch]
 	return np.repeat(image_batch, config[Conf.MAX_SEQ_LENGTH], axis=1)
+
+
+def generate_image_with_noise_training_batch(image_batch, config):
+	noise = generate_input_noise(config)
+	for batch_index in range(len(image_batch)):
+		noise[batch_index][0] = image_batch[batch_index]
+	return noise

@@ -13,7 +13,7 @@ def convert_and_store():
 	image_count = len(image_filenames)
 	del x
 	del all_image_imgvec_pairs
-	pca = PCA(n_components=10)
+	pca = PCA(n_components=50)
 	pca_vectors = pca.fit_transform(image_vectors)
 	for i in range(image_count):
 		store_pca_vector_to_db(image_filenames[i], pca_vectors[i])

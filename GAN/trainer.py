@@ -4,8 +4,7 @@ from keras.optimizers import Adam
 from GAN.embedding import emb_create_generator, emb_create_discriminator, emb_create_image_gan
 from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, \
 	generate_string_sentences, \
-	emb_generate_caption_training_batch, generate_embedding_captions_from_captions, \
-	generate_image_training_batch, generate_image_with_noise_training_batch
+	emb_generate_caption_training_batch, generate_image_with_noise_training_batch, preprocess_sentences
 from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 
@@ -13,7 +12,7 @@ from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_trai
 import time
 import numpy as np
 
-from data.embeddings.helpers.embeddings_helper import fetch_embeddings, fetch_custom_embeddings
+from data.embeddings.helpers.embeddings_helper import fetch_custom_embeddings
 
 
 def generator_containing_discriminator(generator, discriminator):
@@ -50,7 +49,7 @@ def train(gan_logger, config):
 		if config[Conf.IMAGE_CAPTION]:
 			# filenames, all_image_vectors, captions = fetch_embeddings()
 			filenames, all_image_vectors, captions = fetch_custom_embeddings()
-			all_raw_caption_data, word_embedding_dict = generate_embedding_captions_from_captions(config, captions)
+			all_raw_caption_data, word_embedding_dict = preprocess_sentences(config, captions)
 			del captions, filenames
 		else:
 			all_raw_caption_data, word_embedding_dict = generate_string_sentences(config)

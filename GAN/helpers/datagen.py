@@ -57,6 +57,10 @@ def generate_string_sentences(config):
 	else:
 		print "Loading Flickr sentences..."
 		sentences = get_flickr_sentences(cap_data)
+	return preprocess_sentences(config, sentences)
+
+
+def preprocess_sentences(config, sentences):
 	word_list_sentences = []
 	for sentence in sentences:
 		word_list = ["<sos>"]
@@ -67,12 +71,12 @@ def generate_string_sentences(config):
 			word_list.append("<pad>")
 		word_list_sentences.append(word_list)
 	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
-
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
 		print "Loading Glove dictionary..."
 		word_embedding_dict = get_word_embeddings()
 	else:
-		filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], "flowers")
+		filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
+		                             config[Conf.VOCAB_SIZE], "flowers")
 		print "Loading Word2Vec dictionary (%s)..." % filename
 		# word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
 		word_embedding_dict = load_pickle_file(filename)
@@ -160,26 +164,7 @@ def get_word_embeddings():
 	return embeddings_index
 
 
-def generate_embedding_captions_from_captions(config, sentences):
-	word_list_sentences = []
-	for sentence in sentences:
-		word_list = ["<sos>"]
-		for word in sentence.split(" "):
-			word_list.append(word.lower())
-		word_list.append("<eos>")
-		while len(word_list) < config[Conf.MAX_SEQ_LENGTH]:
-			word_list.append("<pad>")
-		word_list_sentences.append(word_list)
-	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
 
-	if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
-		print "Loading Glove dictionary..."
-		word_embedding_dict = get_word_embeddings()
-	else:
-		print "Loading Word2Vec dictionary (%s)..." % config[Conf.WORD_EMBEDDING]
-		word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (
-			config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
-	return np.asarray(word_list_sentences), word_embedding_dict
 
 
 def emb_generate_caption_training_batch(training_batch, word_embedding_dict, config):

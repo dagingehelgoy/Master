@@ -18,7 +18,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "two_flowers_image_caption",
+	Conf.NAME_SUFFIX: "dropout0.5",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
@@ -28,8 +28,8 @@ config = {
 	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
-	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	Conf.LIMITED_DATASET: None,
+	Conf.LIMITED_DATASET: "all_flowers.txt",
+	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 128,
 	Conf.EPOCHS: 10000000,
@@ -47,7 +47,7 @@ config = {
 	# Conf.MODELNAME: "2017-04-26_ImgCapFalse_WordEmbedding.WORD2VEC_Vocab1000_Seq10_Batch128_EmbSize50_NoiseMode.REPEAT_Noise50_PreInitPreInit.NONE_Dataset_all_flowers_500hidden_dropout0.2",
 	Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: True,
+	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50
 
 }

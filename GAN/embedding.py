@@ -8,7 +8,6 @@ from GAN.helpers.datagen import generate_input_noise, generate_string_sentences,
 from GAN.helpers.enums import Conf, PreInit
 from GAN.helpers.list_helpers import *
 
-
 # from data.database.helpers.pca_database_helper import fetch_pca_vector
 from data.database.helpers.pca_database_helper import fetch_pca_vector
 
@@ -35,7 +34,9 @@ def generator_model(config):
 	model.add(Bidirectional(LSTM(
 		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
-		return_sequences=True)))
+		return_sequences=True),
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size)
+	))
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
 	return model
 
@@ -56,10 +57,13 @@ def discriminator_model(config):
 	# print model.output_shape
 	# model.summary()
 
-	model.add(Bidirectional(LSTM(
-		500,
-		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=False, dropout_U=0.5, dropout_W=0.5)))
+	model.add(Bidirectional(
+		LSTM(
+			500,
+			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+			return_sequences=False, dropout_U=0.5, dropout_W=0.5),
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE])
+	))
 	model.add(Dense(1, activation="sigmoid"))
 	return model
 

@@ -134,7 +134,8 @@ def train(gan_logger, config):
 				# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
 			if batch_counter % int(nb_batches / 1) == 0:
 				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
-				print("d_loss_fake_img:\t%f d_acc_fake_img:\t%f" % (d_loss_fake_img, d_acc_fake_img))
+				if config[Conf.IMAGE_CAPTION]:
+					print("d_loss_fake_img:\t%f d_acc_fake_img:\t%f" % (d_loss_fake_img, d_acc_fake_img))
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
 				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				# gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)

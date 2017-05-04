@@ -269,10 +269,10 @@ def img_caption_predict(config, logger):
 		# 	pred_sentence_string = "\n%5.4f\t%s" % (real_classifications[j], real_sentence)
 		# 	prediction_string += pred_sentence_string
 		# 	# print pred_sentence_string
-		# print prediction_string
-		pred_file = open("preds-yellow.txt", 'w+')
-		pred_file.writelines(prediction_string)
-		pred_file.close()
+		print prediction_string
+		# pred_file = open("preds-yellow.txt", 'w+')
+		# pred_file.writelines(prediction_string)
+		# pred_file.close()
 
 
 

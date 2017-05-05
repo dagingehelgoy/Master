@@ -166,8 +166,8 @@ def emb_predict(config, logger):
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 	prediction_string = ""
-	for i in range(len(g_weights)):
-	# for i in range(0, len(g_weights), 100):
+	# for i in range(len(g_weights)):
+	for i in range(0, len(g_weights), 100):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
@@ -228,16 +228,16 @@ def img_caption_predict(config, logger):
 
 	filename_red = 'image_02644'
 	filename_yellow = 'image_03230'
-	# pca_red = fetch_pca_vector(filename_red + ".jpg")
-	pca_yellow = fetch_pca_vector(filename_yellow + ".jpg")
-	image_batch = np.repeat([pca_yellow], config[Conf.BATCH_SIZE], axis=0)
+	pca_red = fetch_pca_vector(filename_red + ".jpg")
+	pca_yellow = fetch_pca_vector(filename_red + ".jpg")
+	image_batch = np.repeat([pca_red], config[Conf.BATCH_SIZE], axis=0)
 	noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 	prediction_string = ""
 	# for i in range(len(g_weights)):
-	for i in range(0, len(g_weights), 1):
+	for i in range(50, len(g_weights), 10):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))

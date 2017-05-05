@@ -192,5 +192,6 @@ def generate_image_training_batch(image_batch, config):
 def generate_image_with_noise_training_batch(image_batch, config):
 	noise = generate_input_noise(config)
 	for batch_index in range(len(image_batch)):
-		noise[batch_index][0] = image_batch[batch_index]
+		for i in range(int(config[Conf.MAX_SEQ_LENGTH] * 0.8)):
+			noise[batch_index][i] = image_batch[batch_index]
 	return noise

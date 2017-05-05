@@ -18,7 +18,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "Bidirectional",
+	Conf.NAME_SUFFIX: "LessNoise",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
@@ -28,10 +28,10 @@ config = {
 	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
-	Conf.LIMITED_DATASET: "all_flowers.txt",
-	# Conf.LIMITED_DATASET: None,
+	# Conf.LIMITED_DATASET: "all_flowers.txt",
+	Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -44,10 +44,10 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-05-03_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset-1",
+	# Conf.MODELNAME: "2017-05-03_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset-1_neg_examples",
 	Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: False,
+	Conf.IMAGE_CAPTION: True,
 	Conf.IMAGE_DIM: 50
 
 }

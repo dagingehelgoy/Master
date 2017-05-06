@@ -83,6 +83,12 @@ class GANLogger:
 			epoch, batch, g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train))
 		loss_file.close()
 
+	def save_loss_acc_fake(self, g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch, batch, d_loss_fake_img, d_acc_fake_img):
+		loss_file = open("GAN/GAN_log/%s/loss.txt" % self.name_prefix, "a")
+		loss_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+			epoch, batch, g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, d_loss_fake_img, d_acc_fake_img))
+		loss_file.close()
+
 	def save_model_weights(self, model, epoch, name, suffix=""):
 		path = "GAN/GAN_log/%s/model_files/stored_weights/" % self.name_prefix
 		if suffix != "":

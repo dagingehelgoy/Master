@@ -1,9 +1,8 @@
 # encoding=utf8
-import copy
 
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
-from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
+from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs
 from helpers.io_helper import *
 
 
@@ -24,10 +23,11 @@ def fetch_embeddings(size=-1):
 
 def fetch_custom_embeddings():
 	print("Generating compatible dataset...")
-	# all_image_names, image_name_caption_dict = create_dictionaries(size)
-	# image_names, image_data, image_captions = get_examples(all_image_names, image_name_caption_dict)
-	filename_class_dict, image_name_caption_dict = create_custom_dictionaries()
-	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, image_name_caption_dict)
+	# all_image_names, filename_caption_dict = create_dictionaries(size)
+	# image_names, image_data, image_captions = get_examples(all_image_names, filename_caption_dict)
+	filename_class_dict, filename_caption_dict, filename_pca_dict = create_custom_dictionaries()
+	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, filename_caption_dict,
+	                                                              filename_pca_dict)
 
 	dataset = [image_names, np.asarray(image_data), image_captions]
 	print("Finished generating %s training example" % len(image_captions))
@@ -40,19 +40,35 @@ def create_custom_dictionaries():
 	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
 	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
 	all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
+
 	num_images = len(all_image_name_class_tuples)
+	filename_class_dict = dict(all_image_name_class_tuples)
+
 	validate_database(num_images)
-	image_name_caption_dict = dict()
+
+	filename_caption_dict = dict()
 	name_cap_tuples = fetch_all_caption_text_tuples()
+
+	filename_pca_dict = dict()
+	name_pca_tuples = fetch_all_pca_vector_pairs()
+
 	filenames = [x[0] for x in all_image_name_class_tuples]
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
-			if name in image_name_caption_dict:
-				image_name_caption_dict[name].append(caption)
+			if name in filename_caption_dict:
+				filename_caption_dict[name].append(caption)
 			else:
-				image_name_caption_dict[name] = [caption]
-	filename_class_dict = dict(all_image_name_class_tuples)
-	return filename_class_dict, image_name_caption_dict
+				filename_caption_dict[name] = [caption]
+
+	for (name, pca) in name_pca_tuples:
+		if name in filenames:
+			if name in filename_pca_dict:
+				filename_pca_dict[name].append(pca)
+			else:
+				filename_pca_dict[name] = [pca]
+
+	return filename_class_dict, filename_caption_dict, filename_pca_dict
+
 
 def create_dictionaries(size):
 	if size > 0:
@@ -98,25 +114,25 @@ def get_examples(all_image_names, image_name_caption_vector_dict):
 	return sorted_image_names, sorted_image_data, sorted_caption_vector_data
 
 
-def get_custom_examples(filename_class_dict, filename_caption_dict):
+def get_custom_examples(filename_class_dict, filename_caption_dict, filename_pca_dict):
 	sorted_caption_data = []
 	sorted_image_data = []
 	sorted_image_names = []
-	filename_red = 'image_02644'
-	filename_yellow = 'image_03230'
-	pca_red = fetch_pca_vector(filename_red + ".jpg")
-	pca_yellow = fetch_pca_vector(filename_yellow + ".jpg")
+	# filename_red = 'image_02644'
+	# filename_yellow = 'image_03230'
+	# pca_red = fetch_pca_vector(filename_red + ".jpg")
+	# pca_yellow = fetch_pca_vector(filename_yellow + ".jpg")
 	all_image_names_total = len(filename_class_dict)
 	filenames = filename_class_dict.keys()
 	for i in range(len(filenames)):
 		image_name = filenames[i]
-		if filename_class_dict[image_name] == filename_class_dict[filename_red]:
-			pca_vector = copy.deepcopy(pca_red)
-		elif filename_class_dict[image_name] == filename_class_dict[filename_yellow]:
-			pca_vector = copy.deepcopy(pca_yellow)
-		else:
-			pca_vector = None
-
+		# if filename_class_dict[image_name] == filename_class_dict[filename_red]:
+		# 	pca_vector = copy.deepcopy(pca_red)
+		# elif filename_class_dict[image_name] == filename_class_dict[filename_yellow]:
+		# 	pca_vector = copy.deepcopy(pca_yellow)
+		# else:
+		# 	pca_vector = None
+		pca_vector = filename_pca_dict[image_name][0]
 		captions = filename_caption_dict[image_name]
 		for caption in captions:
 			sorted_image_data.append(pca_vector)

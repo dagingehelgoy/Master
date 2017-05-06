@@ -1,4 +1,5 @@
 import numpy as np
+from keras import backend as K
 from keras.engine import Input, merge, Model
 from keras.layers import LSTM, TimeDistributed, Dense, Dropout, Bidirectional
 from keras.models import Sequential, model_from_json
@@ -10,7 +11,6 @@ from GAN.helpers.enums import Conf, PreInit
 from GAN.helpers.list_helpers import *
 
 # from data.database.helpers.pca_database_helper import fetch_pca_vector
-from GAN.trainer import modified_binary_crossentropy
 from data.database.helpers.pca_database_helper import fetch_pca_vector
 
 
@@ -299,3 +299,9 @@ def img_caption_predict_old(config, logger):
 			for word in most_sim_words_list:
 				sentence += word[0] + " "
 			print sentence + "\n"
+
+
+def modified_binary_crossentropy(target, output):
+	# output = K.clip(output, _EPSILON, 1.0 - _EPSILON)
+	# return -(target * output + (1.0 - target) * (1.0 - output))
+	return K.mean(target * output)

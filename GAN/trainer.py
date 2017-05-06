@@ -1,3 +1,4 @@
+import keras.backend as K
 from keras.models import Sequential
 from keras.optimizers import Adam
 
@@ -15,12 +16,18 @@ import numpy as np
 from data.embeddings.helpers.embeddings_helper import fetch_custom_embeddings
 
 
+def modified_binary_crossentropy(target, output):
+	# output = K.clip(output, _EPSILON, 1.0 - _EPSILON)
+	# return -(target * output + (1.0 - target) * (1.0 - output))
+	return K.mean(target * output)
+
+
 def generator_containing_discriminator(generator, discriminator):
 	model = Sequential()
 	model.add(generator)
 	discriminator.trainable = False
 	model.add(discriminator)
-	model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+	model.compile(loss=modified_binary_crossentropy, optimizer="RMSprop", metrics=['accuracy'])
 	return model
 
 
@@ -75,26 +82,31 @@ def train(gan_logger, config):
 		# Shuffle data
 		if config[Conf.IMAGE_CAPTION]:
 			pass
-			# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
-			# np.random.shuffle(shuffle_indices)
-			# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
-			# all_image_vectors = all_image_vectors[shuffle_indices]
+		# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+		# np.random.shuffle(shuffle_indices)
+		# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+		# all_image_vectors = all_image_vectors[shuffle_indices]
 		else:
 			np.random.shuffle(all_raw_caption_data)
 
 		for batch_counter in range(nb_batches):
 			# if batch_counter % 10 == 0:
 			# 	print_progress(batch_counter, nb_batches, prefix="Training batches")
-			raw_caption_training_batch = all_raw_caption_data[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]]
+			raw_caption_training_batch = all_raw_caption_data[
+			                             batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[
+				                             Conf.BATCH_SIZE]]
 
 			if config[Conf.IMAGE_CAPTION]:
-				real_image_batch = np.asarray(all_image_vectors[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]])
+				real_image_batch = np.asarray(all_image_vectors[
+				                              batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[
+					                              Conf.BATCH_SIZE]])
 				noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, config)
 			else:
-				real_caption_batch = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
+				real_caption_batch = emb_generate_caption_training_batch(raw_caption_training_batch,
+				                                                         word_embedding_dict, config)
 
 			if config[Conf.IMAGE_CAPTION]:
 				fake_generated_caption_batch = g_model.predict(noise_image_training_batch)
@@ -113,11 +125,15 @@ def train(gan_logger, config):
 			# start_time_d = time.time()
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
-				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(), size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([real_caption_batch, fake_images], training_batch_y_zeros)
+				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(),
+				                                size=real_image_batch.shape)
+				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([real_caption_batch, fake_images],
+				                                                         training_batch_y_zeros)
 
-				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch, real_image_batch], training_batch_y_ones)
-				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch, real_image_batch], training_batch_y_zeros)
+				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch, real_image_batch],
+				                                                   training_batch_y_ones)
+				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch, real_image_batch],
+				                                               training_batch_y_zeros)
 			else:
 				d_loss_train, d_acc_train = d_model.train_on_batch(real_caption_batch, training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch(fake_generated_caption_batch, training_batch_y_zeros)
@@ -128,10 +144,11 @@ def train(gan_logger, config):
 			# start_time_g = time.time()
 			# Train generator
 			if config[Conf.IMAGE_CAPTION]:
-				g_loss, g_acc = gan_model.train_on_batch([noise_image_training_batch, real_image_batch], training_batch_y_ones)
+				g_loss, g_acc = gan_model.train_on_batch([noise_image_training_batch, real_image_batch],
+				                                         training_batch_y_ones)
 			else:
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
-				# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
+			# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
 			if batch_counter % int(nb_batches / 1) == 0:
 				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
 				if config[Conf.IMAGE_CAPTION]:
@@ -139,7 +156,8 @@ def train(gan_logger, config):
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
 				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				# gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
-				gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter)
+				gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt,
+				                         batch_counter)
 		# if (epoch_cnt < 1000 and epoch_cnt % 100 == 0) or (epoch_cnt < 10000 and epoch_cnt % 1000 == 0) or epoch_cnt % 5000 == 0:
 		if epoch_cnt % 100 == 0:
 			gan_logger.save_model_weights(g_model, epoch_cnt, "generator")

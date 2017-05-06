@@ -2,6 +2,7 @@ import numpy as np
 from keras.engine import Input, merge, Model
 from keras.layers import LSTM, TimeDistributed, Dense, Dropout, Bidirectional
 from keras.models import Sequential, model_from_json
+from keras.optimizers import Adam, SGD
 
 from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch, \
 	emb_generate_caption_training_batch, generate_image_with_noise_training_batch
@@ -9,6 +10,7 @@ from GAN.helpers.enums import Conf, PreInit
 from GAN.helpers.list_helpers import *
 
 # from data.database.helpers.pca_database_helper import fetch_pca_vector
+from GAN.trainer import modified_binary_crossentropy
 from data.database.helpers.pca_database_helper import fetch_pca_vector
 
 
@@ -76,6 +78,7 @@ def emb_create_generator(config):
 		g_model = generator_model(config)
 	else:
 		g_model = None
+
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 
 	return g_model
@@ -120,7 +123,7 @@ def emb_create_image_gan(config):
 def emb_create_discriminator(config):
 	d_model = discriminator_model(config)
 	d_model.trainable = True
-	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
+	d_model.compile(loss=modified_binary_crossentropy, optimizer=SGD(clipvalue=0.01), metrics=['accuracy'])
 	return d_model
 
 

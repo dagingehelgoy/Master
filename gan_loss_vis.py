@@ -9,8 +9,12 @@ import numpy as np
 # loss_fix_file.close()
 
 
+log_folder = 'GAN/GAN_log/'
+
+model_name = '2017-05-03_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset-1_neg_examples'
+
 data = np.genfromtxt(
-	'/Users/markus/workspace/master/Master/GAN/GAN_log/2017-05-03_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset-1_neg_examples/loss.txt',
+	log_folder + model_name + "/loss.txt",
 	delimiter=',',
 	skip_header=1,
 	skip_footer=0,

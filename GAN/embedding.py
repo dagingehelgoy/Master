@@ -167,8 +167,8 @@ def emb_predict(config, logger):
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 	prediction_string = ""
-	# for i in range(len(g_weights)):
-	for i in range(0, len(g_weights), 100):
+	for i in range(len(g_weights)):
+	# for i in range(0, len(g_weights), 100):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))

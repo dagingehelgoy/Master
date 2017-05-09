@@ -85,7 +85,7 @@ def get_model(nb_words, embedding_layer):
 	model.add(LSTM(512, return_sequences=False))
 	model.add(Dropout(0.5))
 	model.add(Dense(nb_words, activation='softmax'))
-	model.compile(loss='categorical_crossentropy', optimizer='adam')
+	model.compile(metrics=['accuracy'], loss='categorical_crossentropy', optimizer='adam')
 	return model
 
 

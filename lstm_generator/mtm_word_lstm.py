@@ -32,23 +32,24 @@ def batch_generator(data, batch_size, n_vocab):
             Xs = []
             Ys = []
             for i in range(pos, pos + batch_size):
-                X = data[i]
+                if i < len(data):
+                    X = data[i]
 
-                Xs.append(X)
+                    Xs.append(X)
 
-                Y_sentence = data[pos]
+                    Y_sentence = data[pos]
 
-                Y_onehot = []
+                    Y_onehot = []
 
-                for y_index in range(1, len(Y_sentence)):
-                    onehot = numpy.zeros(n_vocab)
-                    onehot[Y_sentence[y_index]] = 1
-                    Y_onehot.append(onehot)
+                    for y_index in range(1, len(Y_sentence)):
+                        onehot = numpy.zeros(n_vocab)
+                        onehot[Y_sentence[y_index]] = 1
+                        Y_onehot.append(onehot)
 
-                zero_onehot = numpy.zeros(n_vocab)
-                zero_onehot[0] = 1
-                Y_onehot.append(zero_onehot)
-                Ys.append(Y_onehot)
+                    zero_onehot = numpy.zeros(n_vocab)
+                    zero_onehot[0] = 1
+                    Y_onehot.append(zero_onehot)
+                    Ys.append(Y_onehot)
             yield (numpy.asarray(Xs), numpy.asarray(Ys))
 
 

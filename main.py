@@ -37,7 +37,7 @@ def main():
 	elif args.code == "data":
 		fetch_flower_captions()
 	elif args.code == "word_lstm":
-		from lstm_generator.mtm_word_lstm import word_lstm
+		from lstm_generator.mts_word_lstm import word_lstm
 		word_lstm()
 	else:
 		print("### No suitable --code ###")

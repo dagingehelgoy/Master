@@ -17,8 +17,8 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "WGAN",
+	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: "LessNoise",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,
@@ -28,10 +28,11 @@ config = {
 	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
-	Conf.LIMITED_DATASET: "all_flowers.txt",
-	# Conf.LIMITED_DATASET: None,
+	# Conf.LIMITED_DATASET: "all_flowers.txt",
+  	Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	#Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 2048,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -49,5 +50,4 @@ config = {
 
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50
-
 }

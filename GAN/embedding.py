@@ -121,7 +121,7 @@ def emb_create_image_gan(config):
 def emb_create_discriminator(config):
 	d_model = discriminator_model(config)
 	d_model.trainable = True
-	d_model.compile(loss=modified_binary_crossentropy, optimizer=SGD(clipvalue=0.01), metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
 	return d_model
 
 
@@ -297,9 +297,3 @@ def img_caption_predict_old(config, logger):
 			for word in most_sim_words_list:
 				sentence += word[0] + " "
 			print sentence + "\n"
-
-
-def modified_binary_crossentropy(target, output):
-	# output = K.clip(output, _EPSILON, 1.0 - _EPSILON)
-	# return -(target * output + (1.0 - target) * (1.0 - output))
-	return K.mean(target * output)

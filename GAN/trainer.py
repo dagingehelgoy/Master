@@ -1,5 +1,4 @@
 from GAN.embedding import *
-from GAN.embedding import modified_binary_crossentropy
 from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, \
 	generate_string_sentences, \
 	emb_generate_caption_training_batch, generate_image_with_noise_training_batch, preprocess_sentences
@@ -18,7 +17,7 @@ def generator_containing_discriminator(generator, discriminator):
 	model.add(generator)
 	discriminator.trainable = False
 	model.add(discriminator)
-	model.compile(loss=modified_binary_crossentropy, optimizer="RMSprop", metrics=['accuracy'])
+	model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 	return model
 
 

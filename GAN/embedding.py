@@ -121,7 +121,7 @@ def emb_create_image_gan(config):
 def emb_create_discriminator(config):
 	d_model = discriminator_model(config)
 	d_model.trainable = True
-	d_model.compile(loss=modified_binary_crossentropy, optimizer=SGD(clipvalue=0.01), metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return d_model
 
 
@@ -146,8 +146,7 @@ def emb_predict(config, logger):
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
-	                                                              config)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)
@@ -229,16 +228,16 @@ def img_caption_predict(config, logger):
 
 	filename_red = 'image_02644'
 	filename_yellow = 'image_03230'
-	pca_red = fetch_pca_vector(filename_red + ".jpg")
-	pca_yellow = fetch_pca_vector(filename_red + ".jpg")
-	image_batch = np.repeat([pca_red], config[Conf.BATCH_SIZE], axis=0)
+	pca_red = fetch_pca_vector(filename_red)
+	pca_yellow = fetch_pca_vector(filename_red)
+	image_batch = np.repeat([pca_yellow], config[Conf.BATCH_SIZE], axis=0)
 	noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 	prediction_string = ""
 	# for i in range(len(g_weights)):
-	for i in range(50, len(g_weights), 10):
+	for i in range(0, len(g_weights)-150):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))

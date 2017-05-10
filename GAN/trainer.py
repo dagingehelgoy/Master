@@ -18,7 +18,7 @@ def generator_containing_discriminator(generator, discriminator):
 	model.add(generator)
 	discriminator.trainable = False
 	model.add(discriminator)
-	model.compile(loss=modified_binary_crossentropy, optimizer="RMSprop", metrics=['accuracy'])
+	model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 	return model
 
 
@@ -40,8 +40,6 @@ def train(gan_logger, config):
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		all_raw_caption_data, _, _ = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
-		g_model = oh_create_generator(config)
-		d_model = oh_create_discriminator(config)
 	else:
 		# Generate image captions
 		if config[Conf.IMAGE_CAPTION]:
@@ -55,6 +53,10 @@ def train(gan_logger, config):
 	print "Compiling gan..."
 	if config[Conf.IMAGE_CAPTION]:
 		g_model, d_model, gan_model = emb_create_image_gan(config)
+	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+		g_model = oh_create_generator(config)
+		d_model = oh_create_discriminator(config)
+		gan_model = generator_containing_discriminator(g_model, d_model)
 	else:
 		g_model = emb_create_generator(config)
 		d_model = emb_create_discriminator(config)

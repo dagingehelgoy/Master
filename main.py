@@ -17,9 +17,9 @@ def get_args():
 
 
 def main():
-	tf_config = k_tf.tf.ConfigProto()
-	tf_config.gpu_options.allow_growth = True
-	k_tf.set_session(k_tf.tf.Session(config=tf_config))
+	# tf_config = k_tf.tf.ConfigProto()
+	# tf_config.gpu_options.allow_growth = True
+	# k_tf.set_session(k_tf.tf.Session(config=tf_config))
 	args = get_args()
 	if args.code == "seq2seq":
 		from sequence_to_sequence.embedding_seq2seq import seq2seq

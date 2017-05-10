@@ -5,6 +5,7 @@ import keras.backend.tensorflow_backend as k_tf
 from data.data_main import fetch_flower_captions
 
 
+
 def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--code", type=str)
@@ -35,6 +36,9 @@ def main():
 		compare_distributions()
 	elif args.code == "data":
 		fetch_flower_captions()
+	elif args.code == "word_lstm":
+		from lstm_generator.mts_word_lstm import word_lstm
+		word_lstm()
 	else:
 		print("### No suitable --code ###")
 

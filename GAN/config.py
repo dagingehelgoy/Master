@@ -30,7 +30,7 @@ config = {
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
 	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
-	Conf.LIMITED_DATASET: "Flickr8k",
+	Conf.LIMITED_DATASET: "Flickr8k.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 512,

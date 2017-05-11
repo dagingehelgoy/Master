@@ -35,8 +35,12 @@ def generate_index_sentences(config, cap_data=-1):
 	max_seq_length = config[Conf.MAX_SEQ_LENGTH]
 	nb_words = config[Conf.VOCAB_SIZE]
 
-	word_captions = get_flickr_sentences(cap_data)
-	word_captions = ['<SOS> ' + line + ' <EOS>' for line in word_captions]
+	if config[Conf.LIMITED_DATASET] is not None:
+		print "Loading %s sentences" % config[Conf.LIMITED_DATASET]
+		word_captions = get_custom_sentences(config)
+	else:
+		word_captions = get_flickr_sentences(cap_data)
+	word_captions = ['<sos> ' + line + ' <eos>' for line in word_captions]
 
 	tokenizer = Tokenizer(nb_words=nb_words, filters="""!"#$%&'()*+-/:;=?@[\]^_`{|}~""")
 	tokenizer.fit_on_texts(word_captions)

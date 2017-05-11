@@ -30,10 +30,10 @@ config = {
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
 	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
-	Conf.LIMITED_DATASET: "completeFlickr30k",
+	Conf.LIMITED_DATASET: "Flickr8k",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 512,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,

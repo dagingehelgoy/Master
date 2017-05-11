@@ -205,12 +205,43 @@ def oh_create_discriminator(config):
 def oh_predict(config, logger):
 	print "Compiling generator..."
 
-	# weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
-	# weights_file = "generator-0-46-LOCAL-MINIMA"
+	weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
+	weights_file = "generator-0-46-LOCAL-MINIMA"
+	noise_batch = generate_input_noise(config)
+	# g_model = load_decoder(config)
+	g_model = generator_model(config)
+	g_model.compile(loss='categorical_crossentropy', optimizer="adam")
 
-	g_model = load_decoder(config)
-	# g_model.compile(loss='categorical_crossentropy', optimizer="adam")
-	# g_model.load_weights(str(weights_folder) + str(weights_file))
+	g_weights = logger.get_generator_weights()
+	d_weights = logger.get_discriminator_weights()
+	print "Num g_weights: %s" % len(g_weights)
+	print "Num d_weights: %s" % len(g_weights)
+
+	prediction_string = ""
+	for i in range(len(g_weights)):
+		g_weight = g_weights[i]
+		d_weight = d_weights[i]
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
+		generated_sentences = g_model.predict(noise_batch[:10])
+		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
+		prediction_string += gen_header_string
+		# print gen_header_string
+
+
+		index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config,
+	                                                                            cap_data=config[Conf.DATASET_SIZE])
+		for prediction in generated_sentences:
+			sentence = ""
+			for softmax_word in prediction:
+				id = np.argmax(softmax_word)
+				if id == 0:
+					sentence += "0 "
+				else:
+					word = id_to_word_dict[id]
+					sentence += word + " "
+			print sentence + "\n"
+
+	g_model.load_weights(str(weights_folder) + str(weights_file))
 
 	g_input_noise = generate_input_noise(config)
 

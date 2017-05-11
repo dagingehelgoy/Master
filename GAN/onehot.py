@@ -56,7 +56,7 @@ def load_encoder_decoder(config):
 def generator_model(config):
 	model = Sequential()
 	model.add(LSTM(
-		output_dim=config[Conf.NOISE_SIZE],
+		output_dim=config[Conf.EMBEDDING_SIZE],
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]),
 		return_sequences=True))
 

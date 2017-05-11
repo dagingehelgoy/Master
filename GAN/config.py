@@ -13,7 +13,7 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 """
 
 config = {
-	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
+	Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
@@ -28,9 +28,10 @@ config = {
 	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
-	Conf.LIMITED_DATASET: "all_flowers.txt",
-  	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
-	#Conf.LIMITED_DATASET: None,
+	# Conf.LIMITED_DATASET: "all_flowers.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	Conf.LIMITED_DATASET: "completeFlickr30k",
+	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 128,
 	Conf.EPOCHS: 10000000,
@@ -41,7 +42,7 @@ config = {
 
 	Conf.EMBEDDING_SIZE: 50,
 	Conf.NOISE_SIZE: 50,
-	Conf.PREINIT: PreInit.DECODER,
+	Conf.PREINIT: PreInit.NONE,
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 

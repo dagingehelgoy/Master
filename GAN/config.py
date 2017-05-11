@@ -18,7 +18,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	Conf.NAME_SUFFIX: None,
-	# Conf.NAME_SUFFIX: "LessNoise",
+	Conf.NAME_SUFFIX: "Dropout",
 	# Conf.NAME_SUFFIX: "sam1",
 
 	Conf.VOCAB_SIZE: 1000,

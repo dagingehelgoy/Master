@@ -61,8 +61,8 @@ styles = markers + [
     r'$\clubsuit$',
     r'$\checkmark$']
 
-skip = 10
-first = 100
+skip = 2
+first = 60
 # ax1.plot(data['epoch'][:first:skip], data['d_acc_gen'][:first:skip], c='b', label='discriminator_fake_accuracy')
 # ax1.plot(data['epoch'][:first:skip], data['d_acc_train'][:first:skip], c='g', label='discriminator_real_accuracy')
 # ax1.plot(data['epoch'][:first:skip], data['g_acc'][:first:skip], c='r', label='generator_accuracy')
@@ -70,12 +70,11 @@ first = 100
 # ax1.plot(data['epoch'][:first:skip], data['d_loss_gen'][:first:skip], c='b', label='discriminator_fake_loss')
 # ax1.plot(data['epoch'][:first:skip], data['d_loss_train'][:first:skip], c='g', label='discriminator_real_loss')
 
-diagram.plot(data_1['epoch'][:first:skip], data_1['g_loss'][:first:skip], c=colors[0], label='generator_loss')
-diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], marker=styles[2], markersize=10, label='discriminator_loss')
+diagram.plot(data_1['epoch'][:first:skip], data_1['g_loss'][:first:skip], c=colors[0], label='Generator')
+diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], label='Discriminator')
 
-diagram.plot(data_1['epoch'][:first:skip], data_2['g_loss'][:first:skip], c=colors[0], marker=styles[0], markersize=3, label='dropout_generator_loss')
-diagram.plot(data_1['epoch'][:first:skip], d_loss_2[:first:skip], c=colors[1], marker=styles[0], markersize=3,
-             label='dropout_discriminator_loss')
+diagram.plot(data_1['epoch'][:first:skip], data_2['g_loss'][:first:skip], c=colors[0], linestyle=':', label='Generator (Dropout)')
+diagram.plot(data_1['epoch'][:first:skip], d_loss_2[:first:skip], c=colors[1], linestyle=':', label='Discriminator (Dropout)')
 
 leg = diagram.legend()
 

@@ -204,7 +204,6 @@ def oh_predict(config, logger):
 	print "Compiling generator..."
 
 	weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
-	weights_file = "generator-0-46-LOCAL-MINIMA"
 	noise_batch = generate_input_noise(config)
 	# g_model = load_decoder(config)
 	g_model = generator_model(config)
@@ -223,11 +222,9 @@ def oh_predict(config, logger):
 		generated_sentences = g_model.predict(noise_batch[:10])
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string += gen_header_string
-		# print gen_header_string
+		print gen_header_string
 
-
-		index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config,
-	                                                                            cap_data=config[Conf.DATASET_SIZE])
+		index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
 		for prediction in generated_sentences:
 			sentence = ""
 			for softmax_word in prediction:
@@ -238,25 +235,6 @@ def oh_predict(config, logger):
 					word = id_to_word_dict[id]
 					sentence += word + " "
 			print sentence + "\n"
-
-	g_model.load_weights(str(weights_folder) + str(weights_file))
-
-	g_input_noise = generate_input_noise(config)
-
-	predictions = g_model.predict(g_input_noise)
-
-	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config,
-	                                                                            cap_data=config[Conf.DATASET_SIZE])
-	for prediction in predictions:
-		sentence = ""
-		for softmax_word in prediction:
-			id = np.argmax(softmax_word)
-			if id == 0:
-				sentence += "0 "
-			else:
-				word = id_to_word_dict[id]
-				sentence += word + " "
-		print sentence + "\n"
 
 
 def oh_get_training_batch(batch, config):

@@ -95,11 +95,11 @@ def emb_create_image_gan(config):
 	# Discriminator
 
 	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
-	d_lstm_out = LSTM(100, dropout_W=0.5, dropout_U=0.5)(d_lstm_input)
+	d_lstm_out = LSTM(300, dropout_W=0.75, dropout_U=0.75)(d_lstm_input)
 
 	img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
 	d_tensor = merge([d_lstm_out, img_input], mode='concat')
-	d_tensor = Dropout(0.5)(d_tensor)
+	d_tensor = Dropout(0.75)(d_tensor)
 	d_tensor = Dense(1, activation='sigmoid')(d_tensor)
 	d_model = Model(input=[d_lstm_input, img_input], output=d_tensor, name="d_model")
 

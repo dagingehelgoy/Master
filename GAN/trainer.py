@@ -33,8 +33,8 @@ def change_learning_rate(discriminator_on_generator):
 
 
 def train(gan_logger, config):
-	# if gan_logger.exists:
-	# 	raw_input("\nModel already trained.\nPress enter to continue.\n")
+	if gan_logger.exists:
+		raw_input("\nModel already trained.\nPress enter to continue.\n")
 
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -55,11 +55,11 @@ def train(gan_logger, config):
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
+		gan_model = generator_containing_discriminator(g_model, d_model)
 	else:
 		g_model = emb_create_generator(config)
 		d_model = emb_create_discriminator(config)
-
-	gan_model = generator_containing_discriminator(g_model, d_model)
+		gan_model = generator_containing_discriminator(g_model, d_model)
 
 	gan_logger.save_model(g_model, "generator")
 	gan_logger.save_model(d_model, "discriminator")
@@ -73,11 +73,10 @@ def train(gan_logger, config):
 
 		# Shuffle data
 		if config[Conf.IMAGE_CAPTION]:
-			pass
-		# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
-		# np.random.shuffle(shuffle_indices)
-		# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
-		# all_image_vectors = all_image_vectors[shuffle_indices]
+			shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+			np.random.shuffle(shuffle_indices)
+			all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+			all_image_vectors = all_image_vectors[shuffle_indices]
 		else:
 			np.random.shuffle(all_raw_caption_data)
 

@@ -39,6 +39,11 @@ def fetch_custom_embeddings():
 def create_custom_dictionaries():
 	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
 	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
+	if len(image_name_class_tuple_58) > len(image_name_class_tuple_65):
+		image_name_class_tuple_58 = image_name_class_tuple_58[:len(image_name_class_tuple_65)]
+	else:
+		image_name_class_tuple_65 = image_name_class_tuple_65[:len(image_name_class_tuple_58)]
+
 	all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
 
 	num_images = len(all_image_name_class_tuples)
@@ -59,9 +64,12 @@ def create_custom_dictionaries():
 				filename_caption_dict[name].append(caption)
 			else:
 				filename_caption_dict[name] = [caption]
-
-	for (name, pca) in name_pca_tuples:
+	for (name, _) in name_pca_tuples:
 		if name in filenames:
+			if filename_class_dict[name] == '00058':
+				pca = np.zeros(50)
+			else:
+				pca = np.ones(50)
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:

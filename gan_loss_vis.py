@@ -11,7 +11,7 @@ import numpy as np
 
 log_folder = 'GAN/GAN_log/'
 
-model_name = '2017-05-03_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset-1_neg_examples'
+model_name = '2017-05-11_ImgCapFalse_onehot_Vocab1000_Seq15_Batch512_EmbSize50_repeat_Noise50_PreInitNone_Dataset_Flickr8k'
 
 data = np.genfromtxt(
 	log_folder + model_name + "/loss.txt",
@@ -24,14 +24,19 @@ fig = plt.figure()
 
 ax1 = fig.add_subplot(111)
 
-ax1.set_title("Accuracy - 15 seqLength - Two Flowers")
+# ax1.set_title("Accuracy - 15 seqLength - Two Flowers")
 ax1.set_xlabel('Epoch')
 ax1.set_ylabel('Accuracy')
 
-skip = 100
-ax1.plot(data['epoch'][::skip], data['d_acc_gen'][::skip], c='b', label='discriminator_fake_accuracy')
-ax1.plot(data['epoch'][::skip], data['d_acc_train'][::skip], c='g', label='discriminator_real_accuracy')
-ax1.plot(data['epoch'][::skip], data['g_acc'][::skip], c='r', label='generator_accuracy')
+skip = 1
+first = 200
+# ax1.plot(data['epoch'][:first:skip], data['d_acc_gen'][:first:skip], c='b', label='discriminator_fake_accuracy')
+# ax1.plot(data['epoch'][:first:skip], data['d_acc_train'][:first:skip], c='g', label='discriminator_real_accuracy')
+# ax1.plot(data['epoch'][:first:skip], data['g_acc'][:first:skip], c='r', label='generator_accuracy')
+
+ax1.plot(data['epoch'][:first:skip], data['d_loss_gen'][:first:skip], c='b', label='discriminator_fake_loss')
+ax1.plot(data['epoch'][:first:skip], data['d_loss_train'][:first:skip], c='g', label='discriminator_real_loss')
+ax1.plot(data['epoch'][:first:skip], data['g_loss'][:first:skip], c='r', label='generator_loss')
 
 leg = ax1.legend()
 

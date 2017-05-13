@@ -12,14 +12,14 @@ from matplotlib.lines import Line2D
 
 log_folder = 'GAN/GAN_log/'
 
-model_1 = '2017-05-11_ImgCapFalse_onehot_Vocab1000_Seq15_Batch512_EmbSize50_repeat_Noise50_PreInitNone_Dataset_Flickr8k'
-model_2 = '2017-05-11_ImgCapFalse_onehot_Vocab1000_Seq15_Batch512_EmbSize50_repeat_Noise50_PreInitNone_Dataset_Flickr8k_dropout'
+model_1 = '2017-05-12_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+model_2 = '2017-05-12_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
 
 data_1 = np.genfromtxt(
 	log_folder + model_1 + "/loss.txt",
 	delimiter=',',
 	skip_header=1,
-	skip_footer=0,
+	skip_footer=17,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 data_2 = np.genfromtxt(
@@ -61,8 +61,8 @@ styles = markers + [
     r'$\clubsuit$',
     r'$\checkmark$']
 
-skip = 2
-first = 60
+skip = 10
+first = None
 # ax1.plot(data['epoch'][:first:skip], data['d_acc_gen'][:first:skip], c='b', label='discriminator_fake_accuracy')
 # ax1.plot(data['epoch'][:first:skip], data['d_acc_train'][:first:skip], c='g', label='discriminator_real_accuracy')
 # ax1.plot(data['epoch'][:first:skip], data['g_acc'][:first:skip], c='r', label='generator_accuracy')

@@ -38,7 +38,7 @@ def train(gan_logger, config):
 
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-		all_raw_caption_data, _, _ = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
+		all_raw_caption_data, _, word_to_id_dict = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
 	else:
 		# Generate image captions
 		if config[Conf.IMAGE_CAPTION]:
@@ -94,7 +94,7 @@ def train(gan_logger, config):
 				noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
-				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, config)
+				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, word_to_id_dict, config)
 			else:
 				real_caption_batch = emb_generate_caption_training_batch(raw_caption_training_batch,
 				                                                         word_embedding_dict, config)

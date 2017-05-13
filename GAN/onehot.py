@@ -239,8 +239,8 @@ def oh_predict(config, logger):
 			print sentence + "\n"
 
 
-def oh_get_training_batch(batch, config):
-	tr_one_hot_caption_batch = to_categorical_lists(batch, config)
-
-	tr_softmax_caption_batch = onehot_to_softmax(tr_one_hot_caption_batch)
-	return tr_softmax_caption_batch
+def oh_get_training_batch(batch, word_to_id_dict, config):
+	tr_one_hot_caption_batch = to_categorical_lists(batch, word_to_id_dict, config)
+	return tr_one_hot_caption_batch
+	# tr_softmax_caption_batch = onehot_to_softmax(tr_one_hot_caption_batch)
+	# return tr_softmax_caption_batch

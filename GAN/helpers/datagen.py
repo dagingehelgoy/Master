@@ -7,13 +7,13 @@ from helpers.list_helpers import print_progress
 from word2vec.word2vec_helpers import get_dict_filename
 
 
-def to_categorical_lists(captions, config):
+def to_categorical_lists(captions, word_to_id_dict, config):
 	matrix = np.zeros((len(captions), config[Conf.MAX_SEQ_LENGTH], config[Conf.VOCAB_SIZE]))
 	for caption_index in range(len(captions)):
 		caption = captions[caption_index]
 		for word_index in range(config[Conf.MAX_SEQ_LENGTH]):
 			if word_index >= len(caption):
-				word = 0
+				word = word_to_id_dict['<pad>']
 			else:
 				word = caption[word_index]
 			matrix[caption_index, word_index, word] = 1.
@@ -40,16 +40,16 @@ def generate_index_sentences(config, cap_data=-1):
 		word_captions = get_custom_sentences(config)
 	else:
 		word_captions = get_flickr_sentences(cap_data)
-	word_captions = ['<sos> ' + line + ' <eos>' for line in word_captions]
+	word_captions = ['<sos> ' + line + ' <eos> <pad>' for line in word_captions]
 
 	tokenizer = Tokenizer(nb_words=nb_words, filters="""!"#$%&'()*+-/:;=?@[\]^_`{|}~""")
 	tokenizer.fit_on_texts(word_captions)
-	index_captions = tokenizer.texts_to_sequences(word_captions)
-	index_captions = [cap for cap in index_captions if len(cap) <= max_seq_length]
 
 	word_to_id_dict = tokenizer.word_index
 	id_to_word_dict = {token: idx for idx, token in word_to_id_dict.items()}
 
+	index_captions = tokenizer.texts_to_sequences(word_captions)
+	# index_captions = [cap for cap in index_captions if len(cap) <= max_seq_length]
 	return index_captions, id_to_word_dict, word_to_id_dict
 
 

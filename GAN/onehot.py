@@ -2,8 +2,9 @@ from keras.layers import LSTM, TimeDistributed, Dense, Embedding, RepeatVector
 from keras.models import Sequential
 
 from GAN.helpers.datagen import *
+from bleu import fetch_bleu_score
 from helpers.enums import Conf, PreInit
-
+import random
 
 def get_decoder(config):
 	# TODO: Hardcoded, move into conf
@@ -205,6 +206,12 @@ def oh_create_discriminator(config):
 def oh_predict(config, logger):
 	print "Compiling generator..."
 
+
+	bleu_references_file = open("data/datasets/%s" % config[Conf.LIMITED_DATASET])
+	bleu_references = [ref.strip() for ref in bleu_references_file.readlines()]
+	bleu_references_file.close()
+
+
 	weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
 	noise_batch = generate_input_noise(config)
 	# g_model = load_decoder(config)
@@ -216,17 +223,14 @@ def oh_predict(config, logger):
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 
-	prediction_string = ""
-	for i in range(len(g_weights)):
+	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
+	for i in range(100, len(g_weights), 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
-		generated_sentences = g_model.predict(noise_batch[:10])
-		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
-		prediction_string += gen_header_string
-		print gen_header_string
+		generated_sentences = g_model.predict(noise_batch[:1])
+		print "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 
-		index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
 		for prediction in generated_sentences:
 			sentence = ""
 			for softmax_word in prediction:
@@ -236,7 +240,13 @@ def oh_predict(config, logger):
 				else:
 					word = id_to_word_dict[id]
 					sentence += word + " "
+
+
+			score, hyp = fetch_bleu_score(bleu_references, sentence, True)
 			print sentence + "\n"
+			print "%s\tBLEU: %s\n" % (hyp, score)
+
+			print "Score on real sentence: %s" % fetch_bleu_score(bleu_references, bleu_references[random.randint(0, len(bleu_references)-10)])
 
 
 def oh_get_training_batch(batch, word_to_id_dict, config):

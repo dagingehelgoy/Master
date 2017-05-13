@@ -19,7 +19,7 @@ config = {
 
 	# Conf.NAME_SUFFIX: None,
 	# Conf.NAME_SUFFIX: "Two_flower_binary-0.5_imgnoise_ratio",
-	Conf.NAME_SUFFIX: "0.75dropout",
+	Conf.NAME_SUFFIX: "0.75dropout-softmax",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 12,

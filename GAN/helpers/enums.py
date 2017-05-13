@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class NoiseMode(Enum):
+	REPEAT_SINGLE = "repeat_single"
 	REPEAT = "repeat"
 	NEW = "new"
 	FIRST_EACH = "FIRST_EACH"

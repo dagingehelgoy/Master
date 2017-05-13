@@ -131,6 +131,13 @@ def generate_input_noise(config):
 
 		return noise_matrix
 
+	elif config[Conf.NOISE_MODE] == NoiseMode.REPEAT_SINGLE:
+		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], noise_size))
+		for batch_index in range(config[Conf.BATCH_SIZE]):
+			noise_matrix[batch_index] = np.random.normal(size=noise_size)
+
+		return noise_matrix
+
 	elif config[Conf.NOISE_MODE] == NoiseMode.NEW:
 		return np.random.rand(config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size)
 

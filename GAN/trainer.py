@@ -33,8 +33,8 @@ def change_learning_rate(discriminator_on_generator):
 
 
 def train(gan_logger, config):
-	if gan_logger.exists:
-		raw_input("\nModel already trained.\nPress enter to continue.\n")
+	# if gan_logger.exists:
+	# 	raw_input("\nModel already trained.\nPress enter to continue.\n")
 
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -51,7 +51,8 @@ def train(gan_logger, config):
 
 	print "Compiling gan..."
 	if config[Conf.IMAGE_CAPTION]:
-		g_model, d_model, gan_model = emb_create_image_gan(config)
+		# g_model, d_model, gan_model = emb_create_image_gan(config)
+		g_model, d_model, gan_model = emb_create_image_gan_train_image(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -88,10 +89,10 @@ def train(gan_logger, config):
 				                             Conf.BATCH_SIZE]]
 
 			if config[Conf.IMAGE_CAPTION]:
-				real_image_batch = np.asarray(all_image_vectors[
-				                              batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[
-					                              Conf.BATCH_SIZE]])
-				noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
+				real_image_batch = np.asarray(all_image_vectors[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]])
+				# noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
+				noise_image_training_batch = generate_input_noise(config)
+
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, word_to_id_dict, config)
@@ -100,7 +101,7 @@ def train(gan_logger, config):
 				                                                         word_embedding_dict, config)
 
 			if config[Conf.IMAGE_CAPTION]:
-				fake_generated_caption_batch = g_model.predict(noise_image_training_batch)
+				fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])
 			else:
 				noise_batch = generate_input_noise(config)
 				fake_generated_caption_batch = g_model.predict(noise_batch)
@@ -117,10 +118,10 @@ def train(gan_logger, config):
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
 				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(), size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([real_caption_batch, fake_images], training_batch_y_zeros)
+				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
 
-				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch, real_image_batch], training_batch_y_ones)
-				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch, real_image_batch], training_batch_y_zeros)
+				d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
+				d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)
 			else:
 				d_loss_train, d_acc_train = d_model.train_on_batch(real_caption_batch, training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch(fake_generated_caption_batch, training_batch_y_zeros)
@@ -131,8 +132,7 @@ def train(gan_logger, config):
 			# start_time_g = time.time()
 			# Train generator
 			if config[Conf.IMAGE_CAPTION]:
-				g_loss, g_acc = gan_model.train_on_batch([noise_image_training_batch, real_image_batch],
-				                                         training_batch_y_ones)
+				g_loss, g_acc = gan_model.train_on_batch([real_image_batch, noise_image_training_batch], training_batch_y_ones)
 			else:
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 			# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
@@ -148,7 +148,7 @@ def train(gan_logger, config):
 				else:
 					gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter)
 		# if (epoch_cnt < 1000 and epoch_cnt % 100 == 0) or (epoch_cnt < 10000 and epoch_cnt % 1000 == 0) or epoch_cnt % 5000 == 0:
-		if epoch_cnt < 100 or epoch_cnt % 50 == 0:
+		if epoch_cnt < 10 or (epoch_cnt < 100 and epoch_cnt % 10 == 0) or epoch_cnt % 100 == 0:
 			gan_logger.save_model_weights(g_model, epoch_cnt, "generator")
 			gan_logger.save_model_weights(d_model, epoch_cnt, "discriminator")
 		print("--- %7.4f seconds ---" % (time.time() - start_time_epoch))

@@ -1,7 +1,7 @@
 import numpy as np
 from keras import backend as K
-from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense, Dropout, Bidirectional
+from keras.engine import Input, merge, Model, Merge
+from keras.layers import LSTM, TimeDistributed, Dense, Dropout, Bidirectional, RepeatVector
 from keras.models import Sequential, model_from_json
 from keras.optimizers import Adam, SGD
 
@@ -106,6 +106,46 @@ def emb_create_image_gan(config):
 	# GAN
 	gan_tensor = d_model([g_tensor, img_input])
 	gan_model = Model(input=[g_lstm_input, img_input], output=gan_tensor)
+
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="g_model.png", show_shapes=True)
+	# plot(d_model, to_file="d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	return g_model, d_model, gan_model
+
+
+def emb_create_image_gan_train_image(config):
+
+	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_model_image_input")
+
+	# Generator
+
+	g_lstm_noise_input = Input(shape=(config[Conf.NOISE_SIZE],), name="g_model_lstm_noise_input")
+
+	g_merge = merge([gan_image_input, g_lstm_noise_input], mode='concat')
+	g_lstm_input = RepeatVector(config[Conf.MAX_SEQ_LENGTH])(g_merge)
+	g_tensor = LSTM(500, return_sequences=True)(g_lstm_input)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
+
+	# Discriminator
+
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
+	d_lstm_out = LSTM(300, dropout_W=0.75, dropout_U=0.75)(d_lstm_input)
+
+	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = merge([gan_image_input, d_lstm_out], mode='concat')
+	d_tensor = Dropout(0.75)(d_tensor)
+	d_tensor = Dense(1, activation='sigmoid')(d_tensor)
+	d_model = Model(input=[gan_image_input, d_lstm_input], output=d_tensor, name="d_model")
+
+	# GAN
+	gan_tensor = d_model([gan_image_input, g_tensor])
+	gan_model = Model(input=[gan_image_input, g_lstm_noise_input], output=gan_tensor)
 
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 	d_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])

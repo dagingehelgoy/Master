@@ -13,13 +13,12 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 """
 
 config = {
-	Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
+	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
-	# Conf.NAME_SUFFIX: "Two_flower_binary-0.5_imgnoise_ratio",
-	Conf.NAME_SUFFIX: "0.75dropout-softmax",
+	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: "0.75dropout-softmax",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 12,
@@ -29,14 +28,14 @@ config = {
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
 	# Conf.LIMITED_DATASET: "Flickr8k.txt",
-	# Conf.LIMITED_DATASET: None,
+	Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 64,
-	Conf.EPOCHS: 10000,
+	Conf.EPOCHS: 100000,
 
-	Conf.NOISE_MODE: NoiseMode.REPEAT,
+	Conf.NOISE_MODE: NoiseMode.REPEAT_SINGLE,
 
 	Conf.MAX_LOSS_DIFF: 0,
 
@@ -49,6 +48,6 @@ config = {
 	# Conf.MODELNAME: "2017-05-11_ImgCapFalse_onehot_Vocab1000_Seq15_Batch512_EmbSize50_repeat_Noise50_PreInitNone_Dataset_Flickr8k",
 	Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: False,
+	Conf.IMAGE_CAPTION: True,
 	Conf.IMAGE_DIM: 50
 }

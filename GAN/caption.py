@@ -5,7 +5,7 @@ from GAN.helpers.datagen import generate_input_noise, generate_string_sentences
 from GAN.helpers.enums import Conf, PreInit
 
 # from helpers.list_helpers import *
-from sequence_to_sequence.seq2seq import pairwise_cosine_similarity
+# from sequence_to_sequence.seq2seq import pairwise_cosine_similarity
 
 
 def get_decoder(config):

@@ -2,7 +2,7 @@ from keras.layers import LSTM, TimeDistributed, Dense, Embedding, RepeatVector
 from keras.models import Sequential
 from nltk import word_tokenize
 
-from GAN.caption import load_generator
+from GAN.embedding import load_generator
 from GAN.embedding import load_discriminator
 from GAN.helpers.datagen import *
 from bleu import fetch_bleu_score, fetch_bleu_score_tokenized

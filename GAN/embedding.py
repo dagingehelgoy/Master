@@ -62,7 +62,7 @@ def discriminator_model(config):
 		LSTM(
 			500,
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-			return_sequences=False, dropout_U=0.5, dropout_W=0.5),
+			return_sequences=False, dropout_U=0.75, dropout_W=0.75),
 	)
 	model.add(Dense(1, activation="sigmoid"))
 	return model
@@ -206,9 +206,8 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	prediction_string = ""
-	for i in range(len(g_weights)):
-	# for i in range(0, len(g_weights), 100):
+	# for i in range(len(g_weights)):
+	for i in range(20, 120, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
@@ -216,7 +215,7 @@ def emb_predict(config, logger):
 		generated_sentences = g_model.predict(noise_batch[:10])
 		generated_classifications = d_model.predict(generated_sentences)
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
-		prediction_string += gen_header_string
+		prediction_string = gen_header_string
 		# print gen_header_string
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
@@ -248,8 +247,8 @@ def img_caption_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
+	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	# real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)
@@ -271,23 +270,27 @@ def img_caption_predict(config, logger):
 	# pca_red = fetch_pca_vector(filename_red + ".jpg")
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
 	# image_batch = np.repeat([pca_red], config[Conf.BATCH_SIZE], axis=0)
-	image_batch = np.zeros((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	# noise_image_training_batch = generate_input_noise(config)
 	noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
 	prediction_string = ""
 	# for i in range(len(g_weights)):
-	# for i in range(0, len(g_weights), 1):
-	for i in range(0, 20, 1):
+	for i in range(0, len(g_weights), 1):
+	# for i in range(20, 50, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
+
 		generated_sentences = g_model.predict(noise_image_training_batch[:10])
-		generated_classifications = d_model.predict([generated_sentences, image_batch])
+		# generated_sentences = g_model.predict([image_batch[:10], noise_image_training_batch[:10]])
+		# generated_classifications = d_model.predict([image_batch, generated_sentences])
+
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
-		prediction_string += gen_header_string
+		prediction_string = gen_header_string
 		# print gen_header_string
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
@@ -295,7 +298,8 @@ def img_caption_predict(config, logger):
 			gen_most_sim_words_list = pairwise_cosine_similarity(embedded_generated_sentence, word_embedding_dict)
 			for word in gen_most_sim_words_list:
 				generated_sentence += word[0] + " "
-			gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
+			# gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
+			gen_sentence_string = "\n%s" % (generated_sentence)
 			prediction_string += gen_sentence_string
 			# print gen_sentence_string
 

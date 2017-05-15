@@ -1,8 +1,11 @@
 from keras.layers import LSTM, TimeDistributed, Dense, Embedding, RepeatVector
 from keras.models import Sequential
+from nltk import word_tokenize
 
+from GAN.caption import load_generator
+from GAN.embedding import load_discriminator
 from GAN.helpers.datagen import *
-from bleu import fetch_bleu_score
+from bleu import fetch_bleu_score, fetch_bleu_score_tokenized
 from helpers.enums import Conf, PreInit
 import random
 
@@ -207,15 +210,19 @@ def oh_predict(config, logger):
 	print "Compiling generator..."
 
 
-	bleu_references_file = open("data/datasets/%s" % config[Conf.LIMITED_DATASET])
-	bleu_references = [ref.strip() for ref in bleu_references_file.readlines()]
-	bleu_references_file.close()
-
+	# bleu_references_file = open("data/datasets/%s" % config[Conf.LIMITED_DATASET])
+	# bleu_references = [ref.strip() for ref in bleu_references_file.readlines()]
+	# bleu_references_file.close()
+	# tokenized_refs = []
+	# for ref in bleu_references:
+	# 	tokenized_refs.append(word_tokenize(ref))
 
 	weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
 	noise_batch = generate_input_noise(config)
-	# g_model = load_decoder(config)
-	g_model = generator_model(config)
+
+	g_model = load_generator(logger)
+	d_model = load_discriminator(logger)
+
 	g_model.compile(loss='categorical_crossentropy', optimizer="adam")
 
 	g_weights = logger.get_generator_weights()
@@ -224,14 +231,18 @@ def oh_predict(config, logger):
 	print "Num d_weights: %s" % len(g_weights)
 
 	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config, cap_data=config[Conf.DATASET_SIZE])
-	for i in range(100, len(g_weights), 1):
+	for i in range(0, len(g_weights), 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
-		generated_sentences = g_model.predict(noise_batch[:1])
+		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
+
+		generated_sentences = g_model.predict(noise_batch[:5])
+		generated_classifications = d_model.predict(generated_sentences)
 		print "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 
-		for prediction in generated_sentences:
+		for i in range(len(generated_sentences)):
+			prediction = generated_sentences[i]
 			sentence = ""
 			for softmax_word in prediction:
 				id = np.argmax(softmax_word)
@@ -241,12 +252,10 @@ def oh_predict(config, logger):
 					word = id_to_word_dict[id]
 					sentence += word + " "
 
+			print "%5.4f\t%s\n" % (generated_classifications[i][0], sentence)
+			# print "%s\tBLEU: %s\n" % (hyp, score)
 
-			score, hyp = fetch_bleu_score(bleu_references, sentence, True)
-			print sentence + "\n"
-			print "%s\tBLEU: %s\n" % (hyp, score)
-
-			print "Score on real sentence: %s" % fetch_bleu_score(bleu_references, bleu_references[random.randint(0, len(bleu_references)-10)])
+			# print "Score on real sentence: %s" % fetch_bleu_score(bleu_references, bleu_references[random.randint(0, len(bleu_references)-10)])
 
 
 def oh_get_training_batch(batch, word_to_id_dict, config):

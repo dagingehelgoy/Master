@@ -8,15 +8,26 @@ def remove_special(hyp):
 
 
 def fetch_bleu_score(refs, hyp, return_hyp=False):
-	chencherry = SmoothingFunction()
 	tokenized_refs = []
 	for ref in refs:
 		tokenized_refs.append(word_tokenize(ref))
 	clean_hyp = remove_special(hyp)
+
 	tokenized_hyp = word_tokenize(clean_hyp)
-	# bleu = nltk.translate.bleu_score.sentence_bleu(tokenized_refs, tokenized_hyp, weights=(0.1666, 0.1666, 0.1666, 0.1666, 0.1666))
+
 	bleu = nltk.translate.bleu_score.sentence_bleu(tokenized_refs, tokenized_hyp)
 	if return_hyp:
 		return bleu, clean_hyp
 	else:
 		return bleu
+
+
+def fetch_bleu_score_tokenized(refs, hyp, return_hyp=False):
+	clean_hyp = remove_special(hyp)
+	tokenized_hyp = word_tokenize(clean_hyp)
+	bleu = nltk.translate.bleu_score.sentence_bleu(refs, tokenized_hyp)
+	if return_hyp:
+		return bleu, clean_hyp
+	else:
+		return bleu
+

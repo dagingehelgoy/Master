@@ -80,7 +80,7 @@ def preprocess_sentences(config, sentences):
 		word_embedding_dict = get_word_embeddings()
 	else:
 		filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
-		                             config[Conf.VOCAB_SIZE], "flowers")
+		                             config[Conf.VOCAB_SIZE], "flickr")
 		print "Loading Word2Vec dictionary (%s)..." % filename
 		# word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
 		word_embedding_dict = load_pickle_file(filename)

@@ -62,7 +62,7 @@ def discriminator_model(config):
 		LSTM(
 			500,
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-			return_sequences=False, dropout_U=0.25, dropout_W=0.25),
+			return_sequences=False, dropout_U=0.99, dropout_W=0.99),
 	)
 	model.add(Dense(1, activation="sigmoid"))
 	return model

@@ -90,8 +90,8 @@ def train(gan_logger, config):
 
 			if config[Conf.IMAGE_CAPTION]:
 				real_image_batch = np.asarray(all_image_vectors[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]])
-				noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
-				# noise_image_training_batch = generate_input_noise(config)
+				# noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
+				noise_image_training_batch = generate_input_noise(config)
 
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:

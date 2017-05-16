@@ -186,8 +186,7 @@ def emb_predict(config, logger):
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
-	                                                              config)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)

@@ -2,7 +2,7 @@
 
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
-from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs
+from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
 from helpers.io_helper import *
 
 
@@ -26,8 +26,7 @@ def fetch_custom_embeddings():
 	# all_image_names, filename_caption_dict = create_dictionaries(size)
 	# image_names, image_data, image_captions = get_examples(all_image_names, filename_caption_dict)
 	filename_class_dict, filename_caption_dict, filename_pca_dict = create_custom_dictionaries()
-	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, filename_caption_dict,
-	                                                              filename_pca_dict)
+	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, filename_caption_dict, filename_pca_dict)
 
 	dataset = [image_names, np.asarray(image_data), image_captions]
 	print("Finished generating %s training example" % len(image_captions))
@@ -57,6 +56,12 @@ def create_custom_dictionaries():
 	filename_pca_dict = dict()
 	name_pca_tuples = fetch_all_pca_vector_pairs()
 
+	filename_58 = image_name_class_tuple_58[0][0]
+	filename_65 = image_name_class_tuple_65[0][0]
+
+	pca_58 = fetch_pca_vector(filename_58)
+	pca_65 = fetch_pca_vector(filename_65)
+
 	filenames = [x[0] for x in all_image_name_class_tuples]
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
@@ -67,9 +72,9 @@ def create_custom_dictionaries():
 	for (name, _) in name_pca_tuples:
 		if name in filenames:
 			if filename_class_dict[name] == '00058':
-				pca = np.zeros(50)
+				pca = pca_58
 			else:
-				pca = np.ones(50)
+				pca = pca_65
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:

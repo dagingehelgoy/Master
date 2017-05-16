@@ -69,12 +69,12 @@ def create_custom_dictionaries():
 				filename_caption_dict[name].append(caption)
 			else:
 				filename_caption_dict[name] = [caption]
-	for (name, _) in name_pca_tuples:
+	for (name, pca) in name_pca_tuples:
 		if name in filenames:
-			if filename_class_dict[name] == '00058':
-				pca = pca_58
-			else:
-				pca = pca_65
+			# if filename_class_dict[name] == '00058':
+			# 	pca = pca_58
+			# else:
+			# 	pca = pca_65
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:

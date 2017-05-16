@@ -42,3 +42,4 @@ class Conf(Enum):
 	IMAGE_CAPTION = 16
 	IMAGE_DIM = 17
 	LIMITED_DATASET = 18
+	W2V_SET = 19

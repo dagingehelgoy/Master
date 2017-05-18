@@ -19,7 +19,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "zeros/ones",
+	Conf.NAME_SUFFIX: "zeros/ones_500/500-0.5dropout",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 15,

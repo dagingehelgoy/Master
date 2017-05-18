@@ -276,8 +276,8 @@ def img_caption_predict(config, logger):
 	# filename_yellow = 'image_03230'
 	# pca_red = fetch_pca_vector(filename_red + ".jpg")
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
-	# image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
-	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	image_batch = np.repeat([pca_58], config[Conf.BATCH_SIZE], axis=0)
+	# image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
 	noise_image_training_batch = generate_input_noise(config)
 	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 
@@ -299,7 +299,7 @@ def img_caption_predict(config, logger):
 
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string += gen_header_string
-		# print gen_header_string
+		print gen_header_string
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
 			generated_sentence = ""
@@ -307,12 +307,12 @@ def img_caption_predict(config, logger):
 			for word in gen_most_sim_words_list:
 				generated_sentence += word[0] + " "
 			# gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
-			gen_sentence_string = "\n%s" % (generated_sentence)
+			gen_sentence_string = "\n%s" % generated_sentence
 			prediction_string += gen_sentence_string
-			# print gen_sentence_string
-		print_progress(i, len(g_weights))
+			print gen_sentence_string
+		# print_progress(i, len(g_weights))
 
-	print prediction_string
+	# print prediction_string
 	from collections import Counter
 	word_count = Counter(prediction_string.split())
 	tuples = []

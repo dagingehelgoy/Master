@@ -56,12 +56,11 @@ def create_custom_dictionaries():
 	filename_pca_dict = dict()
 	name_pca_tuples = fetch_all_pca_vector_pairs()
 
-	filename_58 = image_name_class_tuple_58[0][0]
-	filename_65 = image_name_class_tuple_65[0][0]
+	# filename_58 = image_name_class_tuple_58[0][0]
+	# filename_65 = image_name_class_tuple_65[0][0]
 
-	pca_58 = fetch_pca_vector(filename_58)
-	pca_65 = fetch_pca_vector(filename_65)
-
+	# pca_58 = fetch_pca_vector(filename_58)
+	# pca_65 = fetch_pca_vector(filename_65)
 	filenames = [x[0] for x in all_image_name_class_tuples]
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
@@ -71,15 +70,16 @@ def create_custom_dictionaries():
 				filename_caption_dict[name] = [caption]
 	for (name, pca) in name_pca_tuples:
 		if name in filenames:
-			# if filename_class_dict[name] == '00058':
-			# 	pca = pca_58
-			# else:
-			# 	pca = pca_65
+			if filename_class_dict[name] == '00058':
+				# pca = pca_58
+				pca = np.zeros(50)
+			else:
+				# pca = pca_65
+				pca = np.ones(50)
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:
 				filename_pca_dict[name] = [pca]
-
 	return filename_class_dict, filename_caption_dict, filename_pca_dict
 
 

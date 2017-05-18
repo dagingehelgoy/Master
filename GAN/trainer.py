@@ -117,8 +117,8 @@ def train(gan_logger, config):
 			# start_time_d = time.time()
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
-				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(), size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
+				# fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(), size=real_image_batch.shape)
+				# d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
 
 				d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)
@@ -138,15 +138,14 @@ def train(gan_logger, config):
 			# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))
 			if batch_counter % int(nb_batches / 1) == 0:
 				print("d_loss_train:\t\t%f d_acc_train:\t\t%f" % (d_loss_train, d_acc_train))
-				if config[Conf.IMAGE_CAPTION]:
-					print("d_loss_fake_img:\t%f d_acc_fake_img:\t%f" % (d_loss_fake_img, d_acc_fake_img))
+				# if config[Conf.IMAGE_CAPTION]:
+				# 	print("d_loss_fake_img:\t%f d_acc_fake_img:\t%f" % (d_loss_fake_img, d_acc_fake_img))
 				print("d_loss_gen:\t\t%f d_acc_gen:\t\t%f" % (d_loss_gen, d_acc_gen))
 				print("g_loss:\t\t\t%f g_acc:\t\t\t%f" % (g_loss, g_acc))
 				# gan_logger.save_loss(g_loss, d_loss_gen, epoch_cnt, batch_counter)
-				if config[Conf.IMAGE_CAPTION]:
-					gan_logger.save_loss_acc_fake(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter, d_loss_fake_img, d_acc_fake_img)
-				else:
-					gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter)
+				# if config[Conf.IMAGE_CAPTION]:
+				# 	gan_logger.save_loss_acc_fake(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter, d_loss_fake_img, d_acc_fake_img)
+				gan_logger.save_loss_acc(g_loss, g_acc, d_loss_gen, d_acc_gen, d_loss_train, d_acc_train, epoch_cnt, batch_counter)
 		# if (epoch_cnt < 1000 and epoch_cnt % 100 == 0) or (epoch_cnt < 10000 and epoch_cnt % 1000 == 0) or epoch_cnt % 5000 == 0:
 		if epoch_cnt < 10 or (epoch_cnt < 100 and epoch_cnt % 10 == 0) or epoch_cnt % 100 == 0:
 			gan_logger.save_model_weights(g_model, epoch_cnt, "generator")

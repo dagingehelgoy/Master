@@ -39,7 +39,7 @@ config = {
 
 	Conf.W2V_SET: "flowers",
 
-	Conf.NOISE_MODE: NoiseMode.REPEAT_SINGLE,
+	Conf.NOISE_MODE: NoiseMode.REPEAT,
 	# Conf.NOISE_MODE: NoiseMode.REPEAT,
 
 	Conf.MAX_LOSS_DIFF: 0,

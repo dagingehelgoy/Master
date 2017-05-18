@@ -205,8 +205,8 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	# for i in range(len(g_weights)):
-	for i in range(20, 120, 1):
+	for i in range(len(g_weights)):
+	# for i in range(20, 120, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
@@ -245,6 +245,8 @@ def img_caption_predict(config, logger):
 	print "Compiling generator..."
 	# noise = load_pickle_file("pred.pkl")
 
+	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange', 'pink', 'purple', 'red', 'white', 'yellow', 'yellow-orange', 'violet']
+
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
 	# real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
@@ -264,14 +266,21 @@ def img_caption_predict(config, logger):
 	g_weights = logger.get_generator_weights()
 	d_weights = logger.get_discriminator_weights()
 
+	filename_58 = 'image_02639'
+	filename_65 = 'image_03182'
+
+	pca_58 = fetch_pca_vector(filename_58)
+	pca_65 = fetch_pca_vector(filename_65)
+
 	# filename_red = 'image_02644'
 	# filename_yellow = 'image_03230'
 	# pca_red = fetch_pca_vector(filename_red + ".jpg")
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
-	# image_batch = np.repeat([pca_red], config[Conf.BATCH_SIZE], axis=0)
+	# image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
 	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
-	# noise_image_training_batch = generate_input_noise(config)
-	noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
+	noise_image_training_batch = generate_input_noise(config)
+	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
+
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
@@ -284,12 +293,12 @@ def img_caption_predict(config, logger):
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
 
-		generated_sentences = g_model.predict(noise_image_training_batch[:10])
-		# generated_sentences = g_model.predict([image_batch[:10], noise_image_training_batch[:10]])
+		# generated_sentences = g_model.predict(noise_image_training_batch[:10])
+		generated_sentences = g_model.predict([image_batch[:10], noise_image_training_batch[:10]])
 		# generated_classifications = d_model.predict([image_batch, generated_sentences])
 
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
-		prediction_string = gen_header_string
+		prediction_string += gen_header_string
 		# print gen_header_string
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
@@ -301,24 +310,17 @@ def img_caption_predict(config, logger):
 			gen_sentence_string = "\n%s" % (generated_sentence)
 			prediction_string += gen_sentence_string
 			# print gen_sentence_string
+		print_progress(i, len(g_weights))
 
-		# pred_header_string = "\nREAL SENTENCES: (%s)\n" % d_weight
-		# prediction_string += pred_header_string
-		# print pred_header_string
-		# real_classifications = d_model.predict(real_embedded_sentences)
-		# for j in range(len(real_classifications)):
-		# 	real_sentence = ""
-		# 	real_most_sim_words_list = pairwise_cosine_similarity(real_embedded_sentences[j], word_embedding_dict)
-		# 	for word in real_most_sim_words_list:
-		# 		real_sentence += word[0] + " "
-		# 	pred_sentence_string = "\n%5.4f\t%s" % (real_classifications[j], real_sentence)
-		# 	prediction_string += pred_sentence_string
-		# 	# print pred_sentence_string
-		print prediction_string
-		# pred_file = open("preds-yellow.txt", 'w+')
-		# pred_file.writelines(prediction_string)
-		# pred_file.close()
-
+	print prediction_string
+	from collections import Counter
+	word_count = Counter(prediction_string.split())
+	tuples = []
+	for color in colors:
+		tuples.append((color, word_count[color]))
+	tuples = sorted(tuples, key=lambda x: x[1], reverse=True)
+	for color, count in tuples:
+		print "%s:\t%s" % (color, count)
 
 
 def img_caption_predict_old(config, logger):

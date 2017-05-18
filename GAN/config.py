@@ -19,20 +19,20 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "zeros/ones_500/500-0.5dropout",
+	Conf.NAME_SUFFIX: "g100/d100",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 15,
+	Conf.MAX_SEQ_LENGTH: 12,
 
 	# Conf.LIMITED_DATASET: "flowers",
 	# Conf.LIMITED_DATASET: "00058.txt",
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	Conf.LIMITED_DATASET: "10_all_flowers.txt",
 	# Conf.LIMITED_DATASET: "Flickr8k.txt",
 	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
-	Conf.LIMITED_DATASET: None,
+	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 10000000,
@@ -53,6 +53,6 @@ config = {
 	# Conf.MODELNAME: "2017-05-16_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_all_pca",
 	Conf.MODELNAME: None,
 
-	Conf.IMAGE_CAPTION: True,
+	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50
 }

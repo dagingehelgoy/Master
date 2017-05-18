@@ -34,7 +34,7 @@ def generator_model(config):
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
 	model.add(LSTM(
-		100,
+		300,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
 		return_sequences=True)
 	)
@@ -47,7 +47,7 @@ def discriminator_model(config):
 
 	model.add(
 		LSTM(
-			100,
+			300,
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 			return_sequences=False, dropout_U=0.5, dropout_W=0.5),
 	)

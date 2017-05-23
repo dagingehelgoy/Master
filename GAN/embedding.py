@@ -210,7 +210,7 @@ def emb_predict(config, logger):
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
-		embedded_generated_sentences = g_model.predict(noise_batch[:8])
+		embedded_generated_sentences = g_model.predict(noise_batch[:30])
 		generated_classifications = d_model.predict(embedded_generated_sentences)
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string = gen_header_string

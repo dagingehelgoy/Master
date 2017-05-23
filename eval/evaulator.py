@@ -182,7 +182,7 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	                             config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 	cpu_count = multiprocessing.cpu_count()
-	# print "CPUs:", cpu_count
+	print "CPUs:", cpu_count
 	pool = ThreadPool(cpu_count)
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array)
@@ -201,7 +201,7 @@ def background_wmd(tuple):
 	result = [x[0] for x in score_tuples[:5]]
 	return result
 
-
+import time
 def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_embedding_dict=None):
 	# print "Evaluating %s generated sentences." % len(sentences)
 	if dataset_string_list_sentences is None or word_embedding_dict is None:
@@ -213,9 +213,9 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	                                                       word_embedding_dict)
 
 	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
-
+	start = time.time()
 	best_sentence_lists_wmd = background_wmd_retrieval(sentences, dataset_string_list_sentences)
-
+	print "Time used: %s" % (time.time() - start)
 	bleu_score_tot_cosine = 0
 	for i in range(len(sentences)):
 		bleu_score_tot_cosine += fetch_bleu_score(best_sentence_lists_cosine[i], sentences[i])

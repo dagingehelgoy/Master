@@ -4,9 +4,10 @@ from GAN.helpers.enums import *
 from GAN.helpers.logger import GANLogger
 from GAN.onehot import oh_predict
 from GAN.trainer import train
+from eval.eval_plotter import plotter
 
 
-def gan_main(inference, eval):
+def gan_main(inference, eval, plot):
 	logger = GANLogger(config, inference)
 	logger.print_start_message()
 	if inference:
@@ -28,6 +29,8 @@ def gan_main(inference, eval):
 				raise NotImplementedError
 			else:
 				emb_evaluate(config, logger)
+	elif plot:
+		plotter(logger)
 	else:
 		print "training"
 		train(logger, config)

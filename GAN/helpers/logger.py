@@ -137,3 +137,12 @@ class GANLogger:
 		eval_file.write("%s,%s,%s,%s,%s,%s,%s\n" % (
 		epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd))
 		eval_file.close()
+
+	def get_eval_lines(self):
+		eval_file = open("GAN/GAN_log/%s/eval.txt" % self.name_prefix, "r")
+		lines = eval_file.readlines()
+		eval_file.close()
+		return lines
+
+	def get_eval_file_path(self):
+		return "GAN/GAN_log/%s/eval.txt" % self.name_prefix

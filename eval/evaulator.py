@@ -183,6 +183,8 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	word_embedding_dict = load_pickle_file(filename)
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
+	if cpu_count > 16:
+		cpu_count = 15
 	pool = ThreadPool(cpu_count)
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array)

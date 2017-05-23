@@ -93,7 +93,7 @@ def cosine_distance_retrieval(pred_strings, dataset_string_list_sentences, word_
 	best_sentence_lists = []
 	for pred_single_vector_sentence in pred_single_vector_sentences:
 		best_sentence_list = find_n_most_similar_vectors(pred_single_vector_sentence, dataset_single_vector_sentences,
-		                                                 dataset_string_list_sentences)
+														 dataset_string_list_sentences)
 		best_sentence_lists.append([" ".join(x) for x in best_sentence_list])
 	return best_sentence_lists
 
@@ -128,7 +128,7 @@ Word bower distance
 def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 	model_vocab = word_embedding_dict.keys()
 	vocabulary = [w for w in set(d1.lower().split() + d2.lower().split()) if
-	              w in model_vocab and w not in stop_words.ENGLISH_STOP_WORDS]
+				  w in model_vocab and w not in stop_words.ENGLISH_STOP_WORDS]
 	if len(vocabulary) < min_vocab:
 		return 1
 	vect = CountVectorizer(vocabulary=vocabulary).fit([d1, d2])
@@ -153,7 +153,7 @@ def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 
 def wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
-	                             config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
+								 config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 
 	best_sentence_lists = []
@@ -179,15 +179,17 @@ import multiprocessing
 
 def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
-	                             config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
+								 config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
-	if cpu_count > 16:
-		cpu_count = 15
+	if cpu_count > 8:
+		cpu_count = 10
 	pool = ThreadPool(cpu_count)
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array)
+	pool.close()
+	pool.join()
 
 	return best_sentence_lists
 
@@ -212,7 +214,7 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 		dataset_string_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
 	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences,
-	                                                       word_embedding_dict)
+														   word_embedding_dict)
 
 	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
 	start = time.time()
@@ -246,13 +248,13 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 
 def main():
 	pred_strings = ["<sos> the flower har large green petals and black stamen <eos> <pad>",
-	                "<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
-	                "<sos> the are petals the the flower petals <eos> many with petals",
-	                "<sos> the are petals the the flower petals <eos> many with petals",
-	                "<sos> the are petals the the flower petals <eos> many with petals",
-	                "<sos> the are petals the the flower petals <eos> many with petals",
-	                "<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
-	                "<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"]
+					"<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
+					"<sos> the are petals the the flower petals <eos> many with petals",
+					"<sos> the are petals the the flower petals <eos> many with petals",
+					"<sos> the are petals the the flower petals <eos> many with petals",
+					"<sos> the are petals the the flower petals <eos> many with petals",
+					"<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
+					"<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"]
 
 	calculate_bleu_score(pred_strings)
 

@@ -18,7 +18,7 @@ def gan_main(inference, eval):
 				img_caption_predict(config, logger)
 			else:
 				emb_predict(config, logger)
-	if eval:
+	elif eval:
 		print "Evaluating"
 		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 			raise NotImplementedError

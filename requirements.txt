@@ -23,3 +23,5 @@ matplotlib==2.0.0
 python-dateutil==2.6.0
 pytz==2017.2
 subprocess32==3.2.7
+pyemd==0.4.3
+gensim=0.12.1

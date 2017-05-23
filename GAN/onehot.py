@@ -63,6 +63,7 @@ def generator_model(config):
 		return_sequences=True))
 
 	model.add(TimeDistributed(Dense(config[Conf.VOCAB_SIZE], activation="softmax")))
+
 	return model
 
 

@@ -18,8 +18,8 @@ config = {
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "g200/d500",
+	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: "g200/d500",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 12,
@@ -38,9 +38,10 @@ config = {
 	Conf.EPOCHS: 10000000,
 
 	Conf.W2V_SET: "flowers",
+	# Conf.W2V_SET: "flickr",
 
+	# Conf.NOISE_MODE: NoiseMode.REPEAT_SINGLE,
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
-	# Conf.NOISE_MODE: NoiseMode.REPEAT,
 
 	Conf.MAX_LOSS_DIFF: 0,
 
@@ -50,8 +51,8 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-05-16_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_all_pca",
-	Conf.MODELNAME: None,
+	Conf.MODELNAME: "2017-05-10_ImgCapFalse_WordEmbedding.WORD2VEC_Vocab1000_Seq12_Batch64_EmbSize50_NoiseMode.REPEAT_Noise50_PreInitPreInit.NONE_Dataset_10_all_flowers",
+	# Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50

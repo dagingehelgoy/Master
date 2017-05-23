@@ -11,13 +11,13 @@ def fetch_bleu_score(refs, hyp, return_hyp=False):
 	tokenized_refs = []
 	for ref in refs:
 		tokenized_refs.append(word_tokenize(ref))
-	clean_hyp = remove_special(hyp)
+	# clean_hyp = remove_special(hyp)
 
-	tokenized_hyp = word_tokenize(clean_hyp)
+	tokenized_hyp = word_tokenize(hyp)
 
 	bleu = nltk.translate.bleu_score.sentence_bleu(tokenized_refs, tokenized_hyp)
 	if return_hyp:
-		return bleu, clean_hyp
+		return bleu, hyp
 	else:
 		return bleu
 

@@ -50,20 +50,20 @@ def find_n_most_similar_images(vector, word_list, vector_list, n=5):
 	return best_word_list, best_vector_list
 
 
-def pairwise_cosine_similarity(predicted_word_vectors, glove_dictionary):
-	glove_vectors = glove_dictionary.values()
-	glove_words = glove_dictionary.keys()
+def pairwise_cosine_similarity(predicted_word_vectors, embedding_dictionary):
+	word_vectors = embedding_dictionary.values()
+	word_strings = embedding_dictionary.keys()
 
-	cos_dis_matrix = cosine_similarity(predicted_word_vectors, glove_vectors)
+	cos_dis_matrix = cosine_similarity(predicted_word_vectors, word_vectors)
 
 	predicted_word_vector_count = len(predicted_word_vectors)
 
-	all_word_vectors_count = len(glove_vectors)
+	all_word_vectors_count = len(word_vectors)
 	most_similar_words_list = []
 	for predicted_image_index in range(predicted_word_vector_count):
 		similarities = []
 		for glove_vector_index in range(all_word_vectors_count):
-			glove_word = glove_words[glove_vector_index]
+			glove_word = word_strings[glove_vector_index]
 			cos_sim = cos_dis_matrix[predicted_image_index][glove_vector_index]
 			similarities.append((glove_word, cos_sim))
 		similarities.sort(key=lambda s: s[1], reverse=True)

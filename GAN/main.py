@@ -4,7 +4,6 @@ from GAN.helpers.enums import *
 from GAN.helpers.logger import GANLogger
 from GAN.onehot import oh_predict
 from GAN.trainer import train
-from eval.eval_plotter import plotter
 
 
 def gan_main(inference, eval, plot):
@@ -37,6 +36,7 @@ def gan_main(inference, eval, plot):
 					config[Conf.MODELNAME] = model
 					emb_evaluate(config, logger)
 	elif plot:
+		from eval.eval_plotter import plotter
 		plotter(logger)
 	else:
 		print "training"

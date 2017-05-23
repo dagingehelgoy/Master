@@ -241,6 +241,7 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	# print "Avarage BLEU score:", avg_bleu_score
 	print "AVG BLEU: %5.4f\t %5.4f,%5.4f,%5.4f (cosine,tfidf,wmd)" % (
 	avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd)
+	return avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd
 
 
 def main():

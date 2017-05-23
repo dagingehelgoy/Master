@@ -6,7 +6,7 @@ from GAN.onehot import oh_predict
 from GAN.trainer import train
 
 
-def gan_main(inference):
+def gan_main(inference, eval):
 	logger = GANLogger(config, inference)
 	logger.print_start_message()
 	if inference:
@@ -18,6 +18,16 @@ def gan_main(inference):
 				img_caption_predict(config, logger)
 			else:
 				emb_predict(config, logger)
+	if eval:
+		print "Evaluating"
+		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
+			raise NotImplementedError
+			# oh_predict(config, logger)
+		else:
+			if config[Conf.IMAGE_CAPTION]:
+				raise NotImplementedError
+			else:
+				emb_evaluate(config, logger)
 	else:
 		print "training"
 		train(logger, config)

@@ -10,6 +10,7 @@ def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--code", type=str)
 	parser.add_argument("--inference", action='store_true')
+	parser.add_argument("--eval", action='store_true')
 	parser.add_argument("--encode_data", action='store_true')
 	parser.add_argument("--decode_random", action='store_true')
 	parser.add_argument("--env", type=str)
@@ -30,7 +31,7 @@ def main():
 		seq2seq(args.inference, args.encode_data)
 	elif args.code == "gan":
 		from GAN.main import gan_main
-		gan_main(args.inference)
+		gan_main(args.inference, args.eval)
 	elif args.code == "compare_distributions":
 		from word2vec.distribution_comparison import compare_distributions
 		compare_distributions()

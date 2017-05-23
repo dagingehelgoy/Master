@@ -51,7 +51,7 @@ class GANLogger:
 			os.makedirs(directory)
 
 	def create_model_files(self):
-		text_filenames = ["comments", "loss", "model_summary"]
+		text_filenames = ["comments", "loss", "model_summary", "eval"]
 		for filename in text_filenames:
 			f = open("GAN/GAN_log/%s/%s.txt" % (self.name_prefix, filename), 'a+')
 			if filename == "loss":
@@ -130,3 +130,10 @@ class GANLogger:
 		print "\n"
 		sys.stdout = orig_stdout
 		summary_file.close()
+
+	def save_eval_data(self, epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf,
+	                   avg_bleu_wmd):
+		eval_file = open("GAN/GAN_log/%s/eval.txt" % self.name_prefix, "a+")
+		eval_file.write("%s,%s,%s,%s,%s,%s,%s\n" % (
+		epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd))
+		eval_file.close()

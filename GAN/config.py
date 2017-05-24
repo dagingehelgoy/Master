@@ -51,7 +51,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-10_ImgCapFalse_WordEmbedding.WORD2VEC_Vocab1000_Seq12_Batch64_EmbSize50_NoiseMode.REPEAT_Noise50_PreInitPreInit.NONE_Dataset_10_all_flowers",
+	Conf.MODELNAME: "2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
 	# Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,

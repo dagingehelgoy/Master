@@ -13,8 +13,8 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 """
 
 config = {
-	Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
-	# Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
+	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
+	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
@@ -51,7 +51,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
+	Conf.MODELNAME: "2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
 	# Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,

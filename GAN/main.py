@@ -37,17 +37,17 @@ def gan_main(inference, eval, plot):
 			if config[Conf.IMAGE_CAPTION]:
 				raise NotImplementedError
 			else:
-				models_to_eval = [
-					"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers",
-					"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
-					"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout-softmax",
-					"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_softmax",
-				]
-				for model in models_to_eval:
-					config[Conf.MODELNAME] = model
-					logger = GANLogger(config, inference)
-					logger.print_start_message()
-					emb_evaluate(config, logger)
+				# models_to_eval = [
+				# 	"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers",
+				# 	"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
+				# 	"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout-softmax",
+				# 	"2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_softmax",
+				# ]
+				# for model in models_to_eval:
+				# 	config[Conf.MODELNAME] = model
+				# 	logger = GANLogger(config, inference)
+				# 	logger.print_start_message()
+				emb_evaluate(config, logger)
 	elif plot:
 		from eval.eval_plotter import plotter
 		plotter(logger)

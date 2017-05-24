@@ -4,6 +4,7 @@ from keras.models import Sequential
 from GAN.embedding import load_discriminator
 from GAN.embedding import load_generator
 from GAN.helpers.datagen import *
+from eval.evaulator import calculate_bleu_score
 from helpers.enums import Conf, PreInit
 
 
@@ -208,15 +209,6 @@ def oh_create_discriminator(config):
 def oh_predict(config, logger):
 	print "Compiling generator..."
 
-
-	# bleu_references_file = open("data/datasets/%s" % config[Conf.LIMITED_DATASET])
-	# bleu_references = [ref.strip() for ref in bleu_references_file.readlines()]
-	# bleu_references_file.close()
-	# tokenized_refs = []
-	# for ref in bleu_references:
-	# 	tokenized_refs.append(word_tokenize(ref))
-
-	weights_folder = 'log/%s/model_files/stored_weights/' % logger.name_prefix
 	noise_batch = generate_input_noise(config)
 
 	g_model = load_generator(logger)
@@ -255,6 +247,61 @@ def oh_predict(config, logger):
 			# print "%s\tBLEU: %s\n" % (hyp, score)
 
 			# print "Score on real sentence: %s" % fetch_bleu_score(bleu_references, bleu_references[random.randint(0, len(bleu_references)-10)])
+
+
+def oh_evaluate(config, logger):
+	print "Compiling generator..."
+
+	noise_batch = generate_input_noise(config)
+
+	if not config[Conf.LIMITED_DATASET].endswith("_uniq.txt"):
+		config[Conf.LIMITED_DATASET] = config[Conf.LIMITED_DATASET].split(".txt")[0] + "_uniq.txt"
+
+	index_captions, id_to_word_dict, word_to_id_dict = generate_index_sentences(config,
+	                                                                            cap_data=config[Conf.DATASET_SIZE])
+	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
+
+	g_model = load_generator(logger)
+
+	g_model.compile(loss='categorical_crossentropy', optimizer="adam")
+	sentence_count = 10
+	g_weights = logger.get_generator_weights()
+	print "Num g_weights: %s" % len(g_weights)
+	print "Num d_weights: %s" % len(g_weights)
+
+	for i in range(0, len(g_weights), 1):
+		g_weight = g_weights[i]
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
+
+		generated_sentences = g_model.predict(noise_batch[:sentence_count])
+		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
+
+		generated_sentences_list = []
+
+		for i in range(len(generated_sentences)):
+			prediction = generated_sentences[i]
+			generated_sentence = ""
+			for softmax_word in prediction:
+				id = np.argmax(softmax_word)
+				if id == 0:
+					generated_sentence += "UNK" + " "
+				else:
+					word = id_to_word_dict[id]
+					generated_sentence += word + " "
+
+			generated_sentences_list.append(generated_sentence)
+
+		print gen_header_string
+		for sentence in sorted(generated_sentences_list):
+			print sentence
+		distinct_sentences = len(set(generated_sentences_list))
+		avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd = calculate_bleu_score(generated_sentences_list,
+		                                                                                     eval_dataset_string_list_sentences,
+		                                                                                     eval_word_embedding_dict)
+		print "Number of distict sentences: %s" % distinct_sentences
+		epoch = g_weight.split("-")[1]
+		logger.save_eval_data(epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine,
+		                      avg_bleu_tfidf, avg_bleu_wmd)
 
 
 def oh_get_training_batch(batch, word_to_id_dict, config):

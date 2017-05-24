@@ -13,8 +13,8 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 """
 
 config = {
-	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
-	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
+	Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
+	# Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 

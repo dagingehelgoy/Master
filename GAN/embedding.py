@@ -67,6 +67,7 @@ def discriminator_model(config):
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
 			# consume_less='gpu'),
+			)
 	)
 	model.add(Dense(1, activation="sigmoid"))
 	return model

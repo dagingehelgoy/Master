@@ -333,8 +333,8 @@ def img_caption_predict(config, logger):
 	# filename_yellow = 'image_03230'
 	# pca_red = fetch_pca_vector(filename_red + ".jpg")
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
-	image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
-	# image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	# image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
+	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
 	noise_image_training_batch = generate_input_noise(config)
 	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 

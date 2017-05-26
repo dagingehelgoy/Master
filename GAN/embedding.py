@@ -37,7 +37,7 @@ def generator_model(config):
 		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
 		return_sequences=True,
-		consume_less='gpu'
+		# consume_less='gpu'
 	)
 	)
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
@@ -66,7 +66,7 @@ def discriminator_model(config):
 			500,
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
-			consume_less='gpu'),
+			# consume_less='gpu'),
 	)
 	model.add(Dense(1, activation="sigmoid"))
 	return model

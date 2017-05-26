@@ -240,7 +240,6 @@ def emb_predict(config, logger):
 
 def emb_evaluate(config, logger):
 	print "Compiling generator..."
-	noise_batch = generate_input_noise(config)
 
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
@@ -250,12 +249,22 @@ def emb_evaluate(config, logger):
 
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
-	sentence_count = 10
-	print "Num g_weights: %s" % len(g_weights)
-	print "Num d_weights: %s" % len(g_weights)
+	sentence_count = 100
+	num_weights_to_eval = 0
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
+		epoch_string = int(g_weight.split("-")[1])
+		if epoch_string % 500 == 0:
+			num_weights_to_eval += 1
+
+	print "Number of weights to evaluate: %s/%s" % (num_weights_to_eval, len(g_weights))
+	for i in range(len(g_weights)):
+		g_weight = g_weights[i]
+		epoch_string = int(g_weight.split("-")[1])
+		if not epoch_string % 500 == 0:
+			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
+		noise_batch = generate_input_noise(config)
 		embedded_generated_sentences = g_model.predict(noise_batch[:sentence_count])
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string = gen_header_string

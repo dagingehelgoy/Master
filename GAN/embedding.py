@@ -294,7 +294,7 @@ def img_caption_predict(config, logger):
 	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange',
 	          'pink', 'purple', 'red', 'white', 'yellow', 'yellow-orange', 'violet']
 
-	filenames, all_image_vectors, captions = fetch_custom_embeddings()
+	filenames, all_image_vectors, captions = fetch_custom_embeddings(config)
 	all_raw_caption_data, word_embedding_dict = preprocess_sentences(config, captions)
 	batch_counter = 1
 	raw_caption_training_batch = all_raw_caption_data[

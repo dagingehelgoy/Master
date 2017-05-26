@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "fakeimage-imgdim1-g100_g100-dropout0.25-zero_one",
+	Conf.NAME_SUFFIX: "fakeimage-imgdim1-g500_g100-dropout0.25-zero_one",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 15,

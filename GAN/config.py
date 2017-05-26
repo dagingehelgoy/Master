@@ -12,14 +12,15 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 		- Teste Embedding Size
 """
 
+
 config = {
 	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
 	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	Conf.NAME_SUFFIX: None,
-	# Conf.NAME_SUFFIX: "g200/d500",
+	# Conf.NAME_SUFFIX: None,
+	Conf.NAME_SUFFIX: "g500-d500_0.25Dropout",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 12,
@@ -29,16 +30,16 @@ config = {
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
 	# Conf.LIMITED_DATASET: "Flickr8k.txt",
-	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
+	Conf.LIMITED_DATASET: "10_Flickr30k.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 64,
+	Conf.BATCH_SIZE: 128,
 	Conf.EPOCHS: 10000000,
 
-	Conf.W2V_SET: "flowers",
-	# Conf.W2V_SET: "flickr",
+	# Conf.W2V_SET: "flowers",
+	Conf.W2V_SET: "flickr",
 
 	# Conf.NOISE_MODE: NoiseMode.REPEAT_SINGLE,
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
@@ -51,8 +52,8 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
-	# Conf.MODELNAME: None,
+	# Conf.MODELNAME: "2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
+	Conf.MODELNAME: None,
 
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50

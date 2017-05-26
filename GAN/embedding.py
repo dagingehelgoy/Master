@@ -34,9 +34,11 @@ def generator_model(config):
 		noise_size = config[Conf.NOISE_SIZE]
 	model = Sequential()
 	model.add(LSTM(
-		200,
+		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], noise_size),
-		return_sequences=True)
+		return_sequences=True,
+		consume_less='gpu'
+	)
 	)
 	model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
 	return model
@@ -63,7 +65,8 @@ def discriminator_model(config):
 		LSTM(
 			500,
 			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-			return_sequences=False, dropout_U=0.5, dropout_W=0.5),
+			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
+			consume_less='gpu'),
 	)
 	model.add(Dense(1, activation="sigmoid"))
 	return model
@@ -174,11 +177,13 @@ def load_discriminator(logger):
 
 def emb_predict(config, logger):
 	print "Compiling generator..."
+	config[Conf.BATCH_SIZE] = 300
+
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
-
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)
@@ -198,23 +203,25 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	for i in range(len(g_weights)):
-		# for i in range(20, 120, 1):
+	# for i in range(len(g_weights)):
+	for i in range(138, 139, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
-		generated_sentences = g_model.predict(noise_batch[:10])
+		generated_sentences = g_model.predict(noise_batch)
 		generated_classifications = d_model.predict(generated_sentences)
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string = gen_header_string
 		# print gen_header_string
+		sentence_list = []
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
 			generated_sentence = ""
 			gen_most_sim_words_list = pairwise_cosine_similarity(embedded_generated_sentence, word_embedding_dict)
 			for word in gen_most_sim_words_list:
 				generated_sentence += word[0] + " "
+			sentence_list.append(generated_sentence)
 			gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
 			prediction_string += gen_sentence_string
 		# print gen_sentence_string
@@ -232,6 +239,8 @@ def emb_predict(config, logger):
 			prediction_string += pred_sentence_string
 		# print pred_sentence_string
 		print prediction_string
+		for s in sorted(sentence_list):
+			print s
 
 
 def emb_evaluate(config, logger):
@@ -311,6 +320,9 @@ def img_caption_predict(config, logger):
 	# 		generated_sentence += word[0] + " "
 	# 	print generated_sentence + "\n"
 
+	# from keras_diagram import ascii
+	# print (ascii(g_model))
+	# print (ascii(d_model))
 	g_weights = logger.get_generator_weights()
 	d_weights = logger.get_discriminator_weights()
 
@@ -324,8 +336,8 @@ def img_caption_predict(config, logger):
 	# filename_yellow = 'image_03230'
 	# pca_red = fetch_pca_vector(filename_red + ".jpg")
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
-	# image_batch = np.repeat([pca_58], config[Conf.BATCH_SIZE], axis=0)
-	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
+	# image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
 	noise_image_training_batch = generate_input_noise(config)
 	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 

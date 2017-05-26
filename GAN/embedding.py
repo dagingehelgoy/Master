@@ -240,7 +240,6 @@ def emb_predict(config, logger):
 
 def emb_evaluate(config, logger):
 	print "Compiling generator..."
-
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
 	if not config[Conf.LIMITED_DATASET].endswith("_uniq.txt"):
@@ -250,6 +249,7 @@ def emb_evaluate(config, logger):
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
 	sentence_count = 100
+	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
@@ -265,7 +265,7 @@ def emb_evaluate(config, logger):
 			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		noise_batch = generate_input_noise(config)
-		embedded_generated_sentences = g_model.predict(noise_batch[:sentence_count])
+		embedded_generated_sentences = g_model.predict(noise_batch)
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string = gen_header_string
 

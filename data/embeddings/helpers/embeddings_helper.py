@@ -1,5 +1,5 @@
 # encoding=utf8
-
+from GAN.helpers.enums import Conf
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
@@ -21,11 +21,11 @@ def fetch_embeddings(size=-1):
 		return dataset
 
 
-def fetch_custom_embeddings():
+def fetch_custom_embeddings(config):
 	print("Generating compatible dataset...")
 	# all_image_names, filename_caption_dict = create_dictionaries(size)
 	# image_names, image_data, image_captions = get_examples(all_image_names, filename_caption_dict)
-	filename_class_dict, filename_caption_dict, filename_pca_dict = create_custom_dictionaries()
+	filename_class_dict, filename_caption_dict, filename_pca_dict = create_custom_dictionaries(config)
 	image_names, image_data, image_captions = get_custom_examples(filename_class_dict, filename_caption_dict, filename_pca_dict)
 
 	dataset = [image_names, np.asarray(image_data), image_captions]
@@ -35,7 +35,7 @@ def fetch_custom_embeddings():
 	return dataset
 
 
-def create_custom_dictionaries():
+def create_custom_dictionaries(config):
 	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
 	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
 	if len(image_name_class_tuple_58) > len(image_name_class_tuple_65):
@@ -72,10 +72,10 @@ def create_custom_dictionaries():
 		if name in filenames:
 			if filename_class_dict[name] == '00058':
 				# pca = pca_58
-				pca = np.zeros(50)
+				pca = np.zeros(config[Conf.IMAGE_DIM])
 			else:
 				# pca = pca_65
-				pca = np.ones(50)
+				pca = np.ones(config[Conf.IMAGE_DIM])
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:

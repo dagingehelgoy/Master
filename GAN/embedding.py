@@ -44,6 +44,21 @@ def generator_model(config):
 	return model
 
 
+def discriminator_model(config):
+	model = Sequential()
+
+	model.add(
+		LSTM(
+			500,
+			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
+			consume_less='gpu',
+		)
+	)
+	model.add(Dense(1, activation="sigmoid"))
+	return model
+
+
 def emb_create_generator(config):
 	if config[Conf.PREINIT] == PreInit.DECODER:
 		print "Setting initial generator weights..."
@@ -58,29 +73,11 @@ def emb_create_generator(config):
 	return g_model
 
 
-def discriminator_model(config):
-	model = Sequential()
-
-	model.add(
-		LSTM(
-			500,
-			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
-			consume_less='gpu',
-			)
-	)
-	model.add(Dense(1, activation="sigmoid"))
-	return model
-
-
 def emb_create_discriminator(config):
 	d_model = discriminator_model(config)
 	d_model.trainable = True
 	d_model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
 	return d_model
-
-
-
 
 
 def emb_create_image_gan(config):
@@ -120,7 +117,6 @@ def emb_create_image_gan(config):
 
 
 def emb_create_image_gan_train_image(config):
-
 	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_model_image_input")
 
 	# Generator
@@ -129,14 +125,14 @@ def emb_create_image_gan_train_image(config):
 
 	g_merge = merge([gan_image_input, g_lstm_noise_input], mode='concat')
 	g_lstm_input = RepeatVector(config[Conf.MAX_SEQ_LENGTH])(g_merge)
-	g_tensor = LSTM(500, return_sequences=True)(g_lstm_input)
+	g_tensor = LSTM(100, return_sequences=True, consume_less='gpu')(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
 
 	# Discriminator
 
 	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
-	d_lstm_out = LSTM(500, dropout_W=0.5, dropout_U=0.5)(d_lstm_input)
+	d_lstm_out = LSTM(100, dropout_W=0.25, dropout_U=0.25, consume_less='gpu')(d_lstm_input)
 
 	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
 	d_tensor = merge([gan_image_input, d_lstm_out], mode='concat')
@@ -149,7 +145,7 @@ def emb_create_image_gan_train_image(config):
 	gan_model = Model(input=[gan_image_input, g_lstm_noise_input], output=gan_tensor)
 
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
-	d_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
 	# from keras.utils.visualize_util import plot
@@ -157,9 +153,6 @@ def emb_create_image_gan_train_image(config):
 	# plot(d_model, to_file="d_model.png", show_shapes=True)
 	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
 	return g_model, d_model, gan_model
-
-
-
 
 
 def load_generator(logger):
@@ -185,7 +178,8 @@ def emb_predict(config, logger):
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
 	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
+	                                                              config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)
@@ -289,14 +283,16 @@ def emb_evaluate(config, logger):
 		                                                                                     eval_word_embedding_dict)
 		print "Number of distict sentences: %s" % distinct_sentences
 		epoch = g_weight.split("-")[1]
-		logger.save_eval_data(epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd)
+		logger.save_eval_data(epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine,
+		                      avg_bleu_tfidf, avg_bleu_wmd)
 
 
 def img_caption_predict(config, logger):
 	print "Compiling generator..."
 	# noise = load_pickle_file("pred.pkl")
 
-	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange', 'pink', 'purple', 'red', 'white', 'yellow', 'yellow-orange', 'violet']
+	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange',
+	          'pink', 'purple', 'red', 'white', 'yellow', 'yellow-orange', 'violet']
 
 	filenames, all_image_vectors, captions = fetch_custom_embeddings()
 	all_raw_caption_data, word_embedding_dict = preprocess_sentences(config, captions)
@@ -348,7 +344,7 @@ def img_caption_predict(config, logger):
 	prediction_string = ""
 	# for i in range(len(g_weights)):
 	for i in range(0, len(g_weights), 1):
-	# for i in range(20, 50, 1):
+		# for i in range(20, 50, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))

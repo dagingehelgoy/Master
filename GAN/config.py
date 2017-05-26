@@ -35,7 +35,7 @@ config = {
 	Conf.LIMITED_DATASET: "10_Flickr30k.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 128,
+	Conf.BATCH_SIZE: 256,
 	Conf.EPOCHS: 10000000,
 
 	# Conf.W2V_SET: "flowers",

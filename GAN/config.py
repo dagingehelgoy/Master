@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "fakeimage-imgdim10-g100_g100-dropout0.25-zero_one",
+	Conf.NAME_SUFFIX: "fakeimage-imgdim1-g100_g100-dropout0.25-zero_one",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 15,
@@ -35,7 +35,7 @@ config = {
 	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
 	Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 32,
+	Conf.BATCH_SIZE: 64,
 	Conf.EPOCHS: 10000000,
 
 	Conf.W2V_SET: "flowers",
@@ -49,11 +49,11 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g500-d200",
+	# Conf.MODELNAME: "2017-05-18_ImgCapTrue_word2vec_Vocab1000_Seq15_Batch64_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_zeros-ones",
 	Conf.MODELNAME: None,
-
+	#
 	Conf.IMAGE_CAPTION: True,
-	Conf.IMAGE_DIM: 10,
+	Conf.IMAGE_DIM: 1,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT_SINGLE if Conf.IMAGE_DIM else NoiseMode.REPEAT
 }

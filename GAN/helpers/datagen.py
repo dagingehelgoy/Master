@@ -163,7 +163,7 @@ def generate_input_noise(config):
 
 def get_word_embeddings():
 	embeddings_index = {}
-	f = open('data/datasets/glove.6B.300d.txt')
+	f = open('data/datasets/glove.6B.50d.txt')
 	count = 0
 	for line in f:
 		values = line.split()

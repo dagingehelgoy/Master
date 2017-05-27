@@ -137,12 +137,25 @@ def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 	D_ = euclidean_distances(W_)
 	D_ = D_.astype(np.double)
 	D_ /= D_.max()  # just for comparison purposes
-	v_1, v_2 = vect.transform([d1, d2])
-	v_1 = v_1.toarray().ravel()
-	v_2 = v_2.toarray().ravel()
+
+	d1 = d1.split(" ")
+	d2 = d2.split(" ")
+	v_1 = [0.0 for _ in range(len(feature_names))]
+	v_2 = [0.0 for _ in range(len(feature_names))]
+	for i in range(len(feature_names)):
+		voc = feature_names[i]
+		v_1[i] += d1.count(voc)
+		v_2[i] += d2.count(voc)
+
+
+	# v_1, v_2 = vect.transform([d1, d2])
+	# v_1 = v_1.toarray().ravel()
+	# v_2 = v_2.toarray().ravel()
 	# pyemd needs double precision input
-	v_1 = v_1.astype(np.double)
-	v_2 = v_2.astype(np.double)
+	# v_1 = v_1.astype(np.double)
+	# v_2 = v_2.astype(np.double)
+	v_1 = np.asarray(v_1)
+	v_2 = np.asarray(v_2)
 	v_1 /= v_1.sum()
 	v_2 /= v_2.sum()
 	if verbose:
@@ -151,7 +164,7 @@ def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 	return emd(v_1, v_2, D_)
 
 
-def wmd_retrieval(pred_strings, dataset_string_list_sentences):
+def wmd_retrieval(pred_strindgs, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
 								 config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
@@ -214,9 +227,10 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 		dataset_string_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
 	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences,
-														   word_embedding_dict)
+	                                                       word_embedding_dict)
 
 	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
+
 	start = time.time()
 	best_sentence_lists_wmd = background_wmd_retrieval(sentences, dataset_string_list_sentences)
 	print "Time used: %s" % (time.time() - start)
@@ -246,18 +260,52 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	return avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd
 
 
-def main():
-	pred_strings = ["<sos> the flower har large green petals and black stamen <eos> <pad>",
+def eval_main():
+	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
+	sentences = ["<sos> the flower har large green petals and black stamen <eos> <pad>",
 					"<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
-					"<sos> the are petals the the flower petals <eos> many with petals",
-					"<sos> the are petals the the flower petals <eos> many with petals",
-					"<sos> the are petals the the flower petals <eos> many with petals",
-					"<sos> the are petals the the flower petals <eos> many with petals",
 					"<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
 					"<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"]
 
-	calculate_bleu_score(pred_strings)
+	sentences = [
+		# "<sos> the flower har large green petals and black stamen <eos> <pad>",
+		# "<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
+		# "<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
+		# "<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"
+		# "this flower has petals that are yellow with white edges"
+		# "<sos> this flower has petals that are blue with blue stamen <eos>"
+		# "<sos> this flower has blue petals with with with green stamen <eos>"
+		# "<sos> 2 villagers carry a baskets of goods while another follows <eos>"
+		# "<sos> a young girl on the beach running toward the water <eos>"
+		# "<sos> Two boys in blue shirts wearing backpacks <eos> <pad> <pad> <pad>"
+		# "<sos> Two soccer players swim on the soccer field <eos> <pad> <pad>"
+		"<sos> An old jeep partially submerged in water <eos> <pad> <pad> <pad>"
+		# "<sos> a man is climbing up a wall <eos> <pad> <pad> <pad>"
+		# "<sos> five sided white flower flower <eos> <pad> <pad> <pad> <pad> <pad>"
+	]
+
+	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+
+	best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
+
+	best_sentence_lists_wmd = background_wmd_retrieval(sentences, eval_dataset_string_list_sentences)
+
+	print
+	print "Sentence:"
+	print sentences[0]
+	print
+	print "COS"
+	for cos in best_sentence_lists_cosine[0][:5]:
+		print cos
+	print
+	print "TFIDF"
+	for tf in best_sentence_lists_tfidf[0][:5]:
+		print tf
+	print
+	print "WMD"
+	for wmd in best_sentence_lists_wmd[0][:5]:
+		print wmd
 
 
 if __name__ == '__main__':
-	main()
+	eval_main()

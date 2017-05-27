@@ -3,7 +3,7 @@ import argparse
 import keras.backend.tensorflow_backend as k_tf
 
 from data.data_main import fetch_flower_captions
-
+from eval.evaulator import eval_main
 
 
 def get_args():
@@ -24,6 +24,7 @@ def main():
 	tf_config.gpu_options.allow_growth = True
 	k_tf.set_session(k_tf.tf.Session(config=tf_config))
 	args = get_args()
+
 	if args.code == "seq2seq":
 		from sequence_to_sequence.embedding_seq2seq import seq2seq
 		seq2seq(args.inference, args.encode_data, args.decode_random)

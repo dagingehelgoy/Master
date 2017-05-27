@@ -33,6 +33,8 @@ config = {
 	Conf.LIMITED_DATASET: "10_all_flowers.txt",
 	# Conf.LIMITED_DATASET: "Flickr8k.txt",
 	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers_uniq.txt",
+	# Conf.LIMITED_DATASET: "10_Flickr30k_uniq.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
 	Conf.BATCH_SIZE: 64,
@@ -51,7 +53,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
+	Conf.MODELNAME: "2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g300-d300",
 	# Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: False,

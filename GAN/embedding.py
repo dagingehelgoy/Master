@@ -171,13 +171,13 @@ def load_discriminator(logger):
 
 def emb_predict(config, logger):
 	print "Compiling generator..."
-	config[Conf.BATCH_SIZE] = 300
+	config[Conf.BATCH_SIZE] = 10
 
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
+	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	# raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
 	                                                              config)
 
@@ -198,8 +198,8 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	# for i in range(len(g_weights)):
-	for i in range(138, 139, 1):
+	for i in range(len(g_weights)):
+	# for i in range(138, 139, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
@@ -234,8 +234,8 @@ def emb_predict(config, logger):
 			prediction_string += pred_sentence_string
 		# print pred_sentence_string
 		print prediction_string
-		for s in sorted(sentence_list):
-			print s
+		# for s in sorted(sentence_list):
+		# 	print s
 
 
 def emb_evaluate(config, logger):

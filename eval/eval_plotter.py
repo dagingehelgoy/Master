@@ -6,11 +6,13 @@ import numpy as np
 
 
 def distinct_number_enlarger(x):
-	if x <= 3:
+	x /= 100
+	return x
+	if x <= 0.3:
 		return 1
-	elif x <= 6:
+	elif x <= 0.6:
 		return 4
-	elif x <= 8:
+	elif x <= 0.8:
 		return 7
 	return 14
 
@@ -41,15 +43,17 @@ def plotter():
 			names=['epoch', 'distinct_sentences', 'sentence_count', 'avg_bleu_score', 'avg_bleu_cosine',
 			       'avg_bleu_tfidf', 'avg_bleu_wmd'])
 
-		skip = 10
-		itemindex = np.where(data['epoch'] == 100)[0][0]
-		stop = itemindex + 170
+		skip = 1
+		# itemindex = np.where(data['epoch'] == 100)[0][0]
+		# stop = itemindex + 170
 		# stop = itemindex + 300
 		# stop = itemindex + 100
+		itemindex = 0
+		stop = 32
 		epoch_ = data['epoch'][itemindex:stop:skip]
 		score_ = data['avg_bleu_score'][itemindex:stop:skip]
-		distinct_sentences = [distinct_number_enlarger(x) * 5 for x in data['distinct_sentences']][::skip]
-		# distinct_sentences = [x*5 for x in data['distinct_sentences']][::skip]
+		distinct_sentences = [distinct_number_enlarger(x) * 50 for x in data['distinct_sentences']][::skip]
+		# distinct_sentences = [x for x in data['distinct_sentences']][::skip]
 
 		color = colors.pop(0)
 		diagram.plot(epoch_, score_, c=color, label=model[1])
@@ -83,7 +87,7 @@ def onehot_dropout_models():
 	return models
 
 
-def w2v_dropout_models(models):
+def w2v_dropout_models():
 	models = [
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.99dropout",
@@ -92,7 +96,7 @@ def w2v_dropout_models(models):
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
 			"W2V 0.75 dropout"),
 		(
-			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
+			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
 			"W2V 0.50 dropout"),
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
@@ -107,7 +111,7 @@ def w2v_dropout_models(models):
 def w2v_hidden_models():
 	models = [
 		(
-			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
+			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
 			"500-500"),
 		(
 			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",

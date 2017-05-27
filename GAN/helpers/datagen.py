@@ -2,6 +2,7 @@ import numpy as np
 from keras.preprocessing.text import Tokenizer
 
 from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
+from GAN.helpers.list_helpers import pairwise_cosine_similarity
 from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import print_progress
 from word2vec.word2vec_helpers import get_dict_filename
@@ -65,25 +66,32 @@ def generate_string_sentences(config):
 
 
 def preprocess_sentences(config, sentences):
-	word_list_sentences = []
-	for sentence in sentences:
-		word_list = ["<sos>"]
-		for word in sentence.split(" "):
-			word_list.append(word.lower())
-		word_list.append("<eos>")
-		while len(word_list) < config[Conf.MAX_SEQ_LENGTH]:
-			word_list.append("<pad>")
-		word_list_sentences.append(word_list)
-	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
+	sos_token = "<sos>"
+	eos_token = "<eos>"
+	pad_token = "<pad>"
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
 		print "Loading Glove dictionary..."
 		word_embedding_dict = get_word_embeddings()
+		sos_token = "<"
+		eos_token = ">"
+		pad_token = "="
 	else:
 		filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
 		                             config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 		print "Loading Word2Vec dictionary (%s)..." % filename
 		# word_embedding_dict = load_pickle_file("word2vec/saved_models/word2vec_%sd%svoc%ssteps_dict.pkl" % (config[Conf.EMBEDDING_SIZE], config[Conf.VOCAB_SIZE], config[Conf.WORD2VEC_NUM_STEPS]))
 		word_embedding_dict = load_pickle_file(filename)
+
+	word_list_sentences = []
+	for sentence in sentences:
+		word_list = [sos_token]
+		for word in sentence.split(" "):
+			word_list.append(word.lower())
+		word_list.append(eos_token)
+		while len(word_list) < config[Conf.MAX_SEQ_LENGTH]:
+			word_list.append(pad_token)
+		word_list_sentences.append(word_list)
+	# word_list_sentences = [[word.lower() for word in sentence.split(" ")] for sentence in sentences]
 	return np.asarray(word_list_sentences), word_embedding_dict
 
 
@@ -182,15 +190,16 @@ def emb_generate_caption_training_batch(training_batch, word_embedding_dict, con
 	for word_list in training_batch:
 		embedding_sentence = []
 		for word_string in word_list:
-			if word_string == 'surfs':
-				word_string = 'surfing'
 			if word_string in word_embedding_dict:
 				word_embedding = word_embedding_dict[word_string]
 				embedding_sentence.append(word_embedding)
 		if len(embedding_sentence) > config[Conf.MAX_SEQ_LENGTH]:
 			embedding_sentence = embedding_sentence[:config[Conf.MAX_SEQ_LENGTH]]
 		while len(embedding_sentence) < config[Conf.MAX_SEQ_LENGTH]:
-			embedding_sentence.append(word_embedding_dict["<pad>"])
+			if config[Conf.WORD_EMBEDDING] == WordEmbedding.GLOVE:
+				embedding_sentence.append(word_embedding_dict["="])
+			else:
+				embedding_sentence.append(word_embedding_dict["<pad>"])
 		embedding_lists.append(embedding_sentence)
 	return np.asarray(embedding_lists)
 

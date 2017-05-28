@@ -263,9 +263,9 @@ def emb_evaluate(config, logger):
 	print "Number of weights to evaluate: %s/%s" % (num_weights_to_eval, len(g_weights))
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
-		# epoch_string = int(g_weight.split("-")[1])
-		# if not epoch_string % epoch_modulo == 0:
-		# 	continue
+		epoch_string = int(g_weight.split("-")[1])
+		if not epoch_string % epoch_modulo == 0:
+			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		noise_batch = generate_input_noise(config)
 		embedded_generated_sentences = g_model.predict(noise_batch)

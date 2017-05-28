@@ -275,36 +275,40 @@ def eval_main():
 		# "this flower has petals that are yellow with white edges"
 		# "<sos> this flower has petals that are blue with blue stamen <eos>"
 		# "<sos> this flower has blue petals with with with green stamen <eos>"
+		"<sos> this flower has petals that are yellow with white edges <eos>"
+		"<sos> this flower has petals that are yellow with white edges <eos>"
 		# "<sos> 2 villagers carry a baskets of goods while another follows <eos>"
 		# "<sos> a young girl on the beach running toward the water <eos>"
 		# "<sos> Two boys in blue shirts wearing backpacks <eos> <pad> <pad> <pad>"
 		# "<sos> Two soccer players swim on the soccer field <eos> <pad> <pad>"
-		"<sos> An old jeep partially submerged in water <eos> <pad> <pad> <pad>"
+		# "<sos> An old jeep partially submerged in water <eos> <pad> <pad> <pad>"
 		# "<sos> a man is climbing up a wall <eos> <pad> <pad> <pad>"
 		# "<sos> five sided white flower flower <eos> <pad> <pad> <pad> <pad> <pad>"
 	]
 
-	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+	# best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+	#
+	# best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
+	#
+	# best_sentence_lists_wmd = background_wmd_retrieval(sentences, eval_dataset_string_list_sentences)
+	#
+	# print
+	# print "Sentence:"
+	# print sentences[0]
+	# print
+	# print "COS"
+	# for cos in best_sentence_lists_cosine[0][:5]:
+	# 	print cos
+	# print
+	# print "TFIDF"
+	# for tf in best_sentence_lists_tfidf[0][:5]:
+	# 	print tf
+	# print
+	# print "WMD"
+	# for wmd in best_sentence_lists_wmd[0][:5]:
+	# 	print wmd
 
-	best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
-
-	best_sentence_lists_wmd = background_wmd_retrieval(sentences, eval_dataset_string_list_sentences)
-
-	print
-	print "Sentence:"
-	print sentences[0]
-	print
-	print "COS"
-	for cos in best_sentence_lists_cosine[0][:5]:
-		print cos
-	print
-	print "TFIDF"
-	for tf in best_sentence_lists_tfidf[0][:5]:
-		print tf
-	print
-	print "WMD"
-	for wmd in best_sentence_lists_wmd[0][:5]:
-		print wmd
+	calculate_bleu_score(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
 
 
 if __name__ == '__main__':

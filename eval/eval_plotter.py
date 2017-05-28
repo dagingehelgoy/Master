@@ -7,7 +7,7 @@ import numpy as np
 
 def distinct_number_enlarger(x):
 	x /= 100
-	return x
+	# return x
 	if x <= 0.3:
 		return 1
 	elif x <= 0.6:
@@ -23,7 +23,7 @@ def plotter():
 
 	fig = plt.figure()
 	diagram = fig.add_subplot(111)
-	# matplotlib.rc('font', family='Arial')
+	plt.rc('font', family='Arial')
 
 	eval_path = "/Users/markus/workspace/master/Master/eval/files/"
 	# models = onehot_dropout_models()
@@ -52,7 +52,7 @@ def plotter():
 		stop = 32
 		epoch_ = data['epoch'][itemindex:stop:skip]
 		score_ = data['avg_bleu_score'][itemindex:stop:skip]
-		distinct_sentences = [distinct_number_enlarger(x) * 50 for x in data['distinct_sentences']][::skip]
+		distinct_sentences = [distinct_number_enlarger(x) * 4 for x in data['distinct_sentences']][::skip]
 		# distinct_sentences = [x for x in data['distinct_sentences']][::skip]
 
 		color = colors.pop(0)
@@ -91,19 +91,19 @@ def w2v_dropout_models():
 	models = [
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.99dropout",
-			"500-500 0.99 dropout"),
+			"0.99 dropout"),
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
-			"W2V 0.75 dropout"),
+			"0.75 dropout"),
 		(
 			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
-			"W2V 0.50 dropout"),
+			"0.50 dropout"),
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
-			"W2V 0.25 dropout"),
-		(
-			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.0dropout",
-			"W2V 0.0 dropout"),
+			"0.25 dropout"),
+		# (
+		# 	"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.0dropout",
+		# 	"W2V 0.0 dropout"),
 	]
 	return models
 
@@ -112,19 +112,19 @@ def w2v_hidden_models():
 	models = [
 		(
 			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
-			"500-500"),
+			"G: 500 - D: 500"),
 		(
 			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
-			"100-100"),
+			"G: 100 - D: 100"),
 		# (
 		# 	"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g200-d500",
-		# 	"200-500"),
+		# 	"G: 200 - D: 500"),
 		# (
 		# 	"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g500-d200",
-		# 	"500-200"),
+		# 	"G: 500 - D: 200"),
 		(
 			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g300-d300",
-			"300-300"),
+			"G: 300 - D: 300"),
 	]
 	return models
 

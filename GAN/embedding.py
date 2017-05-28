@@ -202,6 +202,8 @@ def emb_predict(config, logger):
 	# for i in range(138, 139, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
+		if not g_weight.split("-")[1] == '16000':
+			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
 		generated_sentences = g_model.predict(noise_batch)
@@ -234,8 +236,8 @@ def emb_predict(config, logger):
 			prediction_string += pred_sentence_string
 		# print pred_sentence_string
 		print prediction_string
-		# for s in sorted(sentence_list):
-		# 	print s
+		for s in sorted(sentence_list):
+			print s
 
 
 def emb_evaluate(config, logger):

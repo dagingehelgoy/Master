@@ -12,7 +12,6 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 		- Teste Embedding Size
 """
 
-
 config = {
 	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
 	Conf.WORD_EMBEDDING: WordEmbedding.GLOVE,
@@ -54,10 +53,11 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
-	Conf.MODELNAME: None,
+	Conf.MODELNAME: "2017-05-27_ImgCapFalse_glove_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_500_500-0.25",
+	# Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50,
 
 }
+

@@ -78,8 +78,8 @@ def convert_to_emb_list(dataset_string_list_sentences, word_embedding_dict):
 		for word in sentence:
 			if word in word_embedding_dict:
 				s.append(word_embedding_dict[word])
-			else:
-				s.append(word_embedding_dict['UNK'])
+			# else:
+			# 	s.append(word_embedding_dict['UNK'])
 		dataset_emb_list_sentences.append(s)
 	return dataset_emb_list_sentences
 

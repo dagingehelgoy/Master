@@ -54,7 +54,8 @@ def convert_to_word_embeddings(sentences, word_embedding_dict):
 			if word in word_embedding_dict:
 				embedded_sentence.append(word_embedding_dict[word])
 			else:
-				embedded_sentence.append(word_embedding_dict['UNK'])
+				# embedded_sentence.append(word_embedding_dict['UNK'])
+				embedded_sentence.append(word_embedding_dict['markus'])
 
 		embedded_sentences.append(embedded_sentence)
 	return embedded_sentences
@@ -78,8 +79,9 @@ def convert_to_emb_list(dataset_string_list_sentences, word_embedding_dict):
 		for word in sentence:
 			if word in word_embedding_dict:
 				s.append(word_embedding_dict[word])
-			# else:
-			# 	s.append(word_embedding_dict['UNK'])
+			else:
+				# s.append(word_embedding_dict['UNK'])
+				s.append(word_embedding_dict['markus'])
 		dataset_emb_list_sentences.append(s)
 	return dataset_emb_list_sentences
 

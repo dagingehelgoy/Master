@@ -10,7 +10,7 @@ from GAN.helpers.datagen import generate_string_sentences
 from GAN.helpers.enums import Conf
 from bleu import fetch_bleu_score
 from eval import tfidf
-from helpers.io_helper import load_pickle_file
+from helpers.io_helper import load_pickle_file, save_pickle_file
 from helpers.list_helpers import insert_and_remove_last, print_progress
 from word2vec.word2vec_helpers import get_dict_filename
 
@@ -240,7 +240,8 @@ def background_wmd(tuple):
 	# print counter.value
 	return result
 
-import time
+
+from collections import Counter
 def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_embedding_dict=None):
 	# print "Evaluating %s generated sentences." % len(sentences)
 	if dataset_string_list_sentences is None or word_embedding_dict is None:
@@ -248,34 +249,41 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 			config[Conf.LIMITED_DATASET] = config[Conf.LIMITED_DATASET].split(".txt")[0] + "_uniq.txt"
 		dataset_string_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
-
+	count_dict = Counter(sentences)
+	uniq_sentences = count_dict.keys()
 	print "Finding reference sentneces using WMD"
-	start = time.time()
-	best_sentence_lists_wmd = background_wmd_retrieval(sentences, dataset_string_list_sentences)
-	print "Time used: %s" % (time.time() - start)
+	best_sentence_lists_wmd = background_wmd_retrieval(uniq_sentences, dataset_string_list_sentences)
 
 	print "Finding reference sentneces using cosine distance"
-	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences,
-														   word_embedding_dict)
+	best_sentence_lists_cosine = cosine_distance_retrieval(uniq_sentences, dataset_string_list_sentences,
+	                                                       word_embedding_dict)
 
 	print "Finding reference sentneces using TF-IDF"
-	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
+	best_sentence_lists_tfidf = tfidf_retrieval(uniq_sentences, dataset_string_list_sentences)
 
 	bleu_score_tot_cosine = 0
-	for i in range(len(sentences)):
-		bleu_score_tot_cosine += fetch_bleu_score(best_sentence_lists_cosine[i], sentences[i])
-	avg_bleu_cosine = bleu_score_tot_cosine / float(len(sentences))
-
 	bleu_score_tot_tfidf = 0
-	for i in range(len(sentences)):
-		bleu_score_tot_tfidf += fetch_bleu_score(best_sentence_lists_tfidf[i], sentences[i])
-	avg_bleu_tfidf = bleu_score_tot_tfidf / float(len(sentences))
-
 	bleu_score_tot_wmd = 0
-	for i in range(len(sentences)):
-		bleu_score_tot_wmd += fetch_bleu_score(best_sentence_lists_wmd[i], sentences[i])
-	avg_bleu_wmd = bleu_score_tot_wmd / float(len(sentences))
+	sentence_score_dict = {}
+	for i in range(len(uniq_sentences)):
+		sentence = uniq_sentences[i]
 
+		bleu_cosine = fetch_bleu_score(best_sentence_lists_cosine[i], sentence)
+		bleu_tfidf = fetch_bleu_score(best_sentence_lists_tfidf[i], sentence)
+		bleu_wmd = fetch_bleu_score(best_sentence_lists_wmd[i], sentence)
+
+		bleu_score_tot_cosine += (bleu_cosine * count_dict[sentence])
+		bleu_score_tot_tfidf += (bleu_tfidf * count_dict[sentence])
+		bleu_score_tot_wmd += (bleu_wmd * count_dict[sentence])
+
+		beta_score = (bleu_cosine + bleu_tfidf + bleu_wmd) / 3
+
+		sentence_score_dict[sentence] = (beta_score, count_dict[sentence])
+
+	avg_bleu_tfidf = bleu_score_tot_tfidf / float(len(sentences))
+	avg_bleu_wmd = bleu_score_tot_wmd / float(len(sentences))
+	avg_bleu_cosine = bleu_score_tot_cosine / float(len(sentences))
+	save_pickle_file(sentence_score_dict, "seqgan_score_dict.p")
 	avg_bleu_score = (avg_bleu_cosine + avg_bleu_tfidf + avg_bleu_wmd) / 3
 
 	# print "BLEU score cosine:\t", avg_bleu_cosine
@@ -346,12 +354,11 @@ def eval_seqgan():
 	seqgan_file = open("eval/files/seqgan_flower.txt")
 	seqgan_lines = seqgan_file.readlines()[:1000]
 	seqgan_file.close()
-
+	seqgan_lines = [x.strip() for x in seqgan_lines]
 	distinct_sentences = len(set(seqgan_lines))
 	sentence_count = len(seqgan_lines)
 	calculate_bleu_score(seqgan_lines, eval_dataset_string_list_sentences, eval_word_embedding_dict)
 	print "Number of distict sentences: %s/%s" % (distinct_sentences, sentence_count)
-
 
 
 if __name__ == '__main__':

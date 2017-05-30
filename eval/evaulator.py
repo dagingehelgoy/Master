@@ -283,7 +283,7 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	avg_bleu_tfidf = bleu_score_tot_tfidf / float(len(sentences))
 	avg_bleu_wmd = bleu_score_tot_wmd / float(len(sentences))
 	avg_bleu_cosine = bleu_score_tot_cosine / float(len(sentences))
-	save_pickle_file(sentence_score_dict, "seqgan_score_dict.p")
+	save_pickle_file(sentence_score_dict, "onehot_score_dict_1000.p")
 	avg_bleu_score = (avg_bleu_cosine + avg_bleu_tfidf + avg_bleu_wmd) / 3
 
 	# print "BLEU score cosine:\t", avg_bleu_cosine

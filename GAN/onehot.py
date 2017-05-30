@@ -252,7 +252,6 @@ def oh_predict(config, logger):
 def oh_evaluate(config, logger):
 	print "Compiling generator..."
 
-	noise_batch = generate_input_noise(config)
 
 	if not config[Conf.LIMITED_DATASET].endswith("_uniq.txt"):
 		config[Conf.LIMITED_DATASET] = config[Conf.LIMITED_DATASET].split(".txt")[0] + "_uniq.txt"
@@ -262,15 +261,29 @@ def oh_evaluate(config, logger):
 	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
 
 	g_model = load_generator(logger)
-
 	g_model.compile(loss='categorical_crossentropy', optimizer="adam")
-	sentence_count = 10
 	g_weights = logger.get_generator_weights()
+
+	sentence_count = 1000
+	config[Conf.BATCH_SIZE] = sentence_count
+	num_weights_to_eval = 0
+	epoch_modulo = 3100
+	for i in range(1, len(g_weights), 1):
+		g_weight = g_weights[i]
+		epoch_string = int(g_weight.split("-")[1])
+		if epoch_string % epoch_modulo == 0:
+			num_weights_to_eval += 1
+
+	noise_batch = generate_input_noise(config)
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-
-	for i in range(0, len(g_weights), 1):
+	print "Number of weights to evaluate: %s/%s" % (num_weights_to_eval, len(g_weights))
+	for i in range(1, len(g_weights), 1):
+	# for i in range(0, len(g_weights), 1):
 		g_weight = g_weights[i]
+		epoch_string = int(g_weight.split("-")[1])
+		if not epoch_string % epoch_modulo == 0:
+			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 
 		generated_sentences = g_model.predict(noise_batch[:sentence_count])
@@ -298,7 +311,7 @@ def oh_evaluate(config, logger):
 		avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd = calculate_bleu_score(generated_sentences_list,
 		                                                                                     eval_dataset_string_list_sentences,
 		                                                                                     eval_word_embedding_dict)
-		print "Number of distict sentences: %s" % distinct_sentences
+		print "Number of distict sentences: %s/%s" % (distinct_sentences, sentence_count)
 		epoch = g_weight.split("-")[1]
 		logger.save_eval_data(epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine,
 		                      avg_bleu_tfidf, avg_bleu_wmd)

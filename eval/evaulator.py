@@ -208,13 +208,13 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	word_embedding_dict = load_pickle_file(filename)
 
 	counter = Value('i', 0)
-
+	sentence_count = len(pred_strings)
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
 	if cpu_count > 8:
 		cpu_count = 10
 	pool = Pool(cpu_count, initializer=init, initargs=(counter, ))
-	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
+	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict, sentence_count) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array, chunksize=1)
 	pool.close()
 	pool.join()
@@ -225,7 +225,7 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 def background_wmd(tuple):
 	global counter
 
-	pred_string, dataset_string_list_sentences, word_embedding_dict = tuple
+	pred_string, dataset_string_list_sentences, word_embedding_dict, sentence_count = tuple
 	score_tuples = []
 	for dataset_string_list_sentence in dataset_string_list_sentences:
 		dataset_string = " ".join(dataset_string_list_sentence)
@@ -236,7 +236,7 @@ def background_wmd(tuple):
 	with counter.get_lock():
 		counter.value += 1
 
-	print_progress(counter.value, 1000, "Running WMD")
+	print_progress(counter.value, sentence_count, "Running WMD")
 	# print counter.value
 	return result
 

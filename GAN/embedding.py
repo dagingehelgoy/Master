@@ -250,7 +250,7 @@ def emb_evaluate(config, logger):
 
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
-	sentence_count = 1000
+	sentence_count = 10000
 	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
 	epoch_modulo = 16700

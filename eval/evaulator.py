@@ -54,8 +54,8 @@ def convert_to_word_embeddings(sentences, word_embedding_dict):
 			if word in word_embedding_dict:
 				embedded_sentence.append(word_embedding_dict[word])
 			else:
-				# embedded_sentence.append(word_embedding_dict['UNK'])
-				embedded_sentence.append(word_embedding_dict['markus'])
+				embedded_sentence.append(word_embedding_dict['UNK'])
+				# embedded_sentence.append(word_embedding_dict['markus'])
 
 		embedded_sentences.append(embedded_sentence)
 	return embedded_sentences
@@ -80,8 +80,8 @@ def convert_to_emb_list(dataset_string_list_sentences, word_embedding_dict):
 			if word in word_embedding_dict:
 				s.append(word_embedding_dict[word])
 			else:
-				# s.append(word_embedding_dict['UNK'])
-				s.append(word_embedding_dict['markus'])
+				s.append(word_embedding_dict['UNK'])
+				# s.append(word_embedding_dict['markus'])
 		dataset_emb_list_sentences.append(s)
 	return dataset_emb_list_sentences
 
@@ -188,19 +188,19 @@ def wmd_retrieval(pred_strindgs, dataset_string_list_sentences):
 	return best_sentence_lists
 
 
-from multiprocessing import Pool as ThreadPool
+from multiprocessing import Pool
 import multiprocessing
+import tqdm
 
 
 def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
-	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
-								 config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
+	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
 	if cpu_count > 8:
 		cpu_count = 10
-	pool = ThreadPool(cpu_count)
+	pool = Pool(cpu_count)
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array)
 	pool.close()
@@ -218,6 +218,7 @@ def background_wmd(tuple):
 		score_tuples.append((dataset_string, score))
 	score_tuples = sorted(score_tuples, key=lambda x: x[1], reverse=False)
 	result = [x[0] for x in score_tuples[:5]]
+	print "##DONE##"
 	return result
 
 import time
@@ -228,11 +229,13 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 			config[Conf.LIMITED_DATASET] = config[Conf.LIMITED_DATASET].split(".txt")[0] + "_uniq.txt"
 		dataset_string_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
-	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences,
-	                                                       word_embedding_dict)
+	print "Finding reference sentneces using cosine distance"
+	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences, word_embedding_dict)
 
+	print "Finding reference sentneces using TF-IDF"
 	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
 
+	print "Finding reference sentneces using WMD"
 	start = time.time()
 	best_sentence_lists_wmd = background_wmd_retrieval(sentences, dataset_string_list_sentences)
 	print "Time used: %s" % (time.time() - start)
@@ -277,8 +280,10 @@ def eval_main():
 		# "this flower has petals that are yellow with white edges"
 		# "<sos> this flower has petals that are blue with blue stamen <eos>"
 		# "<sos> this flower has blue petals with with with green stamen <eos>"
-		"<sos> this flower has petals that are yellow with white edges <eos>"
-		"<sos> this flower has petals that are yellow with white edges <eos>"
+		# "<sos> this flower has petals that are with with white edges <eos>"
+		"< plot raincoat petals attractions wielded fuchsia gently nut ol = ="
+		# "< spoilers precocial classify remiss 8-space interchanged interchanged suffice tenchu = ntagtop"
+		# "<sos> this flower has petals that are yellow with white edges <eos>"
 		# "<sos> 2 villagers carry a baskets of goods while another follows <eos>"
 		# "<sos> a young girl on the beach running toward the water <eos>"
 		# "<sos> Two boys in blue shirts wearing backpacks <eos> <pad> <pad> <pad>"
@@ -288,27 +293,27 @@ def eval_main():
 		# "<sos> five sided white flower flower <eos> <pad> <pad> <pad> <pad> <pad>"
 	]
 
-	# best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
-	#
-	# best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
-	#
-	# best_sentence_lists_wmd = background_wmd_retrieval(sentences, eval_dataset_string_list_sentences)
-	#
-	# print
-	# print "Sentence:"
-	# print sentences[0]
-	# print
-	# print "COS"
-	# for cos in best_sentence_lists_cosine[0][:5]:
-	# 	print cos
-	# print
-	# print "TFIDF"
-	# for tf in best_sentence_lists_tfidf[0][:5]:
-	# 	print tf
-	# print
-	# print "WMD"
-	# for wmd in best_sentence_lists_wmd[0][:5]:
-	# 	print wmd
+	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+
+	best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
+
+	best_sentence_lists_wmd = background_wmd_retrieval(sentences, eval_dataset_string_list_sentences)
+
+	print
+	print "Sentence:"
+	print sentences[0]
+	print
+	print "COS"
+	for cos in best_sentence_lists_cosine[0][:5]:
+		print cos
+	print
+	print "TFIDF"
+	for tf in best_sentence_lists_tfidf[0][:5]:
+		print tf
+	print
+	print "WMD"
+	for wmd in best_sentence_lists_wmd[0][:5]:
+		print wmd
 
 	calculate_bleu_score(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
 

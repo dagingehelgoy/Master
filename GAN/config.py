@@ -14,8 +14,8 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 
 config = {
 	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
-	Conf.WORD_EMBEDDING: WordEmbedding.GLOVE,
-	# Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
+	# Conf.WORD_EMBEDDING: WordEmbedding.GLOVE,
+	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
@@ -30,9 +30,8 @@ config = {
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	Conf.LIMITED_DATASET: "10_all_flowers.txt",
-	# Conf.LIMITED_DATASET: "Flickr8k.txt",
-	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	Conf.LIMITED_DATASET: "10_Flickr30k.txt",
 	# Conf.LIMITED_DATASET: "10_all_flowers_uniq.txt",
 	# Conf.LIMITED_DATASET: "10_Flickr30k_uniq.txt",
 	# Conf.LIMITED_DATASET: None,
@@ -53,7 +52,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-27_ImgCapFalse_glove_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_500_500-0.25",
+	Conf.MODELNAME: "2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
 	# Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: False,

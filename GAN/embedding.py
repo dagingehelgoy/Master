@@ -176,8 +176,8 @@ def emb_predict(config, logger):
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	# raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
+	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
 	                                                              config)
 
@@ -202,7 +202,7 @@ def emb_predict(config, logger):
 	# for i in range(138, 139, 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
-		if not g_weight.split("-")[1] == '16000':
+		if not int(g_weight.split("-")[1]) % 1000 == 0:
 			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
@@ -236,8 +236,8 @@ def emb_predict(config, logger):
 			prediction_string += pred_sentence_string
 		# print pred_sentence_string
 		print prediction_string
-		for s in sorted(sentence_list):
-			print s
+		# for s in sorted(sentence_list):
+		# 	print s
 
 
 def emb_evaluate(config, logger):
@@ -253,7 +253,7 @@ def emb_evaluate(config, logger):
 	sentence_count = 100
 	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
-	epoch_modulo = 500
+	epoch_modulo = 16700
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
 		epoch_string = int(g_weight.split("-")[1])
@@ -261,7 +261,7 @@ def emb_evaluate(config, logger):
 			num_weights_to_eval += 1
 
 	print "Number of weights to evaluate: %s/%s" % (num_weights_to_eval, len(g_weights))
-	for i in range(len(g_weights)):
+	for i in range(1, len(g_weights), 1):
 		g_weight = g_weights[i]
 		epoch_string = int(g_weight.split("-")[1])
 		if not epoch_string % epoch_modulo == 0:

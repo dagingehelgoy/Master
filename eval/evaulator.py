@@ -190,8 +190,6 @@ def wmd_retrieval(pred_strindgs, dataset_string_list_sentences):
 
 from multiprocessing import Pool
 import multiprocessing
-import tqdm
-
 
 def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])

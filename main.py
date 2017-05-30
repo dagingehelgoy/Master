@@ -3,7 +3,7 @@ import argparse
 import keras.backend.tensorflow_backend as k_tf
 
 from data.data_main import fetch_flower_captions
-from eval.evaulator import eval_main
+
 
 
 def get_args():
@@ -42,6 +42,9 @@ def main():
 	elif args.code == "word_lstm":
 		from lstm_generator.mts_word_lstm import word_lstm
 		word_lstm()
+	elif args.code == "seq":
+		from eval.evaulator import eval_seqgan
+		eval_seqgan()
 	else:
 		print("### No suitable --code ###")
 

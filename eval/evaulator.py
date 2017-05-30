@@ -340,5 +340,20 @@ def eval_main():
 	calculate_bleu_score(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
 
 
+def eval_seqgan():
+	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
+
+	seqgan_file = open("eval/files/seqgan_flower.txt")
+	seqgan_lines = seqgan_file.readlines()[:1000]
+	seqgan_file.close()
+
+	distinct_sentences = len(set(seqgan_lines))
+	sentence_count = len(seqgan_lines)
+	calculate_bleu_score(seqgan_lines, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+	print "Number of distict sentences: %s/%s" % (distinct_sentences, sentence_count)
+
+
+
 if __name__ == '__main__':
-	eval_main()
+	eval_seqgan()
+	# eval_main()

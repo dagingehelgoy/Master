@@ -99,7 +99,7 @@ def cosine_distance_retrieval(pred_strings, dataset_string_list_sentences, word_
 		best_sentence_list = find_n_most_similar_vectors(pred_single_vector_sentence, dataset_single_vector_sentences,
 														 dataset_string_list_sentences)
 		best_sentence_lists.append([" ".join(x) for x in best_sentence_list])
-		print_progress(i, tot_count, "Calculating cosine distances")
+		print_progress(i + 1, tot_count, "Calculating cosine distances")
 	return best_sentence_lists
 
 
@@ -235,7 +235,9 @@ def background_wmd(tuple):
 	result = [x[0] for x in score_tuples[:5]]
 	with counter.get_lock():
 		counter.value += 1
-	print counter.value
+
+	print_progress(counter.value, 1000, "Running WMD")
+	# print counter.value
 	return result
 
 import time

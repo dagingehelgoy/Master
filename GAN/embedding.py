@@ -250,7 +250,7 @@ def emb_evaluate(config, logger):
 
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
-	sentence_count = 100
+	sentence_count = 1000
 	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
 	epoch_modulo = 16700
@@ -293,7 +293,7 @@ def emb_evaluate(config, logger):
 		avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd = calculate_bleu_score(generated_sentences_list,
 		                                                                                     eval_dataset_string_list_sentences,
 		                                                                                     eval_word_embedding_dict)
-		print "Number of distict sentences: %s" % distinct_sentences
+		print "Number of distict sentences: %s/%s" % (distinct_sentences, sentence_count)
 		print logger.name_prefix
 		epoch = g_weight.split("-")[1]
 		logger.save_eval_data(epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine,

@@ -11,7 +11,7 @@ from GAN.helpers.enums import Conf
 from bleu import fetch_bleu_score
 from eval import tfidf
 from helpers.io_helper import load_pickle_file
-from helpers.list_helpers import insert_and_remove_last
+from helpers.list_helpers import insert_and_remove_last, print_progress
 from word2vec.word2vec_helpers import get_dict_filename
 
 """
@@ -93,10 +93,13 @@ def cosine_distance_retrieval(pred_strings, dataset_string_list_sentences, word_
 	pred_single_vector_sentences = [convert_vectors(sentence) for sentence in pred_emb_list_sentences]
 
 	best_sentence_lists = []
-	for pred_single_vector_sentence in pred_single_vector_sentences:
+	tot_count = len(pred_single_vector_sentences)
+	for i in range(tot_count):
+		pred_single_vector_sentence = pred_single_vector_sentences[i]
 		best_sentence_list = find_n_most_similar_vectors(pred_single_vector_sentence, dataset_single_vector_sentences,
 														 dataset_string_list_sentences)
 		best_sentence_lists.append([" ".join(x) for x in best_sentence_list])
+		print_progress(i, tot_count, "Calculating cosine distances")
 	return best_sentence_lists
 
 
@@ -188,19 +191,31 @@ def wmd_retrieval(pred_strindgs, dataset_string_list_sentences):
 	return best_sentence_lists
 
 
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 import multiprocessing
+
+counter = None
+
+def init(args):
+	''' store the counter for later use '''
+	global counter
+	counter = args
+
+
 
 def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
+
+	counter = Value('i', 0)
+
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
 	if cpu_count > 8:
 		cpu_count = 10
-	pool = Pool(cpu_count)
+	pool = Pool(cpu_count, initializer=init, initargs=(counter, ))
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict) for pred_string in pred_strings]
-	best_sentence_lists = pool.map(background_wmd, tuple_array)
+	best_sentence_lists = pool.map(background_wmd, tuple_array, chunksize=1)
 	pool.close()
 	pool.join()
 
@@ -208,6 +223,8 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 
 
 def background_wmd(tuple):
+	global counter
+
 	pred_string, dataset_string_list_sentences, word_embedding_dict = tuple
 	score_tuples = []
 	for dataset_string_list_sentence in dataset_string_list_sentences:
@@ -216,7 +233,9 @@ def background_wmd(tuple):
 		score_tuples.append((dataset_string, score))
 	score_tuples = sorted(score_tuples, key=lambda x: x[1], reverse=False)
 	result = [x[0] for x in score_tuples[:5]]
-	print "##DONE##"
+	with counter.get_lock():
+		counter.value += 1
+	print counter.value
 	return result
 
 import time
@@ -227,16 +246,19 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 			config[Conf.LIMITED_DATASET] = config[Conf.LIMITED_DATASET].split(".txt")[0] + "_uniq.txt"
 		dataset_string_list_sentences, word_embedding_dict = generate_string_sentences(config)
 
-	print "Finding reference sentneces using cosine distance"
-	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences, word_embedding_dict)
-
-	print "Finding reference sentneces using TF-IDF"
-	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
 
 	print "Finding reference sentneces using WMD"
 	start = time.time()
 	best_sentence_lists_wmd = background_wmd_retrieval(sentences, dataset_string_list_sentences)
 	print "Time used: %s" % (time.time() - start)
+
+	print "Finding reference sentneces using cosine distance"
+	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, dataset_string_list_sentences,
+														   word_embedding_dict)
+
+	print "Finding reference sentneces using TF-IDF"
+	best_sentence_lists_tfidf = tfidf_retrieval(sentences, dataset_string_list_sentences)
+
 	bleu_score_tot_cosine = 0
 	for i in range(len(sentences)):
 		bleu_score_tot_cosine += fetch_bleu_score(best_sentence_lists_cosine[i], sentences[i])

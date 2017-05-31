@@ -61,9 +61,22 @@ def create_custom_dictionaries(config):
 
 	# pca_58 = fetch_pca_vector(filename_58)
 	# pca_65 = fetch_pca_vector(filename_65)
+	red_captions = [
+		"this flower is red",
+		"the petals are red",
+	]
+	yellow_captions = [
+		"this flower is yellow",
+		"the petals are yellow",
+	]
+
 	filenames = [x[0] for x in all_image_name_class_tuples]
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
+			if filename_class_dict[name] == '00058':
+				caption = red_captions[0]
+			else:
+				caption = yellow_captions[0]
 			if name in filename_caption_dict:
 				filename_caption_dict[name].append(caption)
 			else:

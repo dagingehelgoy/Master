@@ -351,7 +351,7 @@ def eval_main():
 def eval_seqgan():
 	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
 
-	seqgan_file = open("eval/files/seqgan_flower.txt")
+	seqgan_file = open("eval/files/seqgan_flickr.txt")
 	seqgan_lines = seqgan_file.readlines()[:10000]
 	seqgan_file.close()
 	seqgan_lines = [x.strip() for x in seqgan_lines]

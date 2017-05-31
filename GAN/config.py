@@ -13,14 +13,14 @@ from GAN.helpers.enums import NoiseMode, Conf, WordEmbedding, PreInit
 """
 
 config = {
-	Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
+	# Conf.WORD_EMBEDDING: WordEmbedding.ONE_HOT,
 	# Conf.WORD_EMBEDDING: WordEmbedding.GLOVE,
-	# Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
+	Conf.WORD_EMBEDDING: WordEmbedding.WORD2VEC,
 
 	Conf.DATE: datetime.datetime.now().date(),
 
-	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "500_500-0.25",
+	Conf.NAME_SUFFIX: None,
+	# Conf.NAME_SUFFIX: "500_500-0.25",
 
 	Conf.VOCAB_SIZE: 1000,
 	Conf.MAX_SEQ_LENGTH: 12,
@@ -30,19 +30,19 @@ config = {
 	# Conf.LIMITED_DATASET: "two_flowers.txt",
 	# Conf.LIMITED_DATASET: "person_surf.txt",
 	# Conf.LIMITED_DATASET: "all_flowers.txt",
-	Conf.LIMITED_DATASET: "10_all_flowers.txt",
-	# Conf.LIMITED_DATASET: "10_Flickr30k.txt",
+	# Conf.LIMITED_DATASET: "10_all_flowers.txt",
+	Conf.LIMITED_DATASET: "10_Flickr30k.txt",
 	# Conf.LIMITED_DATASET: "10_all_flowers_uniq.txt",
 	# Conf.LIMITED_DATASET: "10_Flickr30k_uniq.txt",
 	# Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 64,
+	Conf.BATCH_SIZE: 256,
 	Conf.EPOCHS: 10000000,
 
 	Conf.NOISE_MODE: NoiseMode.REPEAT,
 
-	Conf.W2V_SET: "flowers",
-	# Conf.W2V_SET: "flickr",
+	# Conf.W2V_SET: "flowers",
+	Conf.W2V_SET: "flickr",
 
 	Conf.MAX_LOSS_DIFF: 0,
 
@@ -52,11 +52,10 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	Conf.MODELNAME: "2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
+	Conf.MODELNAME: "2017-05-26_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch256_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_Flickr30k_g500-d500_0.25Dropout",
 	# Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: False,
 	Conf.IMAGE_DIM: 50,
-
 }
 

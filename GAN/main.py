@@ -7,7 +7,7 @@ from GAN.trainer import train
 from GAN.config import config
 
 
-def gan_main(inference, eval, plot):
+def gan_main(inference, eval, plot, resume_training):
 	logger = GANLogger(config, inference)
 	logger.print_start_message()
 	if inference:
@@ -57,4 +57,4 @@ def gan_main(inference, eval, plot):
 		plotter(logger)
 	else:
 		print "training"
-		train(logger, config)
+		train(logger, resume_training, config)

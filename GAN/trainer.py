@@ -32,9 +32,12 @@ def change_learning_rate(discriminator_on_generator):
 	print "Changed optimizer Adam lr=0.1"
 
 
-def train(gan_logger, config):
+def train(gan_logger, resume_training, config):
 	# if gan_logger.exists:
 	# 	raw_input("\nModel already trained.\nPress enter to continue.\n")
+
+
+
 
 	print "Generating data..."
 	if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -62,13 +65,48 @@ def train(gan_logger, config):
 		d_model = emb_create_discriminator(config)
 		gan_model = generator_containing_discriminator(g_model, d_model)
 
-	gan_logger.save_model(g_model, "generator")
-	gan_logger.save_model(d_model, "discriminator")
+
+	start_epoch = 0
+	if resume_training:
+		print "Resuming training..."
+		g_model = load_generator(gan_logger)
+		d_model = load_discriminator(gan_logger)
+		g_weights = gan_logger.get_generator_weights()
+		d_weights = gan_logger.get_discriminator_weights()
+
+		print "Num g_weights: %s" % len(g_weights)
+		print "Num d_weights: %s" % len(d_weights)
+
+		largest_g_weight = 0
+		largest_g_weight_size = 0
+
+		largest_d_weight = 0
+		largest_d_weight_size = 0
+
+		for i in range(len(g_weights)):
+			g_weight = g_weights[i]
+			d_weight = d_weights[i]
+			g_w_number = int(g_weight.split("-")[1])
+			d_w_number = int(d_weight.split("-")[1])
+			if g_w_number > largest_g_weight_size:
+				largest_g_weight_size = g_w_number
+				largest_g_weight = g_weight
+			if d_w_number > largest_d_weight_size:
+				largest_d_weight_size = d_w_number
+				largest_d_weight = d_weight
+
+		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (gan_logger.name_prefix, largest_g_weight))
+		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (gan_logger.name_prefix, largest_d_weight))
+		gan_model = generator_containing_discriminator(g_model, d_model)
+		start_epoch = largest_g_weight_size
+	else:
+		gan_logger.save_model(g_model, "generator")
+		gan_logger.save_model(d_model, "discriminator")
 
 	total_training_data = len(all_raw_caption_data)
 	nb_batches = int(total_training_data / config[Conf.BATCH_SIZE])
 	print("Number of batches: %s" % nb_batches)
-	for epoch_cnt in range(config[Conf.EPOCHS]):
+	for epoch_cnt in range(start_epoch, config[Conf.EPOCHS], 1):
 		start_time_epoch = time.time()
 		print("Epoch: %s\t%s" % (epoch_cnt, gan_logger.name_prefix))
 

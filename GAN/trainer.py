@@ -159,8 +159,8 @@ def train(gan_logger, resume_training, config):
 			if config[Conf.IMAGE_CAPTION]:
 				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(),
 				                                size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch],
-				                                                         training_batch_y_zeros)
+				# d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch],
+				#                                                          training_batch_y_zeros)
 
 				d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch],
 				                                                   training_batch_y_ones)

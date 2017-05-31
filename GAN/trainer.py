@@ -97,6 +97,8 @@ def train(gan_logger, resume_training, config):
 
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (gan_logger.name_prefix, largest_g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (gan_logger.name_prefix, largest_d_weight))
+		g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+		d_model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
 		gan_model = generator_containing_discriminator(g_model, d_model)
 		start_epoch = largest_g_weight_size
 		print "Starting training on epoch %s" % start_epoch

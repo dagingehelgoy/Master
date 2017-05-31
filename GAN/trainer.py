@@ -99,6 +99,7 @@ def train(gan_logger, resume_training, config):
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (gan_logger.name_prefix, largest_d_weight))
 		gan_model = generator_containing_discriminator(g_model, d_model)
 		start_epoch = largest_g_weight_size
+		print "Starting training on epoch %s" % start_epoch
 	else:
 		gan_logger.save_model(g_model, "generator")
 		gan_logger.save_model(d_model, "discriminator")

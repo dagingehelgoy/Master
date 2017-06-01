@@ -211,8 +211,11 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	sentence_count = len(pred_strings)
 	cpu_count = multiprocessing.cpu_count()
 	print "CPUs:", cpu_count
-	if cpu_count > 8:
+	if cpu_count > 8 and cpu_count < 15:
 		cpu_count = 10
+	elif cpu_count > 40:
+		cpu_count = 40
+	print "Starting pool with %s processes" % cpu_count
 	pool = Pool(cpu_count, initializer=init, initargs=(counter, ))
 	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict, sentence_count) for pred_string in pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array, chunksize=1)

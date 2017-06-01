@@ -14,36 +14,39 @@ log_folder = 'GAN/GAN_log/'
 
 # model_1 = '2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
 model_1 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
-model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
-model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_softmax'
-model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout-softmax'
+model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+# model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
+# model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_softmax'
+# model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout-softmax'
 
 data_1 = np.genfromtxt(
 	log_folder + model_1 + "/loss.txt",
 	delimiter=',',
-	skip_header=1,
-	skip_footer=17,
+	skip_header=20,
+	skip_footer=20,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 data_2 = np.genfromtxt(
 	log_folder + model_2 + "/loss.txt",
 	delimiter=',',
 	skip_header=1,
-	skip_footer=1,
+	skip_footer=20,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 data_3 = np.genfromtxt(
 	log_folder + model_3 + "/loss.txt",
 	delimiter=',',
 	skip_header=1,
-	skip_footer=1,
+	skip_footer=20,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 data_4 = np.genfromtxt(
 	log_folder + model_4 + "/loss.txt",
 	delimiter=',',
 	skip_header=1,
-	skip_footer=1,
+	skip_footer=20,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 
@@ -146,6 +149,6 @@ diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], l
 
 
 
+# plt.rc('font', family='Courier')
 leg = diagram.legend()
-
 plt.show()

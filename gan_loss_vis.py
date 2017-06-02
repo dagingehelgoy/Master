@@ -13,10 +13,10 @@ from matplotlib.lines import Line2D
 log_folder = 'GAN/GAN_log/'
 
 # model_1 = '2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
-model_1 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
-model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
-model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
-model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+model_1 = '2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout'
+# model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+# model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
+# model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers'
 # model_2 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout'
 # model_3 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_softmax'
 # model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout-softmax'
@@ -24,51 +24,51 @@ model_4 = '2017-05-13_ImgCapFalse_onehot_Vocab1000_Seq12_Batch64_EmbSize50_repea
 data_1 = np.genfromtxt(
 	log_folder + model_1 + "/loss.txt",
 	delimiter=',',
-	skip_header=20,
-	skip_footer=20,
+	skip_header=1,
+	skip_footer=0,
 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
-data_2 = np.genfromtxt(
-	log_folder + model_2 + "/loss.txt",
-	delimiter=',',
-	skip_header=1,
-	skip_footer=20,
-	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
-
-data_3 = np.genfromtxt(
-	log_folder + model_3 + "/loss.txt",
-	delimiter=',',
-	skip_header=1,
-	skip_footer=20,
-	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
-
-data_4 = np.genfromtxt(
-	log_folder + model_4 + "/loss.txt",
-	delimiter=',',
-	skip_header=1,
-	skip_footer=20,
-	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
+# data_2 = np.genfromtxt(
+# 	log_folder + model_2 + "/loss.txt",
+# 	delimiter=',',
+# 	skip_header=1,
+# 	skip_footer=20,
+# 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
+#
+# data_3 = np.genfromtxt(
+# 	log_folder + model_3 + "/loss.txt",
+# 	delimiter=',',
+# 	skip_header=1,
+# 	skip_footer=20,
+# 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
+#
+# data_4 = np.genfromtxt(
+# 	log_folder + model_4 + "/loss.txt",
+# 	delimiter=',',
+# 	skip_header=1,
+# 	skip_footer=20,
+# 	names=['epoch', 'batch', 'g_loss', 'g_acc', 'd_loss_gen', 'd_acc_gen', 'd_loss_train', 'd_acc_train'])
 
 
 fig = plt.figure()
-
+plt.rc('font', family='Arial')
 diagram = fig.add_subplot(111)
 
 d_loss_train_1 = data_1["d_loss_train"]
 d_loss_gen_1 = data_1["d_loss_gen"]
 d_loss_1 = (d_loss_gen_1 + d_loss_train_1) / 2
 
-d_loss_train_2 = data_2["d_loss_train"]
-d_loss_gen_2 = data_2["d_loss_gen"]
-d_loss_2 = (d_loss_gen_2 + d_loss_train_2) / 2
-
-d_loss_train_3 = data_3["d_loss_train"]
-d_loss_gen_3 = data_3["d_loss_gen"]
-d_loss_3 = (d_loss_gen_3 + d_loss_train_3) / 2
-
-d_loss_train_4 = data_4["d_loss_train"]
-d_loss_gen_4 = data_4["d_loss_gen"]
-d_loss_4 = (d_loss_gen_4 + d_loss_train_4) / 2
+# d_loss_train_2 = data_2["d_loss_train"]
+# d_loss_gen_2 = data_2["d_loss_gen"]
+# d_loss_2 = (d_loss_gen_2 + d_loss_train_2) / 2
+#
+# d_loss_train_3 = data_3["d_loss_train"]
+# d_loss_gen_3 = data_3["d_loss_gen"]
+# d_loss_3 = (d_loss_gen_3 + d_loss_train_3) / 2
+#
+# d_loss_train_4 = data_4["d_loss_train"]
+# d_loss_gen_4 = data_4["d_loss_gen"]
+# d_loss_4 = (d_loss_gen_4 + d_loss_train_4) / 2
 
 # d_acc_train_1 = data_1["d_acc_train"]
 # d_acc_gen_1 = data_1["d_acc_gen"]
@@ -91,23 +91,23 @@ diagram.set_xlabel('Epoch')
 diagram.set_ylabel('Loss')
 
 colors = ['#F95400', '#004FA2', '#F9C000', 'y']
-markers = []
-for m in Line2D.markers:
-    try:
-        if len(m) == 1 and m != ' ':
-            markers.append(m)
-    except TypeError:
-        pass
+# markers = []
+# for m in Line2D.markers:
+#     try:
+#         if len(m) == 1 and m != ' ':
+#             markers.append(m)
+#     except TypeError:
+#         pass
 
-styles = markers + [
-    r'$\lambda$',
-    r'$\bowtie$',
-    r'$\circlearrowleft$',
-    r'$\clubsuit$',
-    r'$\checkmark$']
+# styles = markers + [
+#     r'$\lambda$',
+#     r'$\bowtie$',
+#     r'$\circlearrowleft$',
+#     r'$\clubsuit$',
+#     r'$\checkmark$']
 
-skip = 2
-first = 200
+skip = 50
+first = None
 
 # plt.axvline(13, c='black', linestyle=':', label="Best sentence")
 

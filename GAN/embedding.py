@@ -171,7 +171,8 @@ def load_discriminator(logger):
 
 def emb_predict(config, logger):
 	print "Compiling generator..."
-	config[Conf.BATCH_SIZE] = 10
+	generated_size = 5000
+	config[Conf.BATCH_SIZE] = generated_size
 
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
@@ -198,11 +199,13 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	for i in range(len(g_weights)):
-	# for i in range(138, 139, 1):
+	for i in range(1, len(g_weights), 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
-		if not int(g_weight.split("-")[1]) % 1000 == 0:
+		# if not int(g_weight.split("-")[1]) % 10000 == 0:
+		# 	continue
+
+		if not int(g_weight.split("-")[1]) == 12500 and not int(g_weight.split("-")[1]) == 15000:
 			continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
@@ -210,7 +213,8 @@ def emb_predict(config, logger):
 		generated_classifications = d_model.predict(generated_sentences)
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight
 		prediction_string = gen_header_string
-		# print gen_header_string
+		print gen_header_string
+		sentence_tuple_list = []
 		sentence_list = []
 		for j in range(len(generated_sentences)):
 			embedded_generated_sentence = generated_sentences[j]
@@ -218,10 +222,11 @@ def emb_predict(config, logger):
 			gen_most_sim_words_list = pairwise_cosine_similarity(embedded_generated_sentence, word_embedding_dict)
 			for word in gen_most_sim_words_list:
 				generated_sentence += word[0] + " "
+			classification = generated_classifications[j]
+			gen_sentence_string = "\n%5.4f\t%s" % (classification, generated_sentence)
+			sentence_tuple_list.append((generated_sentence, classification))
 			sentence_list.append(generated_sentence)
-			gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
 			prediction_string += gen_sentence_string
-		# print gen_sentence_string
 
 		pred_header_string = "\nREAL SENTENCES: (%s)\n" % d_weight
 		prediction_string += pred_header_string
@@ -235,8 +240,12 @@ def emb_predict(config, logger):
 			pred_sentence_string = "\n%5.4f\t%s" % (real_classifications[j], real_sentence)
 			prediction_string += pred_sentence_string
 		# print pred_sentence_string
-		print prediction_string
-		# for s in sorted(sentence_list):
+		# print prediction_string
+		sentence_tuple_list = sorted(sentence_tuple_list, key=lambda x: x[1], reverse=True)
+		for (s, c) in sentence_tuple_list[:50]:
+			print "%5.4f\t%s" % (c, s)
+		print "Percentage distinct: %s" % (float(len(set(sentence_list)))/generated_size)
+		# for s in sorted(sentence_tuple_list):
 		# 	print s
 
 
@@ -250,10 +259,10 @@ def emb_evaluate(config, logger):
 
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
-	sentence_count = 10000
+	sentence_count = 1000
 	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
-	epoch_modulo = 10000
+	epoch_modulo = 500
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
 		epoch_string = int(g_weight.split("-")[1])
@@ -261,7 +270,7 @@ def emb_evaluate(config, logger):
 			num_weights_to_eval += 1
 
 	print "Number of weights to evaluate: %s/%s" % (num_weights_to_eval, len(g_weights))
-	for i in range(1, len(g_weights), 1):
+	for i in range(0, len(g_weights), 1):
 		g_weight = g_weights[i]
 		epoch_string = int(g_weight.split("-")[1])
 		if not epoch_string % epoch_modulo == 0:

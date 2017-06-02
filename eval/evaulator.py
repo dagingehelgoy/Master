@@ -10,7 +10,7 @@ from GAN.helpers.datagen import generate_string_sentences
 from GAN.helpers.enums import Conf
 from bleu import fetch_bleu_score
 from eval import tfidf
-from helpers.io_helper import load_pickle_file, save_pickle_file
+from helpers.io_helper import load_pickle_file
 from helpers.list_helpers import insert_and_remove_last, print_progress
 from word2vec.word2vec_helpers import get_dict_filename
 
@@ -45,6 +45,38 @@ def find_n_most_similar_vectors(pred_vector, vector_list, sentence_list, n=5):
 	return best_sentence_list
 
 
+def background_find_n_most_similar_vectors(tuple_array):
+	global counter
+
+	pred_vector, vector_list, sentence_list, sentence_count = tuple_array
+
+	n = 5
+	first_vector = vector_list[0]
+	first_sentence = sentence_list[0]
+	first_mse = compare_vectors(pred_vector, first_vector)
+
+	best_mse_list = [0 for _ in range(n)]
+	best_sentence_list = ["" for _ in range(n)]
+	best_vector_list = [[] for _ in range(n)]
+
+	best_mse_list = insert_and_remove_last(0, best_mse_list, first_mse)
+	best_vector_list = insert_and_remove_last(0, best_vector_list, first_vector)
+	best_sentence_list = insert_and_remove_last(0, best_sentence_list, first_sentence)
+	for i in range(len(vector_list)):
+		temp_vector = vector_list[i]
+		temp_mse = compare_vectors(pred_vector, temp_vector)
+		for index in range(len(best_vector_list)):
+			if temp_mse < best_mse_list[index]:
+				best_mse_list = insert_and_remove_last(index, best_mse_list, temp_mse)
+				best_vector_list = insert_and_remove_last(index, best_vector_list, temp_vector)
+				best_sentence_list = insert_and_remove_last(index, best_sentence_list, sentence_list[i])
+				break
+	with counter.get_lock():
+		counter.value += 1
+	print_progress(counter.value, sentence_count, "Running Cosine distance")
+	return best_sentence_list
+
+
 def convert_to_word_embeddings(sentences, word_embedding_dict):
 	embedded_sentences = []
 	for sentence in sentences:
@@ -55,7 +87,7 @@ def convert_to_word_embeddings(sentences, word_embedding_dict):
 				embedded_sentence.append(word_embedding_dict[word])
 			else:
 				embedded_sentence.append(word_embedding_dict['UNK'])
-				# embedded_sentence.append(word_embedding_dict['markus'])
+			# embedded_sentence.append(word_embedding_dict['markus'])
 
 		embedded_sentences.append(embedded_sentence)
 	return embedded_sentences
@@ -81,7 +113,7 @@ def convert_to_emb_list(dataset_string_list_sentences, word_embedding_dict):
 				s.append(word_embedding_dict[word])
 			else:
 				s.append(word_embedding_dict['UNK'])
-				# s.append(word_embedding_dict['markus'])
+			# s.append(word_embedding_dict['markus'])
 		dataset_emb_list_sentences.append(s)
 	return dataset_emb_list_sentences
 
@@ -97,9 +129,35 @@ def cosine_distance_retrieval(pred_strings, dataset_string_list_sentences, word_
 	for i in range(tot_count):
 		pred_single_vector_sentence = pred_single_vector_sentences[i]
 		best_sentence_list = find_n_most_similar_vectors(pred_single_vector_sentence, dataset_single_vector_sentences,
-														 dataset_string_list_sentences)
+		                                                 dataset_string_list_sentences)
 		best_sentence_lists.append([" ".join(x) for x in best_sentence_list])
 		print_progress(i + 1, tot_count, "Calculating cosine distances")
+	return best_sentence_lists
+
+
+def background_cosine_distance_retrieval(pred_strings, dataset_string_list_sentences, word_embedding_dict):
+	dataset_emb_list_sentences = convert_to_emb_list(dataset_string_list_sentences, word_embedding_dict)
+	dataset_single_vector_sentences = [convert_vectors(sentence) for sentence in dataset_emb_list_sentences]
+
+	pred_emb_list_sentences = convert_to_word_embeddings(pred_strings, word_embedding_dict)
+	pred_single_vector_sentences = [convert_vectors(sentence) for sentence in pred_emb_list_sentences]
+
+	counter = Value('i', 0)
+	sentence_count = len(pred_strings)
+	cpu_count = multiprocessing.cpu_count()
+	print "CPUs:", cpu_count
+	if 8 < cpu_count < 15:
+		cpu_count = 10
+	elif cpu_count > 40:
+		cpu_count = 40
+	print "Starting pool with %s processes" % cpu_count
+	pool = Pool(cpu_count, initializer=init, initargs=(counter,))
+
+	tuple_array = [(pred_single_vector_sentence, dataset_single_vector_sentences, dataset_string_list_sentences, sentence_count) for pred_single_vector_sentence in pred_single_vector_sentences]
+	best_sentence_lists = pool.map(background_find_n_most_similar_vectors, tuple_array, chunksize=1)
+	pool.close()
+	pool.join()
+
 	return best_sentence_lists
 
 
@@ -133,7 +191,7 @@ Word bower distance
 def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 	model_vocab = word_embedding_dict.keys()
 	vocabulary = [w for w in set(d1.lower().split() + d2.lower().split()) if
-				  w in model_vocab and w not in stop_words.ENGLISH_STOP_WORDS]
+	              w in model_vocab and w not in stop_words.ENGLISH_STOP_WORDS]
 	if len(vocabulary) < min_vocab:
 		return 1
 	vect = CountVectorizer(vocabulary=vocabulary).fit([d1, d2])
@@ -151,7 +209,6 @@ def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 		voc = feature_names[i]
 		v_1[i] += d1.count(voc)
 		v_2[i] += d2.count(voc)
-
 
 	# v_1, v_2 = vect.transform([d1, d2])
 	# v_1 = v_1.toarray().ravel()
@@ -171,7 +228,7 @@ def get_wmd_distance(d1, d2, word_embedding_dict, min_vocab=7, verbose=False):
 
 def wmd_retrieval(pred_strindgs, dataset_string_list_sentences):
 	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS],
-								 config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
+	                             config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 
 	best_sentence_lists = []
@@ -196,15 +253,16 @@ import multiprocessing
 
 counter = None
 
+
 def init(args):
 	''' store the counter for later use '''
 	global counter
 	counter = args
 
 
-
 def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
-	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE], config[Conf.W2V_SET])
+	filename = get_dict_filename(config[Conf.EMBEDDING_SIZE], config[Conf.WORD2VEC_NUM_STEPS], config[Conf.VOCAB_SIZE],
+	                             config[Conf.W2V_SET])
 	word_embedding_dict = load_pickle_file(filename)
 
 	counter = Value('i', 0)
@@ -216,8 +274,9 @@ def background_wmd_retrieval(pred_strings, dataset_string_list_sentences):
 	elif cpu_count > 40:
 		cpu_count = 40
 	print "Starting pool with %s processes" % cpu_count
-	pool = Pool(cpu_count, initializer=init, initargs=(counter, ))
-	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict, sentence_count) for pred_string in pred_strings]
+	pool = Pool(cpu_count, initializer=init, initargs=(counter,))
+	tuple_array = [(pred_string, dataset_string_list_sentences, word_embedding_dict, sentence_count) for pred_string in
+	               pred_strings]
 	best_sentence_lists = pool.map(background_wmd, tuple_array, chunksize=1)
 	pool.close()
 	pool.join()
@@ -245,6 +304,8 @@ def background_wmd(tuple):
 
 
 from collections import Counter
+
+
 def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_embedding_dict=None):
 	# print "Evaluating %s generated sentences." % len(sentences)
 	if dataset_string_list_sentences is None or word_embedding_dict is None:
@@ -254,12 +315,14 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 
 	count_dict = Counter(sentences)
 	uniq_sentences = count_dict.keys()
+
+	print "Finding reference sentneces using cosine distance"
+	best_sentence_lists_cosine = background_cosine_distance_retrieval(uniq_sentences, dataset_string_list_sentences,
+	                                                       word_embedding_dict)
+
 	print "Finding reference sentneces using WMD"
 	best_sentence_lists_wmd = background_wmd_retrieval(uniq_sentences, dataset_string_list_sentences)
 
-	print "Finding reference sentneces using cosine distance"
-	best_sentence_lists_cosine = cosine_distance_retrieval(uniq_sentences, dataset_string_list_sentences,
-	                                                       word_embedding_dict)
 
 	print "Finding reference sentneces using TF-IDF"
 	best_sentence_lists_tfidf = tfidf_retrieval(uniq_sentences, dataset_string_list_sentences)
@@ -286,7 +349,7 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	avg_bleu_tfidf = bleu_score_tot_tfidf / float(len(sentences))
 	avg_bleu_wmd = bleu_score_tot_wmd / float(len(sentences))
 	avg_bleu_cosine = bleu_score_tot_cosine / float(len(sentences))
-	save_pickle_file(sentence_score_dict, "emb_score_dict_10000_flickr.p")
+	# save_pickle_file(sentence_score_dict, "emb_score_dict_10000_flickr.p")
 	avg_bleu_score = (avg_bleu_cosine + avg_bleu_tfidf + avg_bleu_wmd) / 3
 
 	# print "BLEU score cosine:\t", avg_bleu_cosine
@@ -294,16 +357,16 @@ def calculate_bleu_score(sentences, dataset_string_list_sentences=None, word_emb
 	# print "BLEU score wmd:\t\t", avg_bleu_wmd
 	# print "Avarage BLEU score:", avg_bleu_score
 	print "AVG BLEU: %5.4f\t %5.4f,%5.4f,%5.4f (cosine,tfidf,wmd)" % (
-	avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd)
+		avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd)
 	return avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf, avg_bleu_wmd
 
 
 def eval_main():
 	eval_dataset_string_list_sentences, eval_word_embedding_dict = generate_string_sentences(config)
 	sentences = ["<sos> the flower har large green petals and black stamen <eos> <pad>",
-					"<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
-					"<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
-					"<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"]
+	             "<sos> this flower has yellow petals and middle red stamen <eos> <pad>",
+	             "<sos> this flower has many yellow petals with yellow stamen <eos> <pad>",
+	             "<sos> stamens are yellow in color with larger anthers <eos> <pad> <pad>"]
 
 	sentences = [
 		# "<sos> the flower har large green petals and black stamen <eos> <pad>",
@@ -326,7 +389,8 @@ def eval_main():
 		# "<sos> five sided white flower flower <eos> <pad> <pad> <pad> <pad> <pad>"
 	]
 
-	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences, eval_word_embedding_dict)
+	best_sentence_lists_cosine = cosine_distance_retrieval(sentences, eval_dataset_string_list_sentences,
+	                                                       eval_word_embedding_dict)
 
 	best_sentence_lists_tfidf = tfidf_retrieval(sentences, eval_dataset_string_list_sentences)
 
@@ -366,4 +430,4 @@ def eval_seqgan():
 
 if __name__ == '__main__':
 	eval_seqgan()
-	# eval_main()
+# eval_main()

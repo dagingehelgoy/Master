@@ -74,7 +74,7 @@ def background_find_n_most_similar_vectors(tuple_array):
 	with counter.get_lock():
 		counter.value += 1
 	print_progress(counter.value, sentence_count, "Running Cosine distance")
-	return best_sentence_list
+	return [" ".join(x) for x in best_sentence_list]
 
 
 def convert_to_word_embeddings(sentences, word_embedding_dict):

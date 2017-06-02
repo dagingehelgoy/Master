@@ -259,10 +259,10 @@ def emb_evaluate(config, logger):
 
 	g_model = load_generator(logger)
 	g_weights = logger.get_generator_weights()
-	sentence_count = 500
+	sentence_count = 1000
 	config[Conf.BATCH_SIZE] = sentence_count
 	num_weights_to_eval = 0
-	epoch_modulo = 1500
+	epoch_modulo = 1000
 	for i in range(len(g_weights)):
 		g_weight = g_weights[i]
 		epoch_string = int(g_weight.split("-")[1])

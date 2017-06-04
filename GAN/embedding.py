@@ -1,6 +1,6 @@
 import numpy as np
 from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector
+from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector, Lambda
 from keras.models import Sequential, model_from_json
 
 from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch, \
@@ -116,7 +116,8 @@ def emb_create_image_gan(config):
 	return g_model, d_model, gan_model
 
 
-def emb_create_image_gan_train_image(config):
+def emb_create_image_gan_merge(config):
+	print "Generating image gan MERGE"
 	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_model_image_input")
 
 	# Generator
@@ -155,6 +156,52 @@ def emb_create_image_gan_train_image(config):
 	return g_model, d_model, gan_model
 
 
+def emb_create_image_gan_prepend(config):
+	print "Generating image gan PREPEND"
+	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_model_image_input")
+
+	# Generator
+
+	g_lstm_noise_input = Input(shape=(config[Conf.NOISE_SIZE],), name="g_model_lstm_noise_input")
+
+	g_merge = merge([gan_image_input, g_lstm_noise_input], mode='concat')
+	g_lstm_input = RepeatVector(config[Conf.MAX_SEQ_LENGTH])(g_merge)
+	g_tensor = LSTM(500, return_sequences=True, consume_less='gpu')(g_lstm_input)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
+
+	# Discriminator
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH] + 1, config[Conf.EMBEDDING_SIZE]),
+	                     name="d_model_lstm_input")
+	d_lambda = Lambda(lambda x: [x])(gan_image_input)
+
+	d_tensor = merge([d_lambda, d_lstm_input], mode='concat', concat_axis=0)
+	d_lstm_out = LSTM(
+		500,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH] + 1, config[Conf.EMBEDDING_SIZE]),
+		return_sequences=False, dropout_U=0.25, dropout_W=0.25,
+		consume_less='gpu',
+	)(d_tensor)
+
+	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)
+	d_model = Model(input=[gan_image_input, d_lstm_input], output=d_tensor, name="d_model")
+
+	# GAN
+	gan_tensor = d_model([gan_image_input, g_tensor])
+	gan_model = Model(input=[gan_image_input, g_lstm_noise_input], output=gan_tensor)
+
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="g_model.png", show_shapes=True)
+	# plot(d_model, to_file="d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	return g_model, d_model, gan_model
+
+
 def load_generator(logger):
 	json_file = open("GAN/GAN_log/%s/model_files/generator.json" % logger.name_prefix, 'r')
 	loaded_model_json = json_file.read()
@@ -171,7 +218,7 @@ def load_discriminator(logger):
 
 def emb_predict(config, logger):
 	print "Compiling generator..."
-	generated_size = 5000
+	generated_size = 10
 	config[Conf.BATCH_SIZE] = generated_size
 
 	noise_batch = generate_input_noise(config)
@@ -179,8 +226,7 @@ def emb_predict(config, logger):
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
 	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
 	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
-	                                                              config)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)
@@ -199,14 +245,14 @@ def emb_predict(config, logger):
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
-	for i in range(1, len(g_weights), 1):
+	for i in range(0, len(g_weights), 1):
 		g_weight = g_weights[i]
 		d_weight = d_weights[i]
 		# if not int(g_weight.split("-")[1]) % 10000 == 0:
 		# 	continue
 
-		if not int(g_weight.split("-")[1]) == 12500 and not int(g_weight.split("-")[1]) == 15000:
-			continue
+		# if not int(g_weight.split("-")[1]) == 12500 and not int(g_weight.split("-")[1]) == 15000:
+		# 	continue
 		g_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, g_weight))
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
 		generated_sentences = g_model.predict(noise_batch)
@@ -310,7 +356,6 @@ def emb_evaluate(config, logger):
 
 
 def img_caption_predict(config, logger):
-	print "Compiling generator..."
 	# noise = load_pickle_file("pred.pkl")
 
 	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange',
@@ -357,6 +402,7 @@ def img_caption_predict(config, logger):
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
 	# image_batch = np.repeat([pca_65], config[Conf.BATCH_SIZE], axis=0)
 	image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
+	# image_batch = np.random.uniform(size=(config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM])).astype(dtype="float32")
 	noise_image_training_batch = generate_input_noise(config)
 	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 

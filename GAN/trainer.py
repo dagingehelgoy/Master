@@ -5,7 +5,6 @@ from GAN.helpers.datagen import generate_index_sentences, generate_input_noise, 
 from GAN.helpers.enums import WordEmbedding, Conf
 from GAN.onehot import oh_create_generator, oh_create_discriminator, oh_get_training_batch
 
-# from data.embeddings.helpers.embeddings_helper import *
 import time
 import numpy as np
 
@@ -52,7 +51,8 @@ def train(gan_logger, resume_training, config):
 	print "Compiling gan..."
 	if config[Conf.IMAGE_CAPTION]:
 		# g_model, d_model, gan_model = emb_create_image_gan(config)
-		g_model, d_model, gan_model = emb_create_image_gan_train_image(config)
+		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
+		g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -113,10 +113,11 @@ def train(gan_logger, resume_training, config):
 
 		# Shuffle data
 		if config[Conf.IMAGE_CAPTION]:
-			shuffle_indices = np.arange(all_raw_caption_data.shape[0])
-			np.random.shuffle(shuffle_indices)
-			all_raw_caption_data = all_raw_caption_data[shuffle_indices]
-			all_image_vectors = all_image_vectors[shuffle_indices]
+			# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+			# np.random.shuffle(shuffle_indices)
+			# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+			# all_image_vectors = all_image_vectors[shuffle_indices]
+			pass
 		else:
 			np.random.shuffle(all_raw_caption_data)
 
@@ -159,7 +160,7 @@ def train(gan_logger, resume_training, config):
 			if config[Conf.IMAGE_CAPTION]:
 				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(),
 				                                size=real_image_batch.shape)
-				# d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
+				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
 
 				d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)

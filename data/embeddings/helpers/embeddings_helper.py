@@ -70,6 +70,13 @@ def create_custom_dictionaries(config):
 		"the petals are yellow",
 	]
 
+	red_captions = [
+		"red red red",
+	]
+	yellow_captions = [
+		"yellow yellow yellow",
+	]
+
 	filenames = [x[0] for x in all_image_name_class_tuples]
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
@@ -86,9 +93,11 @@ def create_custom_dictionaries(config):
 			if filename_class_dict[name] == '00058':
 				# pca = pca_58
 				pca = np.zeros(config[Conf.IMAGE_DIM])
+				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
 			else:
 				# pca = pca_65
 				pca = np.ones(config[Conf.IMAGE_DIM])
+				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
 			else:

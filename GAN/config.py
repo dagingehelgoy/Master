@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "prepend-tripple-color",
+	Conf.NAME_SUFFIX: "prepend-tripple-color-fakeimg",
 	# Conf.NAME_SUFFIX: "tiny_flower",
 
 	Conf.VOCAB_SIZE: 1000,

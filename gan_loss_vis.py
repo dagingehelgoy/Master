@@ -111,8 +111,15 @@ first = None
 
 # plt.axvline(13, c='black', linestyle=':', label="Best sentence")
 
-diagram.plot(data_1['epoch'][:first:skip], data_1['g_loss'][:first:skip], c=colors[0], label='Generator')
-diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], label='Discriminator')
+gen = [0.65, 4.9, 5.7, 5.9, 6.5, 6.4, 5.8, 6.6, 6.9, 7.1, 7.6]
+disc = [0.7, 0.0, .05, 0, 0, 0, 0, 0, 0, 0, 0]
+epoch = [x for x in range(11)]
+diagram.plot(epoch, gen, c=colors[1], label='Generator', marker="D")
+diagram.plot(epoch, disc, c=colors[0], label='Discriminator', marker="D")
+
+# diagram.plot(data_1['epoch'][:first:skip], data_1['g_loss'][:first:skip], c=colors[0], label='Generator')
+# diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], label='Discriminator')
+
 
 
 """
@@ -151,4 +158,5 @@ diagram.plot(data_1['epoch'][:first:skip], d_loss_1[:first:skip], c=colors[1], l
 
 # plt.rc('font', family='Courier')
 leg = diagram.legend()
-plt.show()
+# plt.show()
+plt.savefig("loss.png", dpi=600)

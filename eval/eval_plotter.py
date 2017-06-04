@@ -27,9 +27,9 @@ def plotter():
 
 	eval_path = "/Users/markus/workspace/master/Master/eval/files/"
 	# models = onehot_dropout_models()
-	models = w2v_dropout_models()
+	# models = w2v_dropout_models()
 	# models = w2v_hidden_models()
-	# models = w2v_glove_comp()
+	models = w2v_glove_comp()
 	axes = plt.gca()
 	axes.set_ylim([0, 1])
 	axes.yaxis.grid(True)
@@ -45,13 +45,13 @@ def plotter():
 			       'avg_bleu_tfidf', 'avg_bleu_wmd'])
 
 		skip = 1
-		# itemindex = np.where(data['epoch'] == 100)[0][0]
+		itemindex = np.where(data['epoch'] == 0)[0][0]
 		# stop = itemindex + 170
 		# stop = itemindex + 300
 		# stop = itemindex + 100
-		itemindex = 0
+		# itemindex = 0
 		# stop = 32
-		stop = None
+		stop = 18
 		epoch_ = data['epoch'][itemindex:stop:skip]
 		score_ = data['avg_bleu_score'][itemindex:stop:skip]
 		distinct_sentences = [distinct_number_enlarger(x) * 4 for x in data['distinct_sentences']][::skip]
@@ -68,7 +68,9 @@ def plotter():
 	# diagram.set_xlabel('Epoch', fontsize=15)
 	diagram.set_ylabel(u'β')
 	# diagram.set_ylabel(u'β', fontsize=15)
-	plt.show()
+	import random
+	# plt.show()
+	plt.savefig("plots/beta_plot-%s.png" % random.random(), dpi=600)
 
 
 def onehot_dropout_models():
@@ -91,15 +93,15 @@ def onehot_dropout_models():
 
 def w2v_dropout_models():
 	models = [
-		# (
-		# 	"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.99dropout",
-		# 	"0.99 dropout"),
-		# (
-		# 	"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
-		# 	"0.75 dropout"),
-		# (
-		# 	"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
-		# 	"0.50 dropout"),
+		(
+			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.99dropout",
+			"0.99 dropout"),
+		(
+			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.75dropout",
+			"0.75 dropout"),
+		(
+			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
+			"0.50 dropout"),
 		(
 			"2017-05-16_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.25dropout",
 			"0.25 dropout"),
@@ -112,18 +114,18 @@ def w2v_dropout_models():
 
 def w2v_hidden_models():
 	models = [
-		(
-			"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
-			"G: 500 - D: 500"),
-		(
-			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
-			"G: 100 - D: 100"),
 		# (
-		# 	"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g200-d500",
-		# 	"G: 200 - D: 500"),
+		# 	"2017-05-10_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_0.50dropout",
+		# 	"G: 500 - D: 500"),
 		# (
-		# 	"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g500-d200",
-		# 	"G: 500 - D: 200"),
+		# 	"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g100-d100",
+		# 	"G: 100 - D: 100"),
+		(
+			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g200-d500",
+			"G: 200 - D: 500"),
+		(
+			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g500-d200",
+			"G: 500 - D: 200"),
 		(
 			"2017-05-18_ImgCapFalse_word2vec_Vocab1000_Seq12_Batch64_EmbSize50_repeat_Noise50_PreInitNone_Dataset_10_all_flowers_g300-d300",
 			"G: 300 - D: 300"),

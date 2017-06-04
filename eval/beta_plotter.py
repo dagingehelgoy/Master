@@ -56,12 +56,12 @@ def plotter():
 	colors = ['#F95400', '#0C56A2', '#F9DC00', '#00A670', '#C60074']
 	seqgan_dict = load_pickle_file("/Users/markus/workspace/master/Master/seqgan_score_dict.p")
 	emb_dict = load_pickle_file("/Users/markus/workspace/master/Master/emb_score_dict.p")
-
 	color_seqgan = colors.pop(0)
+	colors.pop(0)
 	color_emb = colors.pop(0)
-
+	plt.rc('font', family='Arial')
 	buckets = 10
-
+	plt.rcParams.update({'font.size': 20})
 	seqgan_count = [0 for _ in range(buckets)]
 	seqgan_count_uniq = [0 for _ in range(buckets)]
 
@@ -82,7 +82,6 @@ def plotter():
 	alpha_uniq = 0.4
 
 	fig, ax = plt.subplots()
-	# axes = plt.gca()
 	# axes.set_xlim([0.5, 1.0])
 	# axes.set_ylim([ymin,ymax])
 
@@ -106,13 +105,12 @@ def plotter():
 		which='both',
 		bottom='off',
 	)
-	ax.legend((seqgan_bars[0], emb_bars[0]), ('SeqGan', 'Word Embedding Model'))
+	ax.legend((seqgan_bars[0], emb_bars[0]), ('SeqGan', 'Word Embedding Model'), fontsize=20)
 
 	autolabel(seqgan_bars_uniq, ax, seqgan_count)
 	autolabel(emb_bars_uniq, ax, emb_count)
-
 	plt.show()
-
+	# plt.savefig("beta_plot.png", dpi=600)
 
 def autolabel(rects, ax, tot_values):
 	"""
@@ -125,8 +123,13 @@ def autolabel(rects, ax, tot_values):
 			continue
 		height = rect.get_height()
 		percentage = float(height) / float(tot_value) * 100
-		ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height, '%2.0f' % (percentage)  + "%", ha='center', va='bottom')
-		ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height, '%2.0f' % (percentage)  + "%", ha='center', va='bottom')
+		ax.text(
+			rect.get_x() + rect.get_width() / 2.,
+			1.05 * height,
+			'%2.0f' % (percentage)  + "%",
+			ha='center',
+			va='bottom',
+			fontsize=15)
 
 
 

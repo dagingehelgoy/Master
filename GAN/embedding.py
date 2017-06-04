@@ -1,6 +1,6 @@
 import numpy as np
 from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector, Lambda
+from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector, Lambda, Reshape
 from keras.models import Sequential, model_from_json
 
 from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch, \
@@ -166,18 +166,19 @@ def emb_create_image_gan_prepend(config):
 
 	g_merge = merge([gan_image_input, g_lstm_noise_input], mode='concat')
 	g_lstm_input = RepeatVector(config[Conf.MAX_SEQ_LENGTH])(g_merge)
-	g_tensor = LSTM(500, return_sequences=True, consume_less='gpu')(g_lstm_input)
+	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
 
 	# Discriminator
-	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH] + 1, config[Conf.EMBEDDING_SIZE]),
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 	                     name="d_model_lstm_input")
-	d_lambda = Lambda(lambda x: [x])(gan_image_input)
+	# d_lambda = Lambda(lambda x: x.insert(0, gan_image_input))(d_lstm_input)
 
-	d_tensor = merge([d_lambda, d_lstm_input], mode='concat', concat_axis=0)
+	d_reshape = Reshape((1, 50))(gan_image_input)
+	d_tensor = merge([d_reshape, d_lstm_input], mode='concat', concat_axis=1)
 	d_lstm_out = LSTM(
-		500,
+		200,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH] + 1, config[Conf.EMBEDDING_SIZE]),
 		return_sequences=False, dropout_U=0.25, dropout_W=0.25,
 		consume_less='gpu',
@@ -195,10 +196,10 @@ def emb_create_image_gan_prepend(config):
 	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	# from keras.utils.visualize_util import plot
-	# plot(g_model, to_file="g_model.png", show_shapes=True)
-	# plot(d_model, to_file="d_model.png", show_shapes=True)
-	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="g_model.png", show_shapes=True)
+	plot(d_model, to_file="d_model.png", show_shapes=True)
+	plot(gan_model, to_file="gan_model.png", show_shapes=True)
 	return g_model, d_model, gan_model
 
 

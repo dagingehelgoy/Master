@@ -166,7 +166,7 @@ def emb_create_image_gan_prepend(config):
 
 	g_merge = merge([gan_image_input, g_lstm_noise_input], mode='concat')
 	g_lstm_input = RepeatVector(config[Conf.MAX_SEQ_LENGTH])(g_merge)
-	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_lstm_input)
+	g_tensor = LSTM(500, return_sequences=True, consume_less='gpu')(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
 
@@ -178,7 +178,7 @@ def emb_create_image_gan_prepend(config):
 	d_reshape = Reshape((1, 50))(gan_image_input)
 	d_tensor = merge([d_reshape, d_lstm_input], mode='concat', concat_axis=1)
 	d_lstm_out = LSTM(
-		200,
+		500,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH] + 1, config[Conf.EMBEDDING_SIZE]),
 		return_sequences=False, dropout_U=0.25, dropout_W=0.25,
 		consume_less='gpu',

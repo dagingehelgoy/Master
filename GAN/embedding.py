@@ -261,7 +261,7 @@ def emb_create_text_gan(config):
 	g_lstm_repeated_noise = RepeatVector(config[Conf.MAX_SEQ_LENGTH] - 1)(g_lstm_noise_input)
 
 	g_merge = merge([gan_image_reshape, g_lstm_repeated_noise], mode='concat', concat_axis=1)
-	g_tensor = LSTM(200, return_sequences=True, consume_less='cpu')(g_merge)
+	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_merge)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
 
@@ -273,7 +273,7 @@ def emb_create_text_gan(config):
 		200,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 		return_sequences=False, dropout_U=0.10, dropout_W=0.10,
-		consume_less='cpu',
+		consume_less='gpu',
 	)(d_lstm_input)
 
 	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")

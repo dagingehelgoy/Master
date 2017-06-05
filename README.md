@@ -3,7 +3,7 @@
 The project is the final delivery of the Master of Science (MSc) degree in Computer Science at the Department of Computer Science (IDI) at the Norwegian University of Science and Technology (NTNU).
 
 ## Abstract
-Challenges with training GANs to produce discrete tokens has seen significant work in the past year. Generating text can be very useful for tasks such as dialog systems and image captioning. Applying deep generative models to text generation has seen limited success when compared to the visual domain and comes with the challenge of passing the gradient, while keeping the network differentiable. The known effective models that generate text with GAN extend the original framework proposed by Goodfellow using the REINFORCE loss function. We propose a novel approach that requires no modification to the training process proposed by Goodfellow and is able to produce meaningful text without any pre-training. One of the main problems with evaluating results produced by GANs is that there is no corresponding real data for each generated sample. To deal with this problem, we have developed an automatic evaluation method for text generative systems. This method combines the machine learning evaluation metric, BLEU, with a set of interchangeable information retrieval techniques. This allows us to evaluate the semantic quality of our models, as well as comparing them to a baseline.
+Challenges with training GANs to produce discrete tokens has seen significant work in the past year. Generating text can be very useful for tasks such as dialog systems and image captioning. Applying deep generative models to text generation has seen limited success when compared to the visual domain and comes with the challenge of passing the gradient, while keeping the network differentiable. The known effective models that generate text with GAN extend the original framework proposed by [Goodfellow](https://arxiv.org/abs/1406.2661) using the [REINFORCE](http://www-anw.cs.umass.edu/~barto/courses/cs687/williams92simple.pdf) loss function. We propose a novel approach that requires no modification to the training process proposed by [Goodfellow](https://arxiv.org/abs/1406.2661) and is able to produce meaningful text without any pre-training. One of the main problems with evaluating results produced by GANs is that there is no corresponding real data for each generated sample. To deal with this problem, we have developed an automatic evaluation method for text generative systems. This method combines the machine learning evaluation metric, BLEU, with a set of interchangeable information retrieval techniques. This allows us to evaluate the semantic quality of our models, as well as comparing them to a baseline.
 
 ## Results
 The following are example sentences produced by our word embedding model.
@@ -36,12 +36,11 @@ The following are example sentences produced by our word embedding model.
 [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 
 ## Usage
+To configure GAN, edit GAN/config.py
+
+To start training a new model:<br />
 `python main.py --code gan`
 
-## Requirements
-h5py==2.6.0
-Keras==1.2.2
-scipy==0.18.1
-scikit-learn==0.18.1
-tensorflow-gpu==1.1.0rc2
+To infer new sentences:<br />
+`python main.py --code gan --inference`
 

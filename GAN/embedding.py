@@ -271,8 +271,8 @@ def emb_predict(config, logger):
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
+	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	# raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 	g_model = load_generator(logger)

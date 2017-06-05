@@ -120,7 +120,7 @@ def get_custom_sentences(config):
 
 	return word_captions
 
-
+import random
 def generate_input_noise(config):
 	if config[Conf.PREINIT] == PreInit.ENCODER_DECODER:
 		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
@@ -152,7 +152,14 @@ def generate_input_noise(config):
 	elif config[Conf.NOISE_MODE] == NoiseMode.FIRST_ONLY:
 		noise_matrix = np.zeros((config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH], noise_size))
 		for batch_index in range(config[Conf.BATCH_SIZE]):
-			word_noise = np.random.uniform(0, 1, noise_size)
+			word_noise = np.random.normal(size=noise_size)
+			for word_index in range(config[Conf.MAX_SEQ_LENGTH]):
+				noise_matrix[batch_index][word_index] = word_noise
+		for batch_index in range(config[Conf.BATCH_SIZE]):
+			if random.random() < 0.5:
+				word_noise = np.zeros(noise_size)
+			else:
+				word_noise = np.ones(noise_size)
 			noise_matrix[batch_index][0] = word_noise
 		return noise_matrix
 

@@ -288,11 +288,11 @@ def emb_create_text_gan(config):
 	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	from keras.utils.visualize_util import plot
-	plot(g_model, to_file="g_model.png", show_shapes=True)
-	plot(d_model, to_file="d_model.png", show_shapes=True)
-	plot(gan_model, to_file="gan_model.png", show_shapes=True)
-	print "PLOTTED"
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="g_model.png", show_shapes=True)
+	# plot(d_model, to_file="d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	# print "PLOTTED"
 	return g_model, d_model, gan_model
 
 

@@ -204,7 +204,7 @@ def emb_create_image_gan_prepend(config):
 
 
 def emb_create_image_gan_replace_noise(config):
-	print "Generating image gan PREPEND"
+	print "Generating image gan REPLACE gan"
 
 	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_model_image_input")
 	gan_image_reshape = Reshape((1, 50))(gan_image_input)
@@ -242,10 +242,10 @@ def emb_create_image_gan_replace_noise(config):
 	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	from keras.utils.visualize_util import plot
-	plot(g_model, to_file="g_model.png", show_shapes=True)
-	plot(d_model, to_file="d_model.png", show_shapes=True)
-	plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="g_model.png", show_shapes=True)
+	# plot(d_model, to_file="d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
 	return g_model, d_model, gan_model
 
 

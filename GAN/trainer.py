@@ -53,7 +53,8 @@ def train(gan_logger, resume_training, config):
 		# g_model, d_model, gan_model = emb_create_image_gan(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
-		g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
+		# g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
+		g_model, d_model, gan_model = emb_create_text_gan(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -158,12 +159,16 @@ def train(gan_logger, resume_training, config):
 			# start_time_d = time.time()
 			d_model.trainable = True
 			if config[Conf.IMAGE_CAPTION]:
-				fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(),
-				                                size=real_image_batch.shape)
-				d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
+				# fake_images = np.random.uniform(real_image_batch.min(), real_image_batch.max(),
+				#                                 size=real_image_batch.shape)
+				# d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
 
-				d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
-				d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)
+				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch], training_batch_y_ones)
+				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch], training_batch_y_zeros)
+
+
+				# d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
+				# d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)
 			else:
 				d_loss_train, d_acc_train = d_model.train_on_batch(real_caption_batch, training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch(fake_generated_caption_batch, training_batch_y_zeros)

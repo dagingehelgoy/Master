@@ -249,6 +249,53 @@ def emb_create_image_gan_replace_noise(config):
 	return g_model, d_model, gan_model
 
 
+def emb_create_text_gan(config):
+	print "Generating image gan only text"
+
+	gan_image_input = Input(shape=(config[Conf.IMAGE_DIM],), name="gan_img_input")
+	gan_image_reshape = Reshape((1, 50))(gan_image_input)
+
+	# Generator
+
+	g_lstm_noise_input = Input(shape=(config[Conf.NOISE_SIZE],), name="g_model_lstm_noise_input")
+	g_lstm_repeated_noise = RepeatVector(config[Conf.MAX_SEQ_LENGTH] - 1)(g_lstm_noise_input)
+
+	g_merge = merge([gan_image_reshape, g_lstm_repeated_noise], mode='concat', concat_axis=1)
+	g_tensor = LSTM(200, return_sequences=True, consume_less='cpu')(g_merge)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=[gan_image_input, g_lstm_noise_input], output=g_tensor)
+
+	# Discriminator
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
+
+	d_tensor = merge([gan_image_reshape, d_lstm_input], mode='concat', concat_axis=1)
+	d_lstm_out = LSTM(
+		200,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+		return_sequences=False, dropout_U=0.10, dropout_W=0.10,
+		consume_less='cpu',
+	)(d_lstm_input)
+
+	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)
+	d_model = Model(input=[d_lstm_input], output=d_tensor, name="d_model")
+
+	# GAN
+	gan_tensor = d_model([g_tensor])
+	gan_model = Model(input=[gan_image_input, g_lstm_noise_input], output=gan_tensor)
+
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="g_model.png", show_shapes=True)
+	plot(d_model, to_file="d_model.png", show_shapes=True)
+	plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	print "PLOTTED"
+	return g_model, d_model, gan_model
+
+
 def load_generator(logger):
 	json_file = open("GAN/GAN_log/%s/model_files/generator.json" % logger.name_prefix, 'r')
 	loaded_model_json = json_file.read()

@@ -52,7 +52,8 @@ def train(gan_logger, resume_training, config):
 	if config[Conf.IMAGE_CAPTION]:
 		# g_model, d_model, gan_model = emb_create_image_gan(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
-		g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
+		# g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
+		g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -113,11 +114,10 @@ def train(gan_logger, resume_training, config):
 
 		# Shuffle data
 		if config[Conf.IMAGE_CAPTION]:
-			# shuffle_indices = np.arange(all_raw_caption_data.shape[0])
-			# np.random.shuffle(shuffle_indices)
-			# all_raw_caption_data = all_raw_caption_data[shuffle_indices]
-			# all_image_vectors = all_image_vectors[shuffle_indices]
-			pass
+			shuffle_indices = np.arange(all_raw_caption_data.shape[0])
+			np.random.shuffle(shuffle_indices)
+			all_raw_caption_data = all_raw_caption_data[shuffle_indices]
+			all_image_vectors = all_image_vectors[shuffle_indices]
 		else:
 			np.random.shuffle(all_raw_caption_data)
 

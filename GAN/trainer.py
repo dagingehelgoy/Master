@@ -143,9 +143,9 @@ def train(gan_logger, resume_training, config):
 			if config[Conf.IMAGE_CAPTION]:
 				# fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])
 				noise_image_training_batch = generate_input_noise(config)
-				A = np.repeat(noise_image_training_batch, 4, axis=0)
-				B = np.reshape(A, (config[Conf.BATCH_SIZE], 4, 50))
-				C = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, 50))
+				A = np.repeat(noise_image_training_batch, config[Conf.MAX_SEQ_LENGTH] - 1, axis=0)
+				B = np.reshape(A, (config[Conf.BATCH_SIZE], config[Conf.MAX_SEQ_LENGTH] - 1, 50))
+				C = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, config[Conf.IMAGE_DIM] - 1))
 				D = np.append(C, B, axis=1)
 				fake_generated_caption_batch = g_model.predict(D)
 			else:

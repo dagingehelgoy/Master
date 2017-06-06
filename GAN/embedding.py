@@ -295,7 +295,7 @@ def emb_create_text_gan(config):
 	return g_model, d_model, gan_model
 
 
-def emb_create_text_gan_custom(config):
+def emb_gan_seq_only_text(config):
 	print "Generating image gan only text CUSTOM"
 
 	# GENERATOR
@@ -336,6 +336,52 @@ def emb_create_text_gan_custom(config):
 	# plot(gan_model, to_file="GAN_TEXT_SEQ_gan_model.png", show_shapes=True)
 	# print "PLOTTED"
 	return g_model, d_model, gan_model
+
+
+def emb_gan_func_only_text(config):
+	print "Generating image gan only text CUSTOM"
+
+	g_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]), name="g_model_lstm_noise_input")
+
+	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_lstm_input)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=[g_lstm_input], output=g_tensor)
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+
+
+	d_sentence_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_sentence_input")
+	# d_img_input = Input(shape=(1, config[Conf.IMAGE_DIM]), name="d_model_img_input")
+	# d_tensor = merge([d_img_input, d_sentence_input], mode='concat', concat_axis=1)
+	d_lstm_out = LSTM(
+		200,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+		return_sequences=False, dropout_U=0.10, dropout_W=0.10,
+		consume_less='gpu',
+	)(d_sentence_input)
+
+	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)
+	d_model = Model(input=[d_sentence_input], output=d_tensor, name="d_model")
+	# d_model = Model(input=[d_img_input, d_sentence_input], output=d_tensor, name="d_model")
+	d_model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+	d_model.trainable = True
+
+	# GAN MODEL
+	# gan_tensor = d_model([d_img_input, g_tensor])
+	# gan_model = Model(input=[d_img_input, g_lstm_input], output=gan_tensor)
+
+	gan_tensor = d_model([g_tensor])
+	gan_model = Model(input=[g_lstm_input], output=gan_tensor)
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="GAN_TEXT_FUNC_g_model.png", show_shapes=True)
+	plot(d_model, to_file="GAN_TEXT_FUNC_d_model.png", show_shapes=True)
+	plot(gan_model, to_file="GAN_TEXT_FUNC_gan_model.png", show_shapes=True)
+	print "PLOTTED"
+	return g_model, d_model, gan_model
+
 
 
 def load_generator(logger):

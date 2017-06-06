@@ -54,8 +54,8 @@ def train(gan_logger, resume_training, config):
 		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
-		# g_model, d_model, gan_model = emb_create_text_gan(config)
-		g_model, d_model, gan_model = emb_create_text_gan_custom(config)
+		g_model, d_model, gan_model = emb_gan_func_only_text(config)
+		# g_model, d_model, gan_model = emb_gan_seq_only_text(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -144,8 +144,8 @@ def train(gan_logger, resume_training, config):
 				# fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])
 				noise_image_training_batch = generate_input_noise(config)
 				A = np.repeat(noise_image_training_batch, 4, axis=0)
-				B = np.reshape(A, (64, 4, 50))
-				C = np.reshape(real_image_batch, (64, 1, 50))
+				B = np.reshape(A, (config[Conf.BATCH_SIZE], 4, 50))
+				C = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, 50))
 				D = np.append(C, B, axis=1)
 				fake_generated_caption_batch = g_model.predict(D)
 			else:

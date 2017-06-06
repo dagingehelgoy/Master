@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "GAN_only_text",
+	Conf.NAME_SUFFIX: "GAN_only_text_func",
 	# Conf.NAME_SUFFIX: "tiny_flower",
 
 	Conf.VOCAB_SIZE: 1000,
@@ -56,7 +56,7 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-06-03_ImgCapTrue_word2vec_Vocab1000_Seq5_Batch128_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_tripple-color",
+	# Conf.MODELNAME: "2017-06-06_ImgCapFalse_word2vec_Vocab1000_Seq5_Batch64_EmbSize50_firstonly_Noise50_PreInitNone_Dataset_trippleflower_GAN_only_text_seq",
 	Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: True,

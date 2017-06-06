@@ -20,11 +20,11 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "GAN_img_func",
+	Conf.NAME_SUFFIX: "one_pca_two_flowers",
 	# Conf.NAME_SUFFIX: "tiny_flower",
 
 	Conf.VOCAB_SIZE: 1000,
-	Conf.MAX_SEQ_LENGTH: 5,
+	Conf.MAX_SEQ_LENGTH: 12,
 
 	# Conf.LIMITED_DATASET: "flowers",
 	# Conf.LIMITED_DATASET: "00058.txt",
@@ -61,5 +61,8 @@ config = {
 	#
 	Conf.IMAGE_CAPTION: True,
 	Conf.IMAGE_DIM: 50,
+
+
+	Conf.LOGGER: None
 }
 

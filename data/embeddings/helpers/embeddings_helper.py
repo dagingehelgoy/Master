@@ -56,47 +56,33 @@ def create_custom_dictionaries(config):
 	filename_pca_dict = dict()
 	name_pca_tuples = fetch_all_pca_vector_pairs()
 
-	# filename_58 = image_name_class_tuple_58[0][0]
-	# filename_65 = image_name_class_tuple_65[0][0]
+	filename_58 = image_name_class_tuple_58[0][0]
+	filename_65 = image_name_class_tuple_65[0][0]
 
-	# pca_58 = fetch_pca_vector(filename_58)
-	# pca_65 = fetch_pca_vector(filename_65)
-	red_captions = [
-		"this flower is red",
-		"the petals are red",
-	]
-	yellow_captions = [
-		"this flower is yellow",
-		"the petals are yellow",
-	]
-
-	red_captions = [
-		"red red red",
-	]
-	yellow_captions = [
-		"yellow yellow yellow",
-	]
-
+	pca_58 = fetch_pca_vector(filename_58)
+	pca_65 = fetch_pca_vector(filename_65)
 	filenames = [x[0] for x in all_image_name_class_tuples]
+	config[Conf.LOGGER].write_to_comments_file("Red PCA %s" % pca_58)
+	config[Conf.LOGGER].write_to_comments_file("Yellow PCA %s" % pca_65)
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
-			if filename_class_dict[name] == '00058':
-				caption = red_captions[0]
-			else:
-				caption = yellow_captions[0]
+			cap_length = len(caption.split(" "))
+			if cap_length > 10:
+				continue
 			if name in filename_caption_dict:
 				filename_caption_dict[name].append(caption)
 			else:
 				filename_caption_dict[name] = [caption]
+
 	for (name, pca) in name_pca_tuples:
 		if name in filenames:
 			if filename_class_dict[name] == '00058':
-				# pca = pca_58
-				pca = np.zeros(config[Conf.IMAGE_DIM])
+				pca = pca_58
+				# pca = np.zeros(config[Conf.IMAGE_DIM])
 				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
 			else:
-				# pca = pca_65
-				pca = np.ones(config[Conf.IMAGE_DIM])
+				pca = pca_65
+				# pca = np.ones(config[Conf.IMAGE_DIM])
 				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
 			if name in filename_pca_dict:
 				filename_pca_dict[name].append(pca)
@@ -168,6 +154,8 @@ def get_custom_examples(filename_class_dict, filename_caption_dict, filename_pca
 		# else:
 		# 	pca_vector = None
 		pca_vector = filename_pca_dict[image_name][0]
+		if image_name not in filename_caption_dict:
+			continue
 		captions = filename_caption_dict[image_name]
 		for caption in captions:
 			sorted_image_data.append(pca_vector)

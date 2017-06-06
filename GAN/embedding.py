@@ -337,12 +337,12 @@ def emb_gan_seq_only_text(config):
 	return g_model, d_model, gan_model
 
 
-def emb_gan_func_only_text(config):
-	print "Generating image gan only text FUNCITONAL"
+def emb_gan_func_img(config):
+	print "Generating image gan image FUNCITONAL"
 
 	g_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]), name="g_model_lstm_noise_input")
 
-	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_lstm_input)
+	g_tensor = LSTM(400, return_sequences=True, consume_less='gpu')(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
 	g_model = Model(input=[g_lstm_input], output=g_tensor)
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
@@ -352,9 +352,9 @@ def emb_gan_func_only_text(config):
 
 	d_tensor = merge([d_img_input, d_sentence_input], mode='concat', concat_axis=1)
 	d_lstm_out = LSTM(
-		200,
+		400,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=False, dropout_U=0.10, dropout_W=0.10,
+		return_sequences=False, dropout_U=0.20, dropout_W=0.20,
 		consume_less='gpu'
 	)(d_tensor)
 
@@ -539,7 +539,6 @@ def emb_evaluate(config, logger):
 
 def img_caption_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
-
 
 	generated_size = 10
 	config[Conf.BATCH_SIZE] = generated_size

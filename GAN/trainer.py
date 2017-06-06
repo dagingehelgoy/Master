@@ -54,7 +54,7 @@ def train(gan_logger, resume_training, config):
 		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
-		g_model, d_model, gan_model = emb_gan_func_only_text(config)
+		g_model, d_model, gan_model = emb_gan_func_img(config)
 		# g_model, d_model, gan_model = emb_gan_seq_only_text(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)

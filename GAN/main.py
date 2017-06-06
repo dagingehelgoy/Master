@@ -10,6 +10,7 @@ from GAN.config import config
 def gan_main(inference, eval, plot, resume_training):
 	logger = GANLogger(config, inference)
 	logger.print_start_message()
+	config[Conf.LOGGER] = logger
 	if inference:
 		print "Predicting"
 		if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:

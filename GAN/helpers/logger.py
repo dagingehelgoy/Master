@@ -131,6 +131,11 @@ class GANLogger:
 		sys.stdout = orig_stdout
 		summary_file.close()
 
+	def write_to_comments_file(self, text):
+		summary_file = open("GAN/GAN_log/%s/comments.txt" % self.name_prefix, "a")
+		summary_file.write("%s\n" % text)
+		summary_file.close()
+
 	def save_eval_data(self, epoch, distinct_sentences, sentence_count, avg_bleu_score, avg_bleu_cosine, avg_bleu_tfidf,
 	                   avg_bleu_wmd):
 		eval_file = open("GAN/GAN_log/%s/eval.txt" % self.name_prefix, "a+")

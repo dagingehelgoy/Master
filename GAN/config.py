@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "GAN_only_text",
+	Conf.NAME_SUFFIX: "GAN_only_text_custom",
 	# Conf.NAME_SUFFIX: "tiny_flower",
 
 	Conf.VOCAB_SIZE: 1000,

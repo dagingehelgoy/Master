@@ -38,7 +38,7 @@ config = {
 	# Conf.LIMITED_DATASET: "trippleflower.txt",
 	Conf.LIMITED_DATASET: None,
 	Conf.DATASET_SIZE: -1,
-	Conf.BATCH_SIZE: 64,
+	Conf.BATCH_SIZE: 32,
 	Conf.EPOCHS: 10000000,
 
 	# Conf.NOISE_MODE: NoiseMode.REPEAT,

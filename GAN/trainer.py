@@ -167,12 +167,13 @@ def train(gan_logger, resume_training, config):
 				#                                 size=real_image_batch.shape)
 				# d_loss_fake_img, d_acc_fake_img = d_model.train_on_batch([fake_images, real_caption_batch], training_batch_y_zeros)
 
-				d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch], training_batch_y_ones)
-				d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch], training_batch_y_zeros)
+				# d_loss_train, d_acc_train = d_model.train_on_batch([real_caption_batch], training_batch_y_ones)
+				# d_loss_gen, d_acc_gen = d_model.train_on_batch([fake_generated_caption_batch], training_batch_y_zeros)
 
 
-				# d_loss_train, d_acc_train = d_model.train_on_batch([real_image_batch, real_caption_batch], training_batch_y_ones)
-				# d_loss_gen, d_acc_gen = d_model.train_on_batch([real_image_batch, fake_generated_caption_batch], training_batch_y_zeros)
+				reshape_image = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, config[Conf.IMAGE_DIM]))
+				d_loss_train, d_acc_train = d_model.train_on_batch([reshape_image, real_caption_batch], training_batch_y_ones)
+				d_loss_gen, d_acc_gen = d_model.train_on_batch([reshape_image, fake_generated_caption_batch], training_batch_y_zeros)
 			else:
 				d_loss_train, d_acc_train = d_model.train_on_batch(real_caption_batch, training_batch_y_ones)
 				d_loss_gen, d_acc_gen = d_model.train_on_batch(fake_generated_caption_batch, training_batch_y_zeros)
@@ -188,8 +189,8 @@ def train(gan_logger, resume_training, config):
 				B = np.reshape(A, (config[Conf.BATCH_SIZE], 4, 50))
 				C = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, 50))
 				D = np.append(C, B, axis=1)
-				g_loss, g_acc = gan_model.train_on_batch(D, training_batch_y_ones)
-				# g_loss, g_acc = gan_model.train_on_batch([real_image_batch, noise_image_training_batch], training_batch_y_ones)
+				# g_loss, g_acc = gan_model.train_on_batch(D, training_batch_y_ones)
+				g_loss, g_acc = gan_model.train_on_batch([C, D], training_batch_y_ones)
 			else:
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 			# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))

@@ -61,6 +61,7 @@ def train(gan_logger, resume_training, config):
 		d_model = oh_create_discriminator(config)
 		gan_model = generator_containing_discriminator(g_model, d_model)
 	else:
+		print "GAN FROM OLD"
 		g_model = emb_create_generator(config)
 		d_model = emb_create_discriminator(config)
 		gan_model = generator_containing_discriminator(g_model, d_model)
@@ -126,9 +127,7 @@ def train(gan_logger, resume_training, config):
 		for batch_counter in range(nb_batches):
 			# if batch_counter % 10 == 0:
 			# 	print_progress(batch_counter, nb_batches, prefix="Training batches")
-			raw_caption_training_batch = all_raw_caption_data[
-			                             batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[
-				                             Conf.BATCH_SIZE]]
+			raw_caption_training_batch = all_raw_caption_data[batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[Conf.BATCH_SIZE]]
 
 			if config[Conf.IMAGE_CAPTION]:
 				real_image_batch = np.asarray(all_image_vectors[
@@ -139,8 +138,7 @@ def train(gan_logger, resume_training, config):
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, word_to_id_dict, config)
 			else:
-				real_caption_batch = emb_generate_caption_training_batch(raw_caption_training_batch,
-				                                                         word_embedding_dict, config)
+				real_caption_batch = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
 
 			if config[Conf.IMAGE_CAPTION]:
 				# fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])

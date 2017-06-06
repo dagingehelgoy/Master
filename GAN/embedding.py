@@ -298,41 +298,43 @@ def emb_create_text_gan(config):
 def emb_create_text_gan_custom(config):
 	print "Generating image gan only text CUSTOM"
 
-	generator_img_noise_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.IMAGE_DIM]), name="gan_img_input")
-
-	# Generator
-
-	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(generator_img_noise_input)
-	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
-	g_model = Model(input=[generator_img_noise_input], output=g_tensor)
-
-	# Discriminator
-	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
-
-	d_lstm_out = LSTM(
-		200,
-		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
-		return_sequences=False, dropout_U=0.25, dropout_W=0.25,
-		consume_less='gpu',
-	)(d_lstm_input)
-
-	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
-	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)
-	d_model = Model(input=[d_lstm_input], output=d_tensor, name="d_model")
-
-	# GAN
-	gan_tensor = d_model([g_tensor])
-	gan_model = Model(input=[generator_img_noise_input], output=gan_tensor)
-
+	# GENERATOR
+	g_model = Sequential()
+	g_model.add(LSTM(
+		500,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]),
+		return_sequences=True,
+		consume_less='gpu'
+	)
+	)
+	g_model.add(TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation="tanh")))
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
-	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
+
+	# DISCRIMINATOR
+	d_model = Sequential()
+	d_model.add(LSTM(
+			500,
+			input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+			return_sequences=False, dropout_U=0.25, dropout_W=0.25,
+			consume_less='gpu',
+		)
+	)
+	d_model.add(Dense(1, activation="sigmoid"))
+	d_model.trainable = True
+	d_model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+
+	# GAN MODEL
+	gan_model = Sequential()
+	gan_model.add(g_model)
+	d_model.trainable = False
+	gan_model.add(d_model)
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	from keras.utils.visualize_util import plot
-	plot(g_model, to_file="GAN_TEXT_CUSTOM_g_model.png", show_shapes=True)
-	plot(d_model, to_file="GAN_TEXT_CUSTOM_d_model.png", show_shapes=True)
-	plot(gan_model, to_file="GAN_TEXT_CUSTOM_gan_model.png", show_shapes=True)
-	print "PLOTTED"
+	# from keras.utils.visualize_util import plot
+	# plot(g_model, to_file="GAN_TEXT_SEQ_g_model.png", show_shapes=True)
+	# plot(d_model, to_file="GAN_TEXT_SEQ_d_model.png", show_shapes=True)
+	# plot(gan_model, to_file="GAN_TEXT_SEQ_gan_model.png", show_shapes=True)
+	# print "PLOTTED"
 	return g_model, d_model, gan_model
 
 
@@ -358,8 +360,8 @@ def emb_predict(config, logger):
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
+	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	# raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
 	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
 	                                                              config)
 

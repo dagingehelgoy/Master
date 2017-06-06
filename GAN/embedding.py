@@ -335,6 +335,7 @@ def emb_create_text_gan_custom(config):
 	print "PLOTTED"
 	return g_model, d_model, gan_model
 
+
 def load_generator(logger):
 	json_file = open("GAN/GAN_log/%s/model_files/generator.json" % logger.name_prefix, 'r')
 	loaded_model_json = json_file.read()
@@ -357,9 +358,10 @@ def emb_predict(config, logger):
 	noise_batch = generate_input_noise(config)
 	# noise = load_pickle_file("pred.pkl")
 	word_list_sentences, word_embedding_dict = generate_string_sentences(config)
-	raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
-	# raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
-	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict, config)
+	# raw_caption_training_batch = word_list_sentences[np.random.randint(word_list_sentences.shape[0], size=4), :]
+	raw_caption_training_batch = np.random.choice(word_list_sentences, 4)
+	real_embedded_sentences = emb_generate_caption_training_batch(raw_caption_training_batch, word_embedding_dict,
+	                                                              config)
 
 	g_model = load_generator(logger)
 	d_model = load_discriminator(logger)
@@ -423,9 +425,9 @@ def emb_predict(config, logger):
 		sentence_tuple_list = sorted(sentence_tuple_list, key=lambda x: x[1], reverse=True)
 		for (s, c) in sentence_tuple_list[:50]:
 			print "%5.4f\t%s" % (c, s)
-		print "Percentage distinct: %s" % (float(len(set(sentence_list)))/generated_size)
-		# for s in sorted(sentence_tuple_list):
-		# 	print s
+		print "Percentage distinct: %s" % (float(len(set(sentence_list))) / generated_size)
+	# for s in sorted(sentence_tuple_list):
+	# 	print s
 
 
 def emb_evaluate(config, logger):
@@ -491,6 +493,10 @@ def emb_evaluate(config, logger):
 def img_caption_predict(config, logger):
 	# noise = load_pickle_file("pred.pkl")
 
+
+	generated_size = 10
+	config[Conf.BATCH_SIZE] = generated_size
+
 	colors = ['black', 'blue', 'brown', 'burgundy', 'gold', 'golden', 'green', 'grey', 'indigo', 'magenta', 'orange',
 	          'pink', 'purple', 'red', 'white', 'yellow', 'yellow-orange', 'violet']
 
@@ -544,7 +550,6 @@ def img_caption_predict(config, logger):
 	B = np.reshape(A, (64, 4, 50))
 	C = np.reshape(image_batch, (64, 1, 50))
 	D = np.append(C, B, axis=1)
-
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)

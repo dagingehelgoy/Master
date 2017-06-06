@@ -587,7 +587,7 @@ def img_caption_predict(config, logger):
 	# pca_yellow = fetch_pca_vector(filename_red + ".jpg")
 	image_batch_58 = np.repeat([pca_58], config[Conf.BATCH_SIZE]/2, axis=0)
 	image_batch_65 = np.repeat([pca_65], config[Conf.BATCH_SIZE]/2, axis=0)
-	image_batch = np.append(image_batch_58, image_batch_65, axis=1)
+	image_batch = np.append(image_batch_58, image_batch_65, axis=0)
 	# image_batch = np.ones((config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM]))
 	# image_batch = np.random.uniform(size=(config[Conf.BATCH_SIZE], config[Conf.IMAGE_DIM])).astype(dtype="float32")
 	# noise_image_training_batch = generate_input_noise(config)

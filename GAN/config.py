@@ -56,8 +56,8 @@ config = {
 
 	Conf.WORD2VEC_NUM_STEPS: 100001,
 
-	# Conf.MODELNAME: "2017-06-06_ImgCapTrue_word2vec_Vocab1000_Seq5_Batch64_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_GAN_only_text_func",
-	Conf.MODELNAME: None,
+	Conf.MODELNAME: "2017-06-06_ImgCapTrue_word2vec_Vocab1000_Seq12_Batch32_EmbSize50_repeat_single_Noise50_PreInitNone_Dataset-1_one_pca_two_flowers",
+	# Conf.MODELNAME: None,
 	#
 	Conf.IMAGE_CAPTION: True,
 	Conf.IMAGE_DIM: 50,

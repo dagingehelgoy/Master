@@ -547,8 +547,8 @@ def img_caption_predict(config, logger):
 
 	noise_image_training_batch = generate_input_noise(config)
 	A = np.repeat(noise_image_training_batch, 4, axis=0)
-	B = np.reshape(A, (64, 4, 50))
-	C = np.reshape(image_batch, (64, 1, 50))
+	B = np.reshape(A, (generated_size, 4, 50))
+	C = np.reshape(image_batch, (generated_size, 1, 50))
 	D = np.append(C, B, axis=1)
 
 	print "Num g_weights: %s" % len(g_weights)

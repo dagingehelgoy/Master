@@ -539,6 +539,12 @@ def img_caption_predict(config, logger):
 	noise_image_training_batch = generate_input_noise(config)
 	# noise_image_training_batch = generate_image_with_noise_training_batch(image_batch, config)
 
+	noise_image_training_batch = generate_input_noise(config)
+	A = np.repeat(noise_image_training_batch, 4, axis=0)
+	B = np.reshape(A, (64, 4, 50))
+	C = np.reshape(real_image_batch, (64, 1, 50))
+	D = np.append(C, B, axis=1)
+
 
 	print "Num g_weights: %s" % len(g_weights)
 	print "Num d_weights: %s" % len(g_weights)
@@ -552,7 +558,8 @@ def img_caption_predict(config, logger):
 		d_model.load_weights("GAN/GAN_log/%s/model_files/stored_weights/%s" % (logger.name_prefix, d_weight))
 
 		# generated_sentences = g_model.predict(noise_image_training_batch[:10])
-		generated_sentences = g_model.predict([image_batch[:10], noise_image_training_batch[:10]])
+		# generated_sentences = g_model.predict([image_batch[:10], noise_image_training_batch[:10]])
+		generated_sentences = g_model.predict(D)
 		# generated_classifications = d_model.predict([image_batch, generated_sentences])
 
 		gen_header_string = "\n\nGENERATED SENTENCES: (%s)\n" % g_weight

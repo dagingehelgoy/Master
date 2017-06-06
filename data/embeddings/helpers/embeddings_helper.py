@@ -3,6 +3,7 @@ from GAN.helpers.enums import Conf
 from data.database.helpers.caption_database_helper import *
 from data.database.helpers.image_database_helper import *
 from data.database.helpers.pca_database_helper import fetch_all_pca_vector_pairs, fetch_pca_vector
+from data.database.helpers.sqlite_wrapper import db_all_filename_class_vector_tuple
 from helpers.io_helper import *
 
 
@@ -36,14 +37,15 @@ def fetch_custom_embeddings(config):
 
 
 def create_custom_dictionaries(config):
-	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
-	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
-	if len(image_name_class_tuple_58) > len(image_name_class_tuple_65):
-		image_name_class_tuple_58 = image_name_class_tuple_58[:len(image_name_class_tuple_65)]
-	else:
-		image_name_class_tuple_65 = image_name_class_tuple_65[:len(image_name_class_tuple_58)]
+	# image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
+	# image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
+	# if len(image_name_class_tuple_58) > len(image_name_class_tuple_65):
+	# 	image_name_class_tuple_58 = image_name_class_tuple_58[:len(image_name_class_tuple_65)]
+	# else:
+	# 	image_name_class_tuple_65 = image_name_class_tuple_65[:len(image_name_class_tuple_58)]
 
-	all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
+	# all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
+	all_image_name_class_tuples = db_all_filename_class_vector_tuple()
 
 	num_images = len(all_image_name_class_tuples)
 	filename_class_dict = dict(all_image_name_class_tuples)
@@ -56,14 +58,14 @@ def create_custom_dictionaries(config):
 	filename_pca_dict = dict()
 	name_pca_tuples = fetch_all_pca_vector_pairs()
 
-	filename_58 = image_name_class_tuple_58[0][0]
-	filename_65 = image_name_class_tuple_65[0][0]
+	# filename_58 = image_name_class_tuple_58[0][0]
+	# filename_65 = image_name_class_tuple_65[0][0]
 
-	pca_58 = fetch_pca_vector(filename_58)
-	pca_65 = fetch_pca_vector(filename_65)
+	# pca_58 = fetch_pca_vector(filename_58)
+	# pca_65 = fetch_pca_vector(filename_65)
 	filenames = [x[0] for x in all_image_name_class_tuples]
-	config[Conf.LOGGER].write_to_comments_file("Red PCA %s" % pca_58)
-	config[Conf.LOGGER].write_to_comments_file("Yellow PCA %s" % pca_65)
+	# config[Conf.LOGGER].write_to_comments_file("Red PCA %s" % pca_58)
+	# config[Conf.LOGGER].write_to_comments_file("Yellow PCA %s" % pca_65)
 	for (name, caption) in name_cap_tuples:
 		if name in filenames:
 			cap_length = len(caption.split(" "))
@@ -76,12 +78,12 @@ def create_custom_dictionaries(config):
 
 	for (name, pca) in name_pca_tuples:
 		if name in filenames:
-			if filename_class_dict[name] == '00058':
-				pca = pca_58
-				# pca = np.zeros(config[Conf.IMAGE_DIM])
-				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
-			else:
-				pca = pca_65
+			# if filename_class_dict[name] == '00058':
+			# 	pca = pca_58
+			# 	# pca = np.zeros(config[Conf.IMAGE_DIM])
+			# 	# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
+			# else:
+			# 	pca = pca_65
 				# pca = np.ones(config[Conf.IMAGE_DIM])
 				# pca = np.random.uniform(size=config[Conf.IMAGE_DIM]).astype(dtype="float32")
 			if name in filename_pca_dict:

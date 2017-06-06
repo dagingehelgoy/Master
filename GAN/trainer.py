@@ -54,7 +54,8 @@ def train(gan_logger, resume_training, config):
 		# g_model, d_model, gan_model = emb_create_image_gan_merge(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_prepend(config)
 		# g_model, d_model, gan_model = emb_create_image_gan_replace_noise(config)
-		g_model, d_model, gan_model = emb_create_text_gan(config)
+		# g_model, d_model, gan_model = emb_create_text_gan(config)
+		g_model, d_model, gan_model = emb_create_text_gan_custom(config)
 	elif config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 		g_model = oh_create_generator(config)
 		d_model = oh_create_discriminator(config)
@@ -134,7 +135,6 @@ def train(gan_logger, resume_training, config):
 				                              batch_counter * config[Conf.BATCH_SIZE]:(batch_counter + 1) * config[
 					                              Conf.BATCH_SIZE]])
 				# noise_image_training_batch = generate_image_with_noise_training_batch(real_image_batch, config)
-				noise_image_training_batch = generate_input_noise(config)
 
 			if config[Conf.WORD_EMBEDDING] == WordEmbedding.ONE_HOT:
 				real_caption_batch = oh_get_training_batch(raw_caption_training_batch, word_to_id_dict, config)
@@ -143,7 +143,13 @@ def train(gan_logger, resume_training, config):
 				                                                         word_embedding_dict, config)
 
 			if config[Conf.IMAGE_CAPTION]:
-				fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])
+				# fake_generated_caption_batch = g_model.predict([real_image_batch, noise_image_training_batch])
+				noise_image_training_batch = generate_input_noise(config)
+				A = np.repeat(noise_image_training_batch, 4, axis=0)
+				B = np.reshape(A, (64, 4, 50))
+				C = np.reshape(real_image_batch, (64, 1, 50))
+				D = np.append(C, B, axis=1)
+				fake_generated_caption_batch = g_model.predict(D)
 			else:
 				noise_batch = generate_input_noise(config)
 				fake_generated_caption_batch = g_model.predict(noise_batch)
@@ -179,8 +185,13 @@ def train(gan_logger, resume_training, config):
 			# start_time_g = time.time()
 			# Train generator
 			if config[Conf.IMAGE_CAPTION]:
-				g_loss, g_acc = gan_model.train_on_batch([real_image_batch, noise_image_training_batch],
-				                                         training_batch_y_ones)
+				noise_image_training_batch = generate_input_noise(config)
+				A = np.repeat(noise_image_training_batch, 4, axis=0)
+				B = np.reshape(A, (64, 4, 50))
+				C = np.reshape(real_image_batch, (64, 1, 50))
+				D = np.append(C, B, axis=1)
+				g_loss, g_acc = gan_model.train_on_batch(D, training_batch_y_ones)
+				# g_loss, g_acc = gan_model.train_on_batch([real_image_batch, noise_image_training_batch], training_batch_y_ones)
 			else:
 				g_loss, g_acc = gan_model.train_on_batch(noise_batch, training_batch_y_ones)
 			# print("Generator --- %s\tseconds ---" % (time.time() - start_time_g))

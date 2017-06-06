@@ -1,6 +1,6 @@
 import numpy as np
 from keras.engine import Input, merge, Model
-from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector, Lambda, Reshape
+from keras.layers import LSTM, TimeDistributed, Dense, Dropout, RepeatVector, Reshape
 from keras.models import Sequential, model_from_json
 
 from GAN.helpers.datagen import generate_input_noise, generate_string_sentences, generate_image_training_batch, \
@@ -242,10 +242,10 @@ def emb_create_image_gan_replace_noise(config):
 	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	# from keras.utils.visualize_util import plot
-	# plot(g_model, to_file="g_model.png", show_shapes=True)
-	# plot(d_model, to_file="d_model.png", show_shapes=True)
-	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="g_model.png", show_shapes=True)
+	plot(d_model, to_file="d_model.png", show_shapes=True)
+	plot(gan_model, to_file="gan_model.png", show_shapes=True)
 	return g_model, d_model, gan_model
 
 
@@ -268,7 +268,6 @@ def emb_create_text_gan(config):
 	# Discriminator
 	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
 
-	d_tensor = merge([gan_image_reshape, d_lstm_input], mode='concat', concat_axis=1)
 	d_lstm_out = LSTM(
 		200,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
@@ -288,13 +287,53 @@ def emb_create_text_gan(config):
 	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
 	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
 
-	# from keras.utils.visualize_util import plot
-	# plot(g_model, to_file="g_model.png", show_shapes=True)
-	# plot(d_model, to_file="d_model.png", show_shapes=True)
-	# plot(gan_model, to_file="gan_model.png", show_shapes=True)
-	# print "PLOTTED"
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="GAN_TEXT_g_model.png", show_shapes=True)
+	plot(d_model, to_file="GAN_TEXT_d_model.png", show_shapes=True)
+	plot(gan_model, to_file="GAN_TEXT_gan_model.png", show_shapes=True)
+	print "PLOTTED"
 	return g_model, d_model, gan_model
 
+
+def emb_create_text_gan_custom(config):
+	print "Generating image gan only text CUSTOM"
+
+	generator_img_noise_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.IMAGE_DIM]), name="gan_img_input")
+
+	# Generator
+
+	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(generator_img_noise_input)
+	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
+	g_model = Model(input=[generator_img_noise_input], output=g_tensor)
+
+	# Discriminator
+	d_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_lstm_input")
+
+	d_lstm_out = LSTM(
+		200,
+		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
+		return_sequences=False, dropout_U=0.25, dropout_W=0.25,
+		consume_less='gpu',
+	)(d_lstm_input)
+
+	# img_input = Input(shape=(config[Conf.IMAGE_DIM],), name="d_model_img_input")
+	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)
+	d_model = Model(input=[d_lstm_input], output=d_tensor, name="d_model")
+
+	# GAN
+	gan_tensor = d_model([g_tensor])
+	gan_model = Model(input=[generator_img_noise_input], output=gan_tensor)
+
+	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+	d_model.compile(loss='binary_crossentropy', optimizer="sgd", metrics=['accuracy'])
+	gan_model.compile(loss='binary_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+	from keras.utils.visualize_util import plot
+	plot(g_model, to_file="GAN_TEXT_CUSTOM_g_model.png", show_shapes=True)
+	plot(d_model, to_file="GAN_TEXT_CUSTOM_d_model.png", show_shapes=True)
+	plot(gan_model, to_file="GAN_TEXT_CUSTOM_gan_model.png", show_shapes=True)
+	print "PLOTTED"
+	return g_model, d_model, gan_model
 
 def load_generator(logger):
 	json_file = open("GAN/GAN_log/%s/model_files/generator.json" % logger.name_prefix, 'r')

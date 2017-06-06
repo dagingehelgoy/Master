@@ -187,8 +187,8 @@ def train(gan_logger, resume_training, config):
 			if config[Conf.IMAGE_CAPTION]:
 				noise_image_training_batch = generate_input_noise(config)
 				A = np.repeat(noise_image_training_batch, 4, axis=0)
-				B = np.reshape(A, (64, 4, 50))
-				C = np.reshape(real_image_batch, (64, 1, 50))
+				B = np.reshape(A, (config[Conf.BATCH_SIZE], 4, 50))
+				C = np.reshape(real_image_batch, (config[Conf.BATCH_SIZE], 1, 50))
 				D = np.append(C, B, axis=1)
 				g_loss, g_acc = gan_model.train_on_batch(D, training_batch_y_ones)
 				# g_loss, g_acc = gan_model.train_on_batch([real_image_batch, noise_image_training_batch], training_batch_y_ones)

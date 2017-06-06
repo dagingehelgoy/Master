@@ -342,9 +342,9 @@ def emb_gan_func_only_text(config):
 
 	g_lstm_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.NOISE_SIZE]), name="g_model_lstm_noise_input")
 
-	g_tensor = LSTM(200, return_sequences=True, implementation=2)(g_lstm_input)
+	g_tensor = LSTM(200, return_sequences=True, consume_less='gpu')(g_lstm_input)
 	g_tensor = TimeDistributed(Dense(config[Conf.EMBEDDING_SIZE], activation='tanh'))(g_tensor)
-	g_model = Model(inputs=[g_lstm_input], outputs=g_tensor)
+	g_model = Model(input=[g_lstm_input], output=g_tensor)
 	g_model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 
 	d_sentence_input = Input(shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]), name="d_model_sentence_input")
@@ -355,7 +355,7 @@ def emb_gan_func_only_text(config):
 		200,
 		input_shape=(config[Conf.MAX_SEQ_LENGTH], config[Conf.EMBEDDING_SIZE]),
 		return_sequences=False, dropout_U=0.10, dropout_W=0.10,
-		implementation=2
+		consume_less='gpu'
 	)(d_tensor)
 
 	d_tensor = Dense(1, activation='sigmoid')(d_lstm_out)

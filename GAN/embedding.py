@@ -542,7 +542,7 @@ def img_caption_predict(config, logger):
 	noise_image_training_batch = generate_input_noise(config)
 	A = np.repeat(noise_image_training_batch, 4, axis=0)
 	B = np.reshape(A, (64, 4, 50))
-	C = np.reshape(real_image_batch, (64, 1, 50))
+	C = np.reshape(image_batch, (64, 1, 50))
 	D = np.append(C, B, axis=1)
 
 

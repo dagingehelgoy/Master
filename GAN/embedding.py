@@ -627,10 +627,10 @@ def img_caption_predict(config, logger):
 			# gen_sentence_string = "\n%5.4f\t%s" % (generated_classifications[j], generated_sentence)
 			gen_sentence_string = "\n%s" % generated_sentence
 			prediction_string += gen_sentence_string
-			print gen_sentence_string
+			# print gen_sentence_string
 		# print_progress(i, len(g_weights))
 
-	# print prediction_string
+	print prediction_string
 	from collections import Counter
 	word_count = Counter(prediction_string.split())
 	tuples = []

@@ -20,7 +20,7 @@ config = {
 	Conf.DATE: datetime.datetime.now().date(),
 
 	# Conf.NAME_SUFFIX: None,
-	Conf.NAME_SUFFIX: "all_flowers_and_pca",
+	Conf.NAME_SUFFIX: "three_flowers_all_pca",
 	# Conf.NAME_SUFFIX: "tiny_flower",
 
 	Conf.VOCAB_SIZE: 1000,

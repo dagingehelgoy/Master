@@ -37,15 +37,16 @@ def fetch_custom_embeddings(config):
 
 
 def create_custom_dictionaries(config):
-	# image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
-	# image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
+	image_name_class_tuple_58 = fetch_all_image_names_with_class(class_string='00058')
+	image_name_class_tuple_65 = fetch_all_image_names_with_class(class_string='00065')
+	image_name_class_tuple_25 = fetch_all_image_names_with_class(class_string='00025')
 	# if len(image_name_class_tuple_58) > len(image_name_class_tuple_65):
 	# 	image_name_class_tuple_58 = image_name_class_tuple_58[:len(image_name_class_tuple_65)]
 	# else:
 	# 	image_name_class_tuple_65 = image_name_class_tuple_65[:len(image_name_class_tuple_58)]
 
-	# all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65
-	all_image_name_class_tuples = db_all_filename_class_vector_tuple()
+	all_image_name_class_tuples = image_name_class_tuple_58 + image_name_class_tuple_65 + image_name_class_tuple_25
+	# all_image_name_class_tuples = db_all_filename_class_vector_tuple()
 
 	num_images = len(all_image_name_class_tuples)
 	filename_class_dict = dict(all_image_name_class_tuples)
